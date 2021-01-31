@@ -296,7 +296,8 @@ namespace Kubera.App.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(32, 10)
+                        .HasColumnType("decimal(32,10)");
 
                     b.Property<Guid>("AssetId")
                         .HasColumnType("uniqueidentifier");
@@ -311,7 +312,8 @@ namespace Kubera.App.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("Fee")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(32, 10)
+                        .HasColumnType("decimal(32,10)");
 
                     b.Property<Guid?>("FeeCurrencyId")
                         .HasColumnType("uniqueidentifier");
@@ -320,7 +322,8 @@ namespace Kubera.App.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Rate")
-                        .HasColumnType("decimal(18,2)");
+                        .HasPrecision(32, 10)
+                        .HasColumnType("decimal(32,10)");
 
                     b.Property<string>("Wallet")
                         .HasColumnType("nvarchar(max)");

@@ -29,6 +29,13 @@ namespace Kubera.App.Data
                 b.Property(u => u.FullName).IsRequired(false);
                 b.Property(u => u.Settings).IsRequired(false);
             });
+
+            builder.Entity<Transaction>(b =>
+            {
+                b.Property(t => t.Amount).HasPrecision(32, 10);
+                b.Property(t => t.Rate).HasPrecision(32, 10);
+                b.Property(t => t.Fee).HasPrecision(32, 10);
+            });
         }
     }
 }

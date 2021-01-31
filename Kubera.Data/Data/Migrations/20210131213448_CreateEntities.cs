@@ -98,10 +98,10 @@ namespace Kubera.App.Data.Migrations
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Wallet = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(32,10)", precision: 32, scale: 10, nullable: false),
                     CurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Rate = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Rate = table.Column<decimal>(type: "decimal(32,10)", precision: 32, scale: 10, nullable: false),
+                    Fee = table.Column<decimal>(type: "decimal(32,10)", precision: 32, scale: 10, nullable: true),
                     FeeCurrencyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Deleted = table.Column<bool>(type: "bit", nullable: false)
                 },
