@@ -1,6 +1,6 @@
 ﻿using Kubera.Data.Entities;
+using Kubera.Data.Store;
 using Kubera.General.Repository;
-using Kubera.General.Store;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +9,7 @@ namespace Kubera.Business.Repository
 {
     public class CurrencyRepository : CrudRepository<Currency>, ICurrencyRepository
     {
-        public CurrencyRepository(ICrudStore<Currency> store) 
+        public CurrencyRepository(ICurrencyStore store) 
             : base(store)
         {
         }
