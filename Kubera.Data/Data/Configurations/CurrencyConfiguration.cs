@@ -16,6 +16,13 @@ namespace Kubera.Data.Data.Configurations
             builder.Property(c => c.Symbol).IsRequired().HasMaxLength(Constraints.Length.Currency.Symbol);
             builder.Property(c => c.Order).IsRequired().ValueGeneratedOnAdd();
             builder.Property(c => c.Deleted).IsRequired(false).HasDefaultValue(false);
+
+            builder.HasMany(c => c.Transactions).WithOne(t => t.Currency)
+                .HasForeignKey(c => c.CurrencyId);
+
+            builder.HasMany(c => c.FeeTransactions).WithOne(t => t.FeeCurrency)
+                .HasForeignKey(c => c.FeeCurrencyId)
+                .IsRequired(false);
         }
     }
 }

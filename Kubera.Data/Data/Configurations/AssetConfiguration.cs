@@ -25,6 +25,9 @@ namespace Kubera.Data.Data.Configurations
             builder.HasOne(a => a.Owner).WithMany(au => au.Assets)
                 .HasForeignKey(a => a.OwnerId)
                 .IsRequired(false);
+
+            builder.HasMany(a => a.Transactions).WithOne(t => t.Asset)
+                .HasForeignKey(a => a.AssetId);
         }
     }
 }

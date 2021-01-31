@@ -125,7 +125,7 @@ namespace Kubera.App
             services.AddScoped<ITransactionStore, TransactionStore>();
             services.AddScoped<IUserStore, UserStore>();
 
-            services.AddSingleton<ISeeder, AppSeeder>();
+            services.AddScoped<ISeeder, AppSeeder>();
 
             services.AddAutoMapper(typeof(AppMapper).Assembly);
         }

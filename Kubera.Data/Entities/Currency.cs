@@ -1,5 +1,6 @@
 ﻿using Kubera.General.Entities;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kubera.Data.Entities
 {
@@ -15,8 +16,10 @@ namespace Kubera.Data.Entities
 
         public virtual bool Deleted { get; set; }
 
+        [NotMapped]
         public virtual ICollection<Transaction> Transactions { get; set; }
 
+        [NotMapped]
         public virtual ICollection<Transaction> FeeTransactions { get; set; }
     }
 }
