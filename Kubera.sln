@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.General", "Kubera.Ge
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Data", "Kubera.Data\Kubera.Data.csproj", "{9877A791-D917-4F0A-A271-D075FACDDB49}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14293EF7-36E1-4EFF-8123-F4CA5A9136EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.UnitTest", "tests\Kubera.UnitTest\Kubera.UnitTest.csproj", "{05433C24-33BC-4BDD-9058-5D7B12BE80FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +37,16 @@ Global
 		{9877A791-D917-4F0A-A271-D075FACDDB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9877A791-D917-4F0A-A271-D075FACDDB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9877A791-D917-4F0A-A271-D075FACDDB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{05433C24-33BC-4BDD-9058-5D7B12BE80FD} = {14293EF7-36E1-4EFF-8123-F4CA5A9136EE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05EBE7AE-548C-4A7C-8E26-47A11FC7D853}
