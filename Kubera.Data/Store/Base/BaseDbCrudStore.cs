@@ -20,6 +20,8 @@ namespace Kubera.Data.Store.Base
                 .AddAsync(entity, cancellationToken)
                 .ConfigureAwait(false);
 
+            await SaveChanges(cancellationToken).ConfigureAwait(false);
+            
             return result.Entity;
         }
 
