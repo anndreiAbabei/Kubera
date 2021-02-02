@@ -38,7 +38,7 @@ namespace Kubera.App
 #if DEBUG
             services.AddDatabaseDeveloperPageExceptionFilter();
 #endif
-            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(ConfigureDb);
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -113,6 +113,11 @@ namespace Kubera.App
             MigrateAndSeed(app).ConfigureAwait(false)
                 .GetAwaiter()
                 .GetResult();
+        }
+
+        private void ConfigureDb(DbContextOptionsBuilder builder)
+        {
+            builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         }
 
         private static void ConfigureDI(IServiceCollection services)
