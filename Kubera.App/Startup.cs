@@ -18,6 +18,7 @@ using Kubera.General;
 using Kubera.Business.Seed;
 using AutoMapper;
 using Kubera.App.Mapper;
+using System;
 
 namespace Kubera.App
 {
@@ -35,7 +36,7 @@ namespace Kubera.App
 #if DEBUG
             services.AddDatabaseDeveloperPageExceptionFilter();
 #endif
-            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(ConfigureDb);
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -106,6 +107,11 @@ namespace Kubera.App
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+        }
+
+        private void ConfigureDb(DbContextOptionsBuilder builder)
+        {
+            builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         }
 
         private static void ConfigureDI(IServiceCollection services)
