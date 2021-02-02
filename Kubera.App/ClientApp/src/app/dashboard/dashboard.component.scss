@@ -1,0 +1,37 @@
+.main {
+  display: grid;
+  height: calc(100vh - 5rem);
+  grid-template-rows: auto 1fr 1fr auto;
+  grid-template-columns: 1.5fr 1fr;
+  grid-gap: 1em;
+  grid-template-areas: 'filter filter' 'transactions assets' 'transactions groups' 'footer footer ';
+
+  @media only screen and (max-width: 768px) {
+    height: calc(100vh - 5rem);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr 1fr 2fr auto;
+    grid-template-areas: 'filter' 'assets' 'groups' 'transactions' 'footer';
+  }
+
+  .filter {
+    grid-area: filter;
+  }
+
+  .transactions {
+    grid-area: transactions;
+  }
+
+  .assets {
+    grid-area: assets;
+  }
+
+  .groups {
+    grid-area: groups
+  }
+
+  .footer {
+    grid-area: footer;
+    box-shadow: 0rem 0.65rem 0.75rem 1.5em rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}

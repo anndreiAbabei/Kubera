@@ -34,8 +34,12 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<GroupModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GroupModel>>> GetGroups()
         {
-            var groups = await _groupRepository.GetAll()
-                .ToListAsync(HttpContext.RequestAborted)
+            var ct = HttpContext.RequestAborted;
+            var query = await _groupRepository.GetAll(cancellationToken: ct)
+                .ConfigureAwait(false);
+
+            var groups = await query
+                .ToListAsync(ct)
                 .ConfigureAwait(false);
 
             return Ok(groups.Select(_mapper.Map<Group, GroupModel>));

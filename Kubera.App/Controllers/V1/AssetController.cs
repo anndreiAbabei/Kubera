@@ -34,11 +34,15 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<AssetModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<AssetModel>>> GetAssets()
         {
-            var currencies = await _assetRepository.GetAll()
-                .ToListAsync(HttpContext.RequestAborted)
+            var ct = HttpContext.RequestAborted;
+            var query = await _assetRepository.GetAll(Paging.All, cancellationToken: ct)
                 .ConfigureAwait(false);
 
-            return Ok(currencies.Select(_mapper.Map<Asset, AssetModel>));
+            var asstes = await query
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+
+            return Ok(asstes.Select(_mapper.Map<Asset, AssetModel>));
         }
 
         /// <summary>

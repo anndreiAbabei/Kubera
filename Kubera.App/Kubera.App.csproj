@@ -29,6 +29,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
   </ItemGroup>
 
@@ -40,9 +44,39 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\models\endpoints.model.ts" />
+    <None Remove="ClientApp\src\models\filtering.model.ts" />
+    <None Remove="ClientApp\src\models\transactions-response.model.ts" />
+    <None Remove="ClientApp\src\models\transactions.model.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Remove="ClientApp\src\services\http-utils.service.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Kubera.Business\Kubera.Business.csproj" />
     <ProjectReference Include="..\Kubera.Data\Kubera.Data.csproj" />
     <ProjectReference Include="..\Kubera.General\Kubera.General.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\NewFolder\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\src\models\filtering - Copy.model.js">
+      <DependentUpon>filtering.model.js</DependentUpon>
+    </None>
+    <None Update="ClientApp\src\models\filtering - Copy.model.js.map">
+      <DependentUpon>filtering.model.js.map</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Update="ClientApp\src\models\endpoints.model.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

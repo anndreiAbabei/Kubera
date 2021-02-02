@@ -1,5 +1,6 @@
 ﻿using Kubera.Data.Entities;
 using Kubera.Data.Store;
+using Kubera.General.Models;
 using Kubera.General.Repository;
 using Kubera.General.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,25 +22,32 @@ namespace Kubera.Business.Repository
 
         public async ValueTask<bool> Exists(Asset asset, CancellationToken cancellationToken = default)
         {
-            return await GetAll()
-                .AnyAsync(g => g.Id != asset.Id &&
-                               (g.OwnerId == null || g.OwnerId == asset.OwnerId) &&
-                               (g.Code == asset.Code || g.Name == asset.Name),
-                         cancellationToken)
+            var query = await GetAll(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return await query.AnyAsync(g => g.Id != asset.Id &&
+                                             (g.OwnerId == null || g.OwnerId == asset.OwnerId) &&
+                                             (g.Code == asset.Code || g.Name == asset.Name),
+                                     cancellationToken)
                 .ConfigureAwait(false);
         }
 
         public async ValueTask<Asset> GetByCode(string code, CancellationToken cancellationToken = default)
         {
-            return await GetAll().FirstOrDefaultAsync(a => a.Code == code, cancellationToken)
+            var query = await GetAll(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return await query.FirstOrDefaultAsync(a => a.Code == code, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public override IQueryable<Asset> GetAll()
+        public override async ValueTask<IQueryable<Asset>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
         {
             var user = _userIdAccesor.Id;
+            var query = await base.GetAll(paging, dateFilter, cancellationToken)
+                .ConfigureAwait(false);
 
-            return base.GetAll().Where(a => a.OwnerId == null || a.OwnerId == user);
+            return query.Where(a => a.OwnerId == user);
         }
     }
 

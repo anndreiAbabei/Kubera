@@ -32,8 +32,12 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<CurrencyModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<CurrencyModel>>> GetCurrencies()
         {
-            var currencies = await _currencyRepository.GetAll()
-                .ToListAsync()
+            var ct = HttpContext.RequestAborted;
+            var query = await _currencyRepository.GetAll(cancellationToken: ct)
+                .ConfigureAwait(false);
+
+            var currencies = await query
+                .ToListAsync(ct)
                 .ConfigureAwait(false);
 
             return Ok(currencies.Select(_mapper.Map<Currency, CurrencyModel>));

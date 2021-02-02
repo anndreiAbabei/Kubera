@@ -11,13 +11,21 @@ import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.
 import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { HomeComponent } from './home/home.component';
+import { DashboardAssetsComponent } from './dashboard/dashboard-assets/dashboard-assets.component';
+import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard-filter.component';
+import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
+import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     DashboardComponent,
-    HomeComponent
+    HomeComponent,
+    DashboardAssetsComponent,
+    DashboardFilterComponent,
+    DashboardGroupsComponent,
+    DashboardTransactionsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),

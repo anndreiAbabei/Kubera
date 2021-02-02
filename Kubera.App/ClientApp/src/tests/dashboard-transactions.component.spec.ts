@@ -1,21 +1,21 @@
-﻿/// <reference path="../../../../node_modules/@types/jasmine/index.d.ts" />
+/// <reference path="../../node_modules/@types/jasmine/index.d.ts" />
 import { TestBed, async, ComponentFixture, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { BrowserModule, By } from "@angular/platform-browser";
-import { HomeComponent } from './home.component';
+import { DashboardTransactionsComponent } from '../app/dashboard/dashboard-transactions/dashboard-transactions.component';
 
-let component: HomeComponent;
-let fixture: ComponentFixture<HomeComponent>;
+let component: DashboardTransactionsComponent;
+let fixture: ComponentFixture<DashboardTransactionsComponent>;
 
-describe('home component', () => {
+describe('dashboard-transactions component', () => {
     beforeEach(async(() => {
         TestBed.configureTestingModule({
-            declarations: [ HomeComponent ],
+            declarations: [ DashboardTransactionsComponent ],
             imports: [ BrowserModule ],
             providers: [
                 { provide: ComponentFixtureAutoDetect, useValue: true }
             ]
         });
-        fixture = TestBed.createComponent(HomeComponent);
+        fixture = TestBed.createComponent(DashboardTransactionsComponent);
         component = fixture.componentInstance;
     }));
 

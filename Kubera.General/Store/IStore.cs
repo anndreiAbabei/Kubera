@@ -1,4 +1,5 @@
 ﻿using Kubera.General.Entities;
+using Kubera.General.Models;
 using System;
 using System.Linq;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace Kubera.General.Store
     public interface IStore<TEntity, TKey> : ISingleEntityStore<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
-        IQueryable<TEntity> GetAll();
+        ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default);
     }
 
     public interface IStore<TEntity> : IStore<TEntity, Guid>, ISingleEntityStore<TEntity>

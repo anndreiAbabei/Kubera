@@ -1,20 +1,20 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { SettingsService } from '../../services/settings.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
 
-  public test: string;
+  public appName: string;
 
-  constructor(private readonly httpClient: HttpClient) {
+  constructor(private readonly settingService: SettingsService) {
 
   }
 
   ngOnInit(): void {
-    this.httpClient.get("/api/v1/asset")
-      .subscribe(a => this.test = JSON.stringify(a));
+    this.appName = this.settingService.fullAppName;
   }
 }

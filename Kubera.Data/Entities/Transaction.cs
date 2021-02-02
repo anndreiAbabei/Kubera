@@ -3,7 +3,7 @@ using System;
 
 namespace Kubera.Data.Entities
 {
-    public class Transaction : Entity, ISoftDeletable
+    public class Transaction : Entity, ISoftDeletable, IDateEntity
     {
         public virtual Guid AssetId { get; set; }
 

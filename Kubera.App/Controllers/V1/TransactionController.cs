@@ -11,6 +11,7 @@ using Kubera.Business.Repository;
 using Kubera.Data.Entities;
 using Kubera.General.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Kubera.App.Infrastructure.Extensions;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -32,11 +33,19 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of logged user groups</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TransactionModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions()
+        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter)
         {
-            var transactions = await _transactionRepository.GetAll()
-                .ToListAsync(HttpContext.RequestAborted)
+            paging ??= new Paging();
+
+            var ct = HttpContext.RequestAborted;
+
+            var query = await _transactionRepository.GetAll(paging, filter, ct)
                 .ConfigureAwait(false);
+
+            var transactions = await query.ToListAsync(ct)
+                .ConfigureAwait(false);
+
+            HttpContext.AddPaging(paging.Result);
 
             return Ok(transactions.Select(_mapper.Map<Transaction, TransactionModel>));
         }

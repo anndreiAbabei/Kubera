@@ -16,7 +16,10 @@ namespace Kubera.Business.Repository
 
         public async ValueTask<Currency> GetByCode(string code, CancellationToken cancellationToken = default)
         {
-            return await GetAll().FirstOrDefaultAsync(c => c.Code == code, cancellationToken)
+            var query = await GetAll(cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+
+            return await query.FirstOrDefaultAsync(c => c.Code == code, cancellationToken)
                 .ConfigureAwait(false);
         }
     }
