@@ -42,7 +42,8 @@ namespace Kubera.App.Controllers.V1
             var query = await _transactionRepository.GetAll(paging, filter, ct)
                 .ConfigureAwait(false);
 
-            var transactions = await query.ToListAsync(ct)
+            var transactions = await query.OrderByDescending(t => t.CreatedAt)
+                .ToListAsync(ct)
                 .ConfigureAwait(false);
 
             HttpContext.AddPaging(paging.Result);

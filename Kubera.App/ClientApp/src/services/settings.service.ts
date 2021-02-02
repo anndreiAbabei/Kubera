@@ -7,5 +7,5 @@ import { Endpoints } from '../models/endpoints.model';
 export class SettingsService {
   public appName = 'Loot';
   public fullAppName = 'Loot - App';
-  public endpoints: Endpoints;
+  public endpoints = new Endpoints();
 }

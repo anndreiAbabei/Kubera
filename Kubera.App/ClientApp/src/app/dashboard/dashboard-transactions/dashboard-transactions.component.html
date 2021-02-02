@@ -1,1 +1,45 @@
-﻿<div style="border: 1px solid red">dashboard-transactions Component</div>
+<div>
+  <div class="action">
+    <button class="btn btn-primary" [disabled]="loading" (click)="addTransaction()">Add transaction</button>
+  </div>
+  <h3 *ngIf="!loading && (!transactions || transactions.length === 0)">
+    No available transaction, you can always add one :)
+  </h3>
+  <table class="table" *ngIf="loading || (transactions && transactions.length > 0) ">
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Group</th>
+        <th scope="col">Asset</th>
+        <th scope="col">Wallet</th>
+        <th scope="col">Ammount bought</th>
+        <th scope="col">Paid</th>
+        <th scope="col">Rate</th>
+        <th scope="col">Action</th>
+        <th scope="col">Fee</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr scope="row" *ngFor="let transaction in transactions">
+        <td>{{transaction.createdAt}}</td>
+        <td>{{transaction.group}}</td>
+        <td>{{transaction.asset}}</td>
+        <td>{{transaction.wallet}}</td>
+        <td>{{transaction.amount}}</td>
+        <td>{{transaction.rate * transaction.amount}} {{transaction.currency}}</td>
+        <td>{{transaction.rate}}</td>
+        <td>{{transaction.action}}</td>
+        <td>{{transaction.fee}} {{transaction.feeCurrency}}<</td>
+        <td><a href="$" class="btn" (click)="removeTransaction(transaction)">&times;</a></td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <button class="btn btn-outline"
+            (click)="loadMore()"
+            [disabled]="!canLoadMore || loading">
+      Load more
+    </button>
+  </div>
+</div>

@@ -18,7 +18,7 @@ export class TransactionsService {
   }
 
   public getAll(paging?: Paging, filter?: DateFilter): Observable<TransactionsResponse> {
-    const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.transactions, paging, filter);
+    const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.get.transactions, paging, filter);
 
     const page: number = paging ? paging.page : undefined;
     const items: number = paging ? paging.items : undefined;
@@ -33,5 +33,9 @@ export class TransactionsService {
           transactions: r.body
         } as TransactionsResponse;
       }));
+  }
+
+  public delete(transactionId: string): Observable<Object> {
+    return this.httpClient.delete(this.settingsService.endpoints.delete.transaction + '/' + transactionId);
   }
 }

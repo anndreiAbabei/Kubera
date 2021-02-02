@@ -40,7 +40,7 @@ namespace Kubera.Data.Store.Base
                 var total = await query.CountAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                query = query.Skip((int)(paging.Page * paging.Items))
+                query = query.Skip((int)((paging.Page + 1) * paging.Items))
                             .Take((int)paging.Items);
 
                 paging.Result = new PagingResult((int)Math.Ceiling((float)total / paging.Items));
