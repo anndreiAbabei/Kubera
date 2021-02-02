@@ -6,7 +6,7 @@ namespace Kubera.App.Infrastructure
 
     [Authorize]
     [ApiController]
-    [Route("api/{v:apiVersion}/[controller]")]
+    [Route("api/v{v:apiVersion}/[controller]")]
     public class BaseController : ControllerBase
     {
     }

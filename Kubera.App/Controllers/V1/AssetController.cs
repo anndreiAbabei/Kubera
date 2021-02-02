@@ -19,7 +19,6 @@ namespace Kubera.App.Controllers.V1
     public class AssetController : BaseController
     {
         private readonly IAssetRepository _assetRepository;
-        private readonly IUserIdAccesor _userIdAccesor;
         private readonly IMapper _mapper;
 
         public AssetController(IAssetRepository assetRepository, IMapper mapper)

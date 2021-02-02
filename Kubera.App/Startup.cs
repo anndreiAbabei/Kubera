@@ -18,6 +18,9 @@ using Kubera.General;
 using Kubera.Business.Seed;
 using AutoMapper;
 using Kubera.App.Mapper;
+using System;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Kubera.App
 {
@@ -106,6 +109,10 @@ namespace Kubera.App
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+            MigrateAndSeed(app).ConfigureAwait(false)
+                .GetAwaiter()
+                .GetResult();
         }
 
         private static void ConfigureDI(IServiceCollection services)
@@ -128,6 +135,19 @@ namespace Kubera.App
             services.AddScoped<ISeeder, AppSeeder>();
 
             services.AddAutoMapper(typeof(AppMapper).Assembly);
+        }
+
+        private static async ValueTask MigrateAndSeed(IApplicationBuilder app, CancellationToken cancellationToken = default)
+        {
+            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+            var seeder = serviceScope.ServiceProvider.GetService<ISeeder>();
+
+            await context.Database.MigrateAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            await seeder.Seed(cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }
