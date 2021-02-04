@@ -3,7 +3,7 @@ import { Currency } from './currency.model';
 import { Group } from './group.model';
 
 export class TransactionsResponse {
-  totalPages: number;
+  totalItems: number;
   currentPage: number;
   itemsPerPage: number;
 
@@ -25,4 +25,18 @@ export class Transaction {
   group: Group;
   asset: Asset;
   feeCurrency: Currency;
+
+  get totalFormated(): string{
+    return `${this.rate * this.amount} ${this.currency.symbol}`;
+  }
+
+  get feeFormated(): string {
+     return this.fee
+        ? `${this.fee} ${this.currency.symbol}`
+        : `${0.00} ${this.currency.symbol}`;
+  }
+
+  get action(): string {
+    return this.amount < 0 ? 'SOLD' : 'BOUGHT';
+  }
 }

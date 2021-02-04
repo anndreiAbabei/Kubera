@@ -17,7 +17,7 @@ namespace Kubera.App.Infrastructure.Extensions
             if (pagingResult == null)
                 throw new ArgumentNullException(nameof(pagingResult));
 
-            httpContext.Response.Headers.Add(HeaderNumberOfPagesName, pagingResult.TotalPages.ToString(CultureInfo.InvariantCulture));
+            httpContext.Response.Headers.Add(HeaderNumberOfPagesName, pagingResult.TotalItems.ToString(CultureInfo.InvariantCulture));
         }
     }
 }

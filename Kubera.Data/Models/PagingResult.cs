@@ -4,11 +4,11 @@ namespace Kubera.Data.Models
 {
     internal sealed class PagingResult : IPagingResult
     {
-        public uint TotalPages { get; }
+        public uint TotalItems { get; }
 
-        internal PagingResult(int totalPages)
+        internal PagingResult(int totalItems)
         {
-            TotalPages = (uint)totalPages;
+            TotalItems = (uint)totalItems;
         }
     }
 }

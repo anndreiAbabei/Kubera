@@ -13,6 +13,7 @@ using Kubera.General.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Kubera.App.Infrastructure.Extensions;
 using Kubera.Data.Extensions;
+using Kubera.General.Models;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -44,17 +45,21 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of logged user groups</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TransactionModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter)
+        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
         {
             paging ??= new Paging();
+            order ??= Order.Descending;
 
             var ct = HttpContext.RequestAborted;
 
             var query = await _transactionRepository.GetAll(paging, filter, ct)
                 .ConfigureAwait(false);
 
-            var transactions = await query.OrderByDescending(t => t.CreatedAt)
-                .ToListAsync(ct)
+            query = order.Value == Order.Descending
+                        ? query.OrderByDescending(t => t.CreatedAt)
+                        : query.OrderBy(t => t.CreatedAt);
+
+            var transactions = await query.ToListAsync(ct)
                 .ConfigureAwait(false);
             var currencies = await _currencyRepository.GetAll(cancellationToken: ct)
                 .ToListAsync(ct)

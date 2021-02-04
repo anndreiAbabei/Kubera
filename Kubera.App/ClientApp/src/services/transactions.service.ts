@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Paging, DateFilter } from '../models/filtering.model';
+import { Paging, DateFilter, Order } from '../models/filtering.model';
 import { Transaction, TransactionsResponse } from '../models/transactions.model';
 import { HttpUtilsService } from './http-utils.service';
 import { SettingsService } from './settings.service';
@@ -17,8 +17,8 @@ export class TransactionsService {
 
   }
 
-  public getAll(paging?: Paging, filter?: DateFilter): Observable<TransactionsResponse> {
-    const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.get.transactions, paging, filter);
+  public getAll(paging?: Paging, ascending?: Order, filter?: DateFilter): Observable<TransactionsResponse> {
+    const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.get.transactions, paging, ascending, filter);
 
     const page: number = paging ? paging.page : undefined;
     const items: number = paging ? paging.items : undefined;
@@ -29,7 +29,7 @@ export class TransactionsService {
         return {
           currentPage: page,
           itemsPerPage: items,
-          totalPages: this.httpUtilsService.getTotalPagesFromHeader(r.headers),
+          totalItems: this.httpUtilsService.getTotalPagesFromHeader(r.headers),
           transactions: r.body
         } as TransactionsResponse;
       }));

@@ -1,7 +1,23 @@
-﻿.no-item, .loading {
+﻿.no-item {
     text-align: center;
+    color: gray;
 }
 
-.loading {
-    margin-top: 4em;
+.root > div {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  grid-template-columns: 1fr;
+  grid-template-areas: 'table' 'pagination';
+}
+
+.no-results {
+  position: relative;
+}
+
+.table {
+  grid-area: table;
+}
+
+.paginator {
+  grid-area: paginator;
 }

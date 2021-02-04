@@ -2,6 +2,6 @@
 {
     public interface IPagingResult
     {
-        uint TotalPages { get; }
+        uint TotalItems { get; }
     }
 }
