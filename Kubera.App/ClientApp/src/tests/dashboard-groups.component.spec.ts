@@ -1,5 +1,5 @@
 /// <reference path="../../node_modules/@types/jasmine/index.d.ts" />
-import { TestBed, async, ComponentFixture, ComponentFixtureAutoDetect } from '@angular/core/testing';
+import { TestBed, ComponentFixture, ComponentFixtureAutoDetect, waitForAsync } from '@angular/core/testing';
 import { BrowserModule, By } from "@angular/platform-browser";
 import { DashboardGroupsComponent } from '../app/dashboard/dashboard-groups/dashboard-groups.component';
 
@@ -7,7 +7,7 @@ let component: DashboardGroupsComponent;
 let fixture: ComponentFixture<DashboardGroupsComponent>;
 
 describe('dashboard-groups component', () => {
-    beforeEach(async(() => {
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [ DashboardGroupsComponent ],
             imports: [ BrowserModule ],
@@ -19,7 +19,7 @@ describe('dashboard-groups component', () => {
         component = fixture.componentInstance;
     }));
 
-    it('should do something', async(() => {
+    it('should do something', waitForAsync(() => {
         expect(true).toEqual(true);
     }));
 });

@@ -39,9 +39,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     ApiAuthorizationModule,
     NgbModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent },
-      { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },
-    ])
+    { path: '', component: HomeComponent },
+    { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },
+], { relativeLinkResolution: 'legacy' })
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }
