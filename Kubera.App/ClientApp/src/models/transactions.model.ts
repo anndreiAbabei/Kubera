@@ -1,3 +1,7 @@
+import { Asset } from './asset.model';
+import { Currency } from './currency.model';
+import { Group } from './group.model';
+
 export class TransactionsResponse {
   totalPages: number;
   currentPage: number;
@@ -16,4 +20,9 @@ export class Transaction {
   rate: number;
   fee?: number;
   feeCurrencyId?: string;
+
+  currency: Currency;
+  group: Group;
+  asset: Asset;
+  feeCurrency: Currency;
 }

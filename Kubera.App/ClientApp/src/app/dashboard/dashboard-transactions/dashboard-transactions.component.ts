@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Paging } from '../../../models/filtering.model';
 import { Transaction } from '../../../models/transactions.model';
 import { TransactionsService } from '../../../services/transactions.service';
+import { DashboardCreateTransactionComponent } from '../dashboard-create-transaction/dashboard-create-transaction.component';
 
 @Component({
     selector: 'app-dashboard-transactions',
@@ -14,7 +16,8 @@ export class DashboardTransactionsComponent implements OnInit {
   public transactions: Transaction[];
   public page: Paging;
 
-  constructor(private readonly transactionService: TransactionsService) {
+  constructor(private readonly transactionService: TransactionsService,
+    private readonly modalService: NgbModal) {
     this.page = {
       page: 0,
       items: 10
@@ -26,19 +29,22 @@ export class DashboardTransactionsComponent implements OnInit {
   }
 
   public loadMore(increasePage?: boolean): void {
-    if (this.loading || !this.canLoadMore)
+    if (this.loading || !this.canLoadMore) {
       return;
+    }
 
     this.loading = true;
-    if (increasePage)
+    if (increasePage) {
       this.page.page++;
+    }
 
     this.transactionService.getAll(this.page)
       .subscribe(r => {
-        if (!this.transactions)
+        if (!this.transactions) {
           this.transactions = r.transactions;
-        else
+        } else {
           this.transactions = this.transactions.concat(r.transactions);
+        }
 
         this.canLoadMore = r.totalPages > this.page.page;
         this.loading = false;
@@ -46,19 +52,23 @@ export class DashboardTransactionsComponent implements OnInit {
   }
 
   public addTransaction(): void {
-    if (this.loading)
+    if (this.loading) {
       return;
+    }
 
+    this.modalService.open(DashboardCreateTransactionComponent);
   }
 
   public removeTransaction(transaction: Transaction): void {
-    if (this.loading || !transaction)
+    if (this.loading || !transaction) {
       return;
+    }
 
     const answer = confirm('Are you sure you want to remove transaction [' + transaction.id + ']?');
 
-    if (!answer)
+    if (!answer) {
       return;
+    }
 
     this.loading = true;
     this.transactionService.delete(transaction.id)

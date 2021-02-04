@@ -21,5 +21,13 @@ namespace Kubera.App.Models
         public virtual decimal? Fee { get; set; }
 
         public virtual Guid? FeeCurrencyId { get; set; }
+
+        public virtual AssetModel Asset { get; set; }
+
+        public virtual GroupModel Group => Asset.Group;
+
+        public virtual CurrencyModel Currency { get; set; }
+
+        public virtual CurrencyModel FeeCurrency { get; set; }
     }
 }

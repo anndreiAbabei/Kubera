@@ -5,7 +5,7 @@ export class EndpointsGet {
 }
 
 export class EndpointsDelete {
-  transaction = `${this.base}/transaction`;
+  transaction = `${this.base}/transaction`; 
 
   constructor(private base: string) { }
 }

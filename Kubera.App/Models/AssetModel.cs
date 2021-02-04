@@ -9,5 +9,7 @@ namespace Kubera.App.Models
         public virtual Guid GroupId { get; set; }
 
         public virtual string Icon { get; set; }
+
+        public virtual GroupModel Group { get; set; }
     }
 }

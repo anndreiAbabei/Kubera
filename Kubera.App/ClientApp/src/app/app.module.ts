@@ -15,6 +15,9 @@ import { DashboardAssetsComponent } from './dashboard/dashboard-assets/dashboard
 import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard-filter.component';
 import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
 import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
+import { LoadingComponent } from './shared/loading/loading.component';
+import { DashboardCreateTransactionComponent } from './dashboard/dashboard-create-transaction/dashboard-create-transaction.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -25,13 +28,16 @@ import { DashboardTransactionsComponent } from './dashboard/dashboard-transactio
     DashboardAssetsComponent,
     DashboardFilterComponent,
     DashboardGroupsComponent,
-    DashboardTransactionsComponent
+    DashboardTransactionsComponent,
+    DashboardCreateTransactionComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
     ApiAuthorizationModule,
+    NgbModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },

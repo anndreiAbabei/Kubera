@@ -12,6 +12,7 @@ using Kubera.Data.Entities;
 using Kubera.General.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Kubera.App.Infrastructure.Extensions;
+using Kubera.Data.Extensions;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -19,11 +20,21 @@ namespace Kubera.App.Controllers.V1
     public class TransactionController : BaseController
     {
         private readonly ITransactionRepository _transactionRepository;
+        private readonly IAssetRepository _assetRepository;
+        private readonly IGroupRepository _groupRepository;
+        private readonly ICurrencyRepository _currencyRepository;
         private readonly IMapper _mapper;
 
-        public TransactionController(ITransactionRepository transactionRepository, IMapper mapper)
+        public TransactionController(ITransactionRepository transactionRepository, 
+                                     IAssetRepository assetRepository,
+                                     IGroupRepository groupRepository,
+                                     ICurrencyRepository currencyRepository,
+                                     IMapper mapper)
         {
             _transactionRepository = transactionRepository;
+            _assetRepository = assetRepository;
+            _groupRepository = groupRepository;
+            _currencyRepository = currencyRepository;
             _mapper = mapper;
         }
 
@@ -45,10 +56,41 @@ namespace Kubera.App.Controllers.V1
             var transactions = await query.OrderByDescending(t => t.CreatedAt)
                 .ToListAsync(ct)
                 .ConfigureAwait(false);
+            var currencies = await _currencyRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+            var assets = await _assetRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+            var groups = await _groupRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+
 
             HttpContext.AddPaging(paging.Result);
 
-            return Ok(transactions.Select(_mapper.Map<Transaction, TransactionModel>));
+            var models = transactions.Select(_mapper.Map<Transaction, TransactionModel>).ToList();
+
+            foreach (var model in models)
+            {
+                if (currencies.Found(model.CurrencyId, out var currency))
+                    model.Currency = _mapper.Map<Currency, CurrencyModel>(currency);
+
+                if (assets.Found(model.AssetId, out var asset))
+                {
+                    model.Asset = _mapper.Map<Asset, AssetModel>(asset);
+
+
+                    if (groups.Found(asset.GroupId, out var group))
+                        model.Asset.Group = _mapper.Map<Group, GroupModel>(group);
+                }
+
+                if (model.FeeCurrencyId.HasValue && currencies.Found(model.FeeCurrencyId.Value, out var feeCurrency))
+                    model.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
+            }
+
+
+            return Ok(models);
         }
 
         /// <summary>
