@@ -32,15 +32,22 @@ namespace Kubera.Data.Store.Base
                 query = ApplicationDbContext.Set<TEntity>();
 
             if (dateFilter != null && typeof(TEntity).Implements<IDateEntity>())
-                query = ApplicationDbContext.Set<TEntity>()
-                    .Where(e => ((IDateEntity)e).CreatedAt >= dateFilter.From && ((IDateEntity)e).CreatedAt <= dateFilter.To);
+            {
+                if(dateFilter.From.HasValue)
+                    query = ApplicationDbContext.Set<TEntity>()
+                        .Where(e => ((IDateEntity)e).CreatedAt >= dateFilter.From.Value);
+
+                if (dateFilter.To.HasValue)
+                    query = ApplicationDbContext.Set<TEntity>()
+                        .Where(e => ((IDateEntity)e).CreatedAt >= dateFilter.To.Value);
+            }
 
             if(paging != null)
             {
                 var total = await query.CountAsync(cancellationToken)
                     .ConfigureAwait(false);
 
-                query = query.Skip((int)((paging.Page + 1) * paging.Items))
+                query = query.Skip((int)(paging.Page * paging.Items))
                             .Take((int)paging.Items);
 
                 paging.Result = new PagingResult(total);

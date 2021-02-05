@@ -35,7 +35,7 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<IEnumerable<AssetModel>>> GetAssets()
         {
             var ct = HttpContext.RequestAborted;
-            var query = await _assetRepository.GetAll(Paging.All, cancellationToken: ct)
+            var query = await _assetRepository.GetAll(cancellationToken: ct)
                 .ConfigureAwait(false);
 
             var asstes = await query

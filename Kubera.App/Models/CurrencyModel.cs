@@ -1,7 +1,11 @@
-﻿namespace Kubera.App.Models
+﻿using System;
+
+namespace Kubera.App.Models
 {
     public class CurrencyModel
     {
+        public virtual Guid Id { get; set; }
+
         public virtual string Code { get; set; }
 
         public virtual string Name { get; set; }

@@ -24,7 +24,7 @@ namespace Kubera.App.Models
 
         public virtual AssetModel Asset { get; set; }
 
-        public virtual GroupModel Group => Asset.Group;
+        public virtual GroupModel Group => Asset?.Group;
 
         public virtual CurrencyModel Currency { get; set; }
 

@@ -18,7 +18,7 @@ export class DashboardTransactionsComponent implements AfterViewInit {
   public resultsLength = 0;
   public isLoadingResults = true;
   public noResult = false;
-  public displayedColumns: string[] = ['createdAt', 'group', 'asset', 'wallet', 'amount', 'rate', 'totalFormated', 'action', 'feeFormated'];
+  public displayedColumns: string[] = ['createdAt', 'group', 'asset', 'wallet', 'action', 'amount', 'rate', 'totalFormated', 'feeFormated'];
   public canLoadMore = true;
   public transactions: Transaction[];
   public page: Paging;
@@ -51,6 +51,14 @@ export class DashboardTransactionsComponent implements AfterViewInit {
         this.noResult = data.transactions.length === 0;
         this.resultsLength = data.totalItems;
 
+        data.transactions.forEach(t => {
+          t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
+          t.feeFormated = t.fee
+                            ? `${t.fee} ${t.feeCurrency?.symbol}`
+                            : `${0.00} ${t.currency?.symbol}`;
+          t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+        });
+
         return data.transactions;
       }),
       catchError(() => {
@@ -66,8 +74,13 @@ export class DashboardTransactionsComponent implements AfterViewInit {
       return;
     }
 
-    this.modalService.open(DashboardCreateTransactionComponent);
-  }
+    this.modalService.open(DashboardCreateTransactionComponent)
+      .result.then(p => {
+        if (p) {
+          this.transactions.push(p);
+        }
+      });
+    }
 
   public removeTransaction(transaction: Transaction): void {
     if (this.isLoadingResults || !transaction) {
@@ -86,5 +99,9 @@ export class DashboardTransactionsComponent implements AfterViewInit {
         this.transactions = this.transactions.filter(t => t.id !== transaction.id);
         this.isLoadingResults = false;
       });
+  }
+
+  public formatTotal(transaction: Transaction): string {
+    return transaction.totalFormated;
   }
 }

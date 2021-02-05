@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Kubera.App.Infrastructure.Extensions;
 using Kubera.Data.Extensions;
 using Kubera.General.Models;
+using Kubera.General.Services;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -25,18 +26,21 @@ namespace Kubera.App.Controllers.V1
         private readonly IGroupRepository _groupRepository;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IMapper _mapper;
+        private readonly IUserIdAccesor _userIdAccesor;
 
         public TransactionController(ITransactionRepository transactionRepository, 
                                      IAssetRepository assetRepository,
                                      IGroupRepository groupRepository,
                                      ICurrencyRepository currencyRepository,
-                                     IMapper mapper)
+                                     IMapper mapper,
+                                     IUserIdAccesor userIdAccesor)
         {
             _transactionRepository = transactionRepository;
             _assetRepository = assetRepository;
             _groupRepository = groupRepository;
             _currencyRepository = currencyRepository;
             _mapper = mapper;
+            _userIdAccesor = userIdAccesor;
         }
 
         /// <summary>
@@ -52,7 +56,7 @@ namespace Kubera.App.Controllers.V1
 
             var ct = HttpContext.RequestAborted;
 
-            var query = await _transactionRepository.GetAll(paging, filter, ct)
+             var query = await _transactionRepository.GetAll(paging, filter, ct)
                 .ConfigureAwait(false);
 
             query = order.Value == Order.Descending
@@ -138,13 +142,13 @@ namespace Kubera.App.Controllers.V1
             {
                 AssetId = model.AssetId,
                 Wallet = model.Wallet,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = model.CreatedAt,
                 Amount = model.Amount,
                 CurrencyId = model.CurrencyId,
                 Rate = model.Rate,
                 Fee = model.Fee,
                 FeeCurrencyId = model.FeeCurrencyId,
-                OwnerId = User.Identity.Name
+                OwnerId = _userIdAccesor.Id
             };
 
             transaction = await _transactionRepository.Add(transaction, ct)

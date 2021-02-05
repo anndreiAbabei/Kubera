@@ -66,6 +66,7 @@ import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard
 import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
 import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
 import { DashboardCreateTransactionComponent } from './dashboard/dashboard-create-transaction/dashboard-create-transaction.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -91,6 +92,14 @@ import { DashboardCreateTransactionComponent } from './dashboard/dashboard-creat
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
+    MatProgressBarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCheckboxModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },
@@ -117,6 +126,7 @@ import { DashboardCreateTransactionComponent } from './dashboard/dashboard-creat
     MatDialogModule,
     MatDividerModule,
     MatExpansionModule,
+    MatFormFieldModule,
     MatGridListModule,
     MatIconModule,
     MatInputModule,

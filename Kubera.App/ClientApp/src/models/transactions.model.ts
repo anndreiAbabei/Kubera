@@ -26,17 +26,7 @@ export class Transaction {
   asset: Asset;
   feeCurrency: Currency;
 
-  get totalFormated(): string{
-    return `${this.rate * this.amount} ${this.currency.symbol}`;
-  }
-
-  get feeFormated(): string {
-     return this.fee
-        ? `${this.fee} ${this.currency.symbol}`
-        : `${0.00} ${this.currency.symbol}`;
-  }
-
-  get action(): string {
-    return this.amount < 0 ? 'SOLD' : 'BOUGHT';
-  }
+  totalFormated: string;
+  feeFormated: string;
+  action: string;
 }

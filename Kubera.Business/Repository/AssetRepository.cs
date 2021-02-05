@@ -47,7 +47,7 @@ namespace Kubera.Business.Repository
             var query = await base.GetAll(paging, dateFilter, cancellationToken)
                 .ConfigureAwait(false);
 
-            return query.Where(a => a.OwnerId == user);
+            return query.Where(a => string.IsNullOrEmpty(a.OwnerId) || a.OwnerId == user);
         }
     }
 
