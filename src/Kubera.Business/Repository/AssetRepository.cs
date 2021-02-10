@@ -14,8 +14,11 @@ namespace Kubera.Business.Repository
     {
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public AssetRepository(IAssetStore store, ICacheService cacheService, IUserIdAccesor userIdAccesor) 
-            : base(store, cacheService)
+        public AssetRepository(IAssetStore store,
+            ICacheService cacheService,
+            IUserIdAccesor userIdAccesor,
+            ICacheOptions options) 
+            : base(store, cacheService, options)
         {
             _userIdAccesor = userIdAccesor;
         }

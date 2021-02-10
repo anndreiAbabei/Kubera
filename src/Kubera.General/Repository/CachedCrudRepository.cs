@@ -21,29 +21,31 @@ namespace Kubera.General.Repository
     {
         protected new ICrudStore<TEntity, TKey> Store { get; }
 
-        public CachedCrudRepository(ICrudStore<TEntity, TKey> store, ICacheService cacheService) 
-            : base(store, cacheService)
+        public CachedCrudRepository(ICrudStore<TEntity, TKey> store,
+            ICacheService cacheService,
+            ICacheOptions options) 
+            : base(store, cacheService, options)
         {
             Store = store;
         }
 
-        public async ValueTask<TEntity> Add(TEntity entity, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<TEntity> Add(TEntity entity, CancellationToken cancellationToken = default)
         {
             Clear();
 
             return await Store.Add(entity, cancellationToken);
         }
 
-        public async ValueTask Update(TEntity entity, CancellationToken cancellationToken = default)
+        public virtual async ValueTask Update(TEntity entity, CancellationToken cancellationToken = default)
         {
             Clear();
 
             await Store.Update(entity, cancellationToken);
         }
 
-        public async ValueTask Delete(TKey[] keys, bool hardDelete = false, CancellationToken cancellationToken = default)
+        public virtual async ValueTask Delete(TKey[] keys, bool hardDelete = false, CancellationToken cancellationToken = default)
         {
-            base.Clear();
+            Clear();
 
             await Store.Delete(keys, hardDelete, cancellationToken);
         }
@@ -52,8 +54,10 @@ namespace Kubera.General.Repository
     public class CachedCrudRepository<TEntity> : CachedCrudRepository<TEntity, Guid>, ICrudRepository<TEntity>
         where TEntity : IEntity
     {
-        public CachedCrudRepository(ICrudStore<TEntity> store, ICacheService cacheService)
-            : base(store, cacheService)
+        public CachedCrudRepository(ICrudStore<TEntity> store,
+            ICacheService cacheService,
+            ICacheOptions options)
+            : base(store, cacheService, options)
         {
         }
     }

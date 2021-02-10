@@ -25,12 +25,17 @@ namespace Kubera.General.Repository
     public class CachedReadOnlyRepository<TEntity, TKey> : ReadOnlyRepository<TEntity, TKey>, ICachedReadOnlyRepository<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
+        protected virtual ICacheOptions Options { get; }
+
         protected virtual ICacheService CacheService { get; }
 
-        public CachedReadOnlyRepository(IStore<TEntity, TKey> store, ICacheService cacheService) 
+        public CachedReadOnlyRepository(IStore<TEntity, TKey> store,
+            ICacheService cacheService,
+            ICacheOptions options)
             : base(store)
         {
             CacheService = cacheService;
+            Options = options;
         }
 
         public virtual void Remove(TKey[] keys) => CacheService.Remove<TEntity>(keys?.Cast<object>().ToArray());
@@ -39,12 +44,20 @@ namespace Kubera.General.Repository
 
         public override async ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken = default)
         {
-            return await CacheService.GetOrAdd(keys, async () => await base.GetById(keys, cancellationToken).ConfigureAwait(false))
+            if (!Options.UseCache)
+                return await base.GetById(keys, cancellationToken).ConfigureAwait(false);
+
+            return await CacheService.GetOrAdd(keys,
+                                               async () => await base.GetById(keys, cancellationToken)
+                                                                     .ConfigureAwait(false))
                 .ConfigureAwait(false);
         }
 
         public override async ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
         {
+            if (!Options.UseCache)
+                return await base.GetAll(paging, dateFilter, cancellationToken).ConfigureAwait(false);
+
             var keys = CalculateGetAllKey(paging, dateFilter);
 
             return await CacheService.GetOrAdd(keys, async () => await base.GetAll(paging, dateFilter, cancellationToken).ConfigureAwait(false))
@@ -60,8 +73,10 @@ namespace Kubera.General.Repository
     public class CachedReadOnlyRepository<TEntity> : CachedReadOnlyRepository<TEntity, Guid>, ICachedReadOnlyRepository<TEntity>
         where TEntity : IEntity
     {
-        public CachedReadOnlyRepository(IStore<TEntity> store, ICacheService cacheService) 
-            : base(store, cacheService)
+        public CachedReadOnlyRepository(IStore<TEntity> store,
+            ICacheService cacheService,
+            ICacheOptions options) 
+            : base(store, cacheService, options)
         {
         }
     }

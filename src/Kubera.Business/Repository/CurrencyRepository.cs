@@ -10,8 +10,10 @@ namespace Kubera.Business.Repository
 {
     public class CurrencyRepository : CachedCrudRepository<Currency>, ICurrencyRepository
     {
-        public CurrencyRepository(ICurrencyStore store, ICacheService cacheService) 
-            : base(store, cacheService)
+        public CurrencyRepository(ICurrencyStore store,
+            ICacheService cacheService,
+            ICacheOptions options)
+            : base(store, cacheService, options)
         {
         }
 

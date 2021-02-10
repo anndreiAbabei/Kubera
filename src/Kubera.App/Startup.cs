@@ -121,11 +121,15 @@ namespace Kubera.App
             builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
         }
 
-        private static void ConfigureDI(IServiceCollection services)
+        private void ConfigureDI(IServiceCollection services)
         {
+            var settings = Configuration.GetSection("AppSettings").Get<AppSettings>();
+
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
 
+            services.AddSingleton<IAppSettings, AppSettings>(i => settings);
+            services.AddSingleton(i => settings.CacheOptions);
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
