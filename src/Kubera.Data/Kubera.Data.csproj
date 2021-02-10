@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Kubera.General\Kubera.General.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

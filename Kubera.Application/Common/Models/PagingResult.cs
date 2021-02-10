@@ -1,6 +1,6 @@
 ﻿using Kubera.General.Models;
 
-namespace Kubera.Data.Models
+namespace Kubera.Application.Common.Models
 {
     internal sealed class PagingResult : IPagingResult
     {

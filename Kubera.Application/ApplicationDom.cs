@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Kubera.Application
+﻿namespace Kubera.Application
 {
     public class ApplicationDom
     {

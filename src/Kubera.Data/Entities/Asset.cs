@@ -1,7 +1,6 @@
 ﻿using Kubera.General.Entities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kubera.Data.Entities
 {

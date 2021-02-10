@@ -6,11 +6,9 @@ using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.Data.Extensions;
 using Kubera.General.Models;
-using Kubera.General.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Kubera.General.Extensions;
@@ -57,16 +55,20 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
                     query = query.Where(t => t.CreatedAt <= request.Date.To.Value);
             }
 
-            var totalTrans = await query.CountAsync(cancellationToken)
-                .ConfigureAwait(false);
+            if (request.Paging != null)
+            {
+                var totalTrans = await query.CountAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                query = query.Skip((int)(request.Paging.Page * request.Paging.Items))
+                    .Take((int)request.Paging.Items);
+
+                _httpContextAccessor.HttpContext.AddPaging(new PagingResult(totalTrans));
+            }
 
             query = order == Order.Descending
                         ? query.OrderByDescending(t => t.CreatedAt)
                         : query.OrderBy(t => t.CreatedAt);
-
-            if (request.Paging != null)
-                query = query.Skip((int)(request.Paging.Page * request.Paging.Items))
-                    .Take((int)request.Paging.Items);
 
             var transactions = await query.ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
@@ -81,8 +83,6 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-
-            _httpContextAccessor.HttpContext.AddPaging(request.Paging.Result);
 
             var models = transactions.Select(_mapper.Map<Transaction, TransactionModel>).ToList();
 

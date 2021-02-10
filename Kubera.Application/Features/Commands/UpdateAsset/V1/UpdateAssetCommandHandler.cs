@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
 using MediatR;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 

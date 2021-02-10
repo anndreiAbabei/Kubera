@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Kubera.General.Extensions;
 using Kubera.Application.Common.Models;
 using MediatR;
 using Kubera.Application.Features.Queries.GetAllAssets.V1;

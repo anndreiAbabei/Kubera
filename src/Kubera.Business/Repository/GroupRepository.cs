@@ -1,7 +1,6 @@
 ﻿using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.Data.Store;
-using Kubera.General.Models;
 using Kubera.General.Repository;
 using Kubera.General.Services;
 using Microsoft.EntityFrameworkCore;
