@@ -24,12 +24,11 @@
     <PackageReference Include="Bogus" Version="33.0.1" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Kubera.App\Kubera.App.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <Folder Include="Misc\" />
     <Folder Include="TestData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kubera.App\Kubera.App.csproj" />
   </ItemGroup>
 </Project>
