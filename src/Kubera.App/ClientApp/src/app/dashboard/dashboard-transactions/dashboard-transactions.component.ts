@@ -16,12 +16,13 @@ import { DashboardCreateTransactionComponent } from '../dashboard-create-transac
 })
 export class DashboardTransactionsComponent implements AfterViewInit {
   public resultsLength = 0;
-  public isLoadingResults: boolean;
+  public isLoadingResults = false;
   public noResult = false;
   public displayedColumns: string[] = ['createdAt', 'group', 'asset', 'wallet', 'action', 'amount', 'rate', 'totalFormated', 'feeFormated'];
   public canLoadMore = true;
   public transactions: Transaction[];
   public page: Paging;
+  public readonly itemsPerPage = 30;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -59,14 +60,14 @@ export class DashboardTransactionsComponent implements AfterViewInit {
 
       const page = new Paging();
       page.page = this.paginator.pageIndex;
-      page.items = 30;
+      page.items = this.itemsPerPage;
 
       return this.transactionService.getAll(page, order);
     }),
     map(data => {
       this.isLoadingResults = false;
       this.noResult = data.transactions.length === 0;
-      this.resultsLength = data.totalItems;
+      this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
 
       data.transactions.forEach(t => {
         t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;

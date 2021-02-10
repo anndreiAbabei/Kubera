@@ -40,10 +40,11 @@
 
     td {
       vertical-align: middle;
+    }
 
-      &.right {
-        text-align: end;
-      }
+    td.right,
+    th.right {
+      text-align: end;
     }
   }
 }

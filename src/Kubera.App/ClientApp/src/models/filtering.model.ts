@@ -9,6 +9,6 @@ export class DateFilter {
 }
 
 export enum Order {
-  ascending = 0,
-  descending
+  ascending = 1,
+  descending = 2
 }

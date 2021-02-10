@@ -2,7 +2,7 @@
 {
     public enum Order : short
     {
-        Ascending = 0,
+        Ascending = 1,
         Descending
     }
 }

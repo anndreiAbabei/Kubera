@@ -23,9 +23,7 @@ export class HttpUtilsService {
       }
     }
 
-    if (order) {
-      url += `order=${order}`;
-    }
+    url += `order=${order}`;
 
     if (filter) {
       if ((paging || order) && (filter.from || filter.to)) {
