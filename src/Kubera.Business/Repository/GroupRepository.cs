@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Kubera.Business.Repository
 {
-    public class GroupRepository : CrudRepository<Group>, IGroupRepository
+    public class GroupRepository : CachedCrudRepository<Group>, IGroupRepository
     {
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public GroupRepository(IGroupStore store, IUserIdAccesor userIdAccesor) 
-            : base(store)
+        public GroupRepository(IGroupStore store, ICacheService cacheService, IUserIdAccesor userIdAccesor) 
+            : base(store, cacheService)
         {
             _userIdAccesor = userIdAccesor;
         }

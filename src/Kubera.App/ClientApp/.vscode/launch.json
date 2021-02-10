@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "pwa-chrome",
+            "name": "https://localhost:44352/dashboard",
+            "request": "launch",
+            "url": "https://localhost:44352/dashboard"
+        }
+    ]
+}

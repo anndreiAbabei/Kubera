@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Kubera.Business.Repository
 {
-    public class TransactionRepository : CrudRepository<Transaction>, ITransactionRepository
+    public class TransactionRepository : CachedCrudRepository<Transaction>, ITransactionRepository
     {
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public TransactionRepository(ITransactionStore store, IUserIdAccesor userIdAccesor) 
-            : base(store)
+        public TransactionRepository(ITransactionStore store, ICacheService cacheService, IUserIdAccesor userIdAccesor) 
+            : base(store, cacheService)
         {
             _userIdAccesor = userIdAccesor;
         }
