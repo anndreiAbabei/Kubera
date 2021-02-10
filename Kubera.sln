@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Data", "Kubera.Data\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14293EF7-36E1-4EFF-8123-F4CA5A9136EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.UnitTest", "tests\Kubera.UnitTest\Kubera.UnitTest.csproj", "{05433C24-33BC-4BDD-9058-5D7B12BE80FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.App.IntegrationTests", "tests\Kubera.UnitTest\Kubera.App.IntegrationTests.csproj", "{05433C24-33BC-4BDD-9058-5D7B12BE80FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
