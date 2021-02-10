@@ -3,17 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App", "Kubera.App\Kubera.App.csproj", "{AAA83BB2-EF9C-46AA-9EBD-62003C929368}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Business", "Kubera.Business\Kubera.Business.csproj", "{E168715B-D313-4002-9809-FB5918E2DACA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.General", "Kubera.General\Kubera.General.csproj", "{B7B90C9C-9E15-48BE-ACFD-FF620803B61D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Data", "Kubera.Data\Kubera.Data.csproj", "{9877A791-D917-4F0A-A271-D075FACDDB49}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{14293EF7-36E1-4EFF-8123-F4CA5A9136EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.UnitTest", "tests\Kubera.UnitTest\Kubera.UnitTest.csproj", "{05433C24-33BC-4BDD-9058-5D7B12BE80FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.UnitTest", "tests\Kubera.UnitTest\Kubera.UnitTest.csproj", "{05433C24-33BC-4BDD-9058-5D7B12BE80FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A8F96EC4-FD37-4787-AE65-84223962BC85}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.General", "src\Kubera.General\Kubera.General.csproj", "{B98DF6D0-D972-41AE-90FF-8082B7369BFD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Data", "src\Kubera.Data\Kubera.Data.csproj", "{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.Business", "src\Kubera.Business\Kubera.Business.csproj", "{45B511D2-7750-45F4-B2C0-23C13B32FF8C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{63BA477D-54AA-4EA7-B4ED-DEB38671F839}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{B0A9901E-2D4C-471D-AF31-6AA59912F4A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App", "src\Kubera.App\Kubera.App.csproj", "{722C92A8-9C35-4946-AB15-8C70EC16199A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,32 +27,38 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{AAA83BB2-EF9C-46AA-9EBD-62003C929368}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AAA83BB2-EF9C-46AA-9EBD-62003C929368}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AAA83BB2-EF9C-46AA-9EBD-62003C929368}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AAA83BB2-EF9C-46AA-9EBD-62003C929368}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E168715B-D313-4002-9809-FB5918E2DACA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E168715B-D313-4002-9809-FB5918E2DACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E168715B-D313-4002-9809-FB5918E2DACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E168715B-D313-4002-9809-FB5918E2DACA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B7B90C9C-9E15-48BE-ACFD-FF620803B61D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7B90C9C-9E15-48BE-ACFD-FF620803B61D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7B90C9C-9E15-48BE-ACFD-FF620803B61D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7B90C9C-9E15-48BE-ACFD-FF620803B61D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9877A791-D917-4F0A-A271-D075FACDDB49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9877A791-D917-4F0A-A271-D075FACDDB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9877A791-D917-4F0A-A271-D075FACDDB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9877A791-D917-4F0A-A271-D075FACDDB49}.Release|Any CPU.Build.0 = Release|Any CPU
 		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05433C24-33BC-4BDD-9058-5D7B12BE80FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B98DF6D0-D972-41AE-90FF-8082B7369BFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B98DF6D0-D972-41AE-90FF-8082B7369BFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B98DF6D0-D972-41AE-90FF-8082B7369BFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B98DF6D0-D972-41AE-90FF-8082B7369BFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45B511D2-7750-45F4-B2C0-23C13B32FF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45B511D2-7750-45F4-B2C0-23C13B32FF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45B511D2-7750-45F4-B2C0-23C13B32FF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45B511D2-7750-45F4-B2C0-23C13B32FF8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{722C92A8-9C35-4946-AB15-8C70EC16199A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{722C92A8-9C35-4946-AB15-8C70EC16199A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{722C92A8-9C35-4946-AB15-8C70EC16199A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{722C92A8-9C35-4946-AB15-8C70EC16199A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{05433C24-33BC-4BDD-9058-5D7B12BE80FD} = {14293EF7-36E1-4EFF-8123-F4CA5A9136EE}
+		{B98DF6D0-D972-41AE-90FF-8082B7369BFD} = {B0A9901E-2D4C-471D-AF31-6AA59912F4A6}
+		{C3DCA42B-E835-4DDE-B8B3-762472F1B9B5} = {B0A9901E-2D4C-471D-AF31-6AA59912F4A6}
+		{45B511D2-7750-45F4-B2C0-23C13B32FF8C} = {B0A9901E-2D4C-471D-AF31-6AA59912F4A6}
+		{63BA477D-54AA-4EA7-B4ED-DEB38671F839} = {A8F96EC4-FD37-4787-AE65-84223962BC85}
+		{B0A9901E-2D4C-471D-AF31-6AA59912F4A6} = {A8F96EC4-FD37-4787-AE65-84223962BC85}
+		{722C92A8-9C35-4946-AB15-8C70EC16199A} = {63BA477D-54AA-4EA7-B4ED-DEB38671F839}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05EBE7AE-548C-4A7C-8E26-47A11FC7D853}
