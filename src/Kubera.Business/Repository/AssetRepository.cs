@@ -1,4 +1,5 @@
-﻿using Kubera.Data.Entities;
+﻿using Kubera.Application.Services;
+using Kubera.Data.Entities;
 using Kubera.Data.Store;
 using Kubera.General.Models;
 using Kubera.General.Repository;
@@ -25,10 +26,7 @@ namespace Kubera.Business.Repository
 
         public async ValueTask<bool> Exists(Asset asset, CancellationToken cancellationToken = default)
         {
-            var query = await GetAll(cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            return await query.AnyAsync(g => g.Id != asset.Id &&
+            return await GetAll().AnyAsync(g => g.Id != asset.Id &&
                                              (g.OwnerId == null || g.OwnerId == asset.OwnerId) &&
                                              (g.Code == asset.Code || g.Name == asset.Name),
                                      cancellationToken)
@@ -37,26 +35,15 @@ namespace Kubera.Business.Repository
 
         public async ValueTask<Asset> GetByCode(string code, CancellationToken cancellationToken = default)
         {
-            var query = await GetAll(cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-
-            return await query.FirstOrDefaultAsync(a => a.Code == code, cancellationToken)
+            return await GetAll().FirstOrDefaultAsync(a => a.Code == code, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public override async ValueTask<IQueryable<Asset>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
+        public override IQueryable<Asset> GetAll()
         {
             var user = _userIdAccesor.Id;
-            var query = await base.GetAll(paging, dateFilter, cancellationToken)
-                .ConfigureAwait(false);
 
-            return query.Where(a => string.IsNullOrEmpty(a.OwnerId) || a.OwnerId == user);
+            return base.GetAll().Where(a => string.IsNullOrEmpty(a.OwnerId) || a.OwnerId == user);
         }
-    }
-
-    public interface IAssetRepository : ICrudRepository<Asset>
-    {
-        ValueTask<Asset> GetByCode(string code, CancellationToken cancellationToken = default);
-        ValueTask<bool> Exists(Asset asset, CancellationToken cancellationToken = default);
     }
 }

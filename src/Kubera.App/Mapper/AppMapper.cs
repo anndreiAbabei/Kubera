@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using Kubera.App.Models;
+using Kubera.Application.Common.Models;
+using Kubera.Business.Entities;
 using Kubera.Data.Entities;
 
 namespace Kubera.App.Mapper
@@ -38,6 +39,11 @@ namespace Kubera.App.Mapper
                 .ForMember(tm => tm.Rate, c => c.MapFrom(t => t.Rate))
                 .ForMember(tm => tm.Fee, c => c.MapFrom(t => t.Fee))
                 .ForMember(tm => tm.FeeCurrencyId, c => c.MapFrom(t => t.FeeCurrencyId));
+
+            CreateMap<UserSettings, UserSettingsModel>()
+                .ForMember(usm => usm.Language, c => c.MapFrom(us => us.Language))
+                .ForMember(usm => usm.PrefferedCurrency, c => c.MapFrom(us => us.PrefferedCurrency))
+                .ForMember(usm => usm.Currencies, c => c.MapFrom(us => us.Currencies));
         }
     }
 }

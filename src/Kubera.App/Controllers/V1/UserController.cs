@@ -1,26 +1,20 @@
 ﻿using Kubera.App.Infrastructure;
-using Kubera.App.Models;
-using Kubera.Business.Repository;
-using Kubera.General.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text.Json;
-using Kubera.Business.Entities;
+using Kubera.Application.Common.Models;
+using MediatR;
+using Kubera.Application.Features.Queries.GetUserInfo.V1;
+using Kubera.App.Infrastructure.Extensions;
 
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
     public class UserController : BaseController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IUserIdAccesor _userIdAccesor;
-
-        public UserController(IUserRepository userRepository, IUserIdAccesor userIdAccesor)
+        public UserController(IMediator mediator)
+            : base(mediator)
         {
-            _userRepository = userRepository;
-            _userIdAccesor = userIdAccesor;
         }
 
         /// <summary>
@@ -28,19 +22,14 @@ namespace Kubera.App.Controllers.V1
         /// </summary>
         /// <returns>User information object</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<CurrencyModel>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<UserInfoModel>> GetUserInfo()
         {
-            var user = await _userRepository.GetMe(HttpContext.RequestAborted)
+            var query = new GetUserInfoQuery();
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
-            var result = new UserInfoModel
-            {
-                Email = user.Email,
-                FullName = user.FullName,
-                Settings = JsonSerializer.Deserialize<UserSettings>(user.Settings)
-            };
 
-            return Ok(result);
+            return result.AsActionResult();
         }
     }
 }

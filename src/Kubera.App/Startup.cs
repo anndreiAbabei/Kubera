@@ -16,12 +16,23 @@ using Kubera.Business.Repository;
 using Kubera.Data.Store;
 using Kubera.General;
 using Kubera.Business.Seed;
-using AutoMapper;
+using FluentValidation.AspNetCore;
 using Kubera.App.Mapper;
+using Kubera.Application;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Kubera.Business.Services;
+using ZymLabs.NSwag.FluentValidation;
+using NSwag.Generation.AspNetCore;
+using NSwag;
+using System.Text.Json;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
+using MediatR;
+using System.Reflection;
+using Kubera.App.Infrastructure.Behaviours;
+using Kubera.Application.Services;
 
 namespace Kubera.App
 {
@@ -56,12 +67,40 @@ namespace Kubera.App
                 x.DefaultApiVersion = new ApiVersion(1, 0);
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ReportApiVersions = true;
-            });
-            // In production, the Angular files will be served from this directory
+            })
+            //.AddVersionedApiExplorer(options =>
+            //{
+            //    options.GroupNameFormat = "VVV";
+            //    options.SubstituteApiVersionInUrl = true;
+            //})
+            .AddSingleton<FluentValidationSchemaProcessor>()
+            .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
+
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true)
+               .AddControllers(options =>
+               {
+                   options.EnableEndpointRouting = false;
+
+                   options.ReturnHttpNotAcceptable = true;
+
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); // Even if Axway is returning this then we want it visible in the OpenAPI/Swagger doc (TODO: Will Axway return a ProblemDetails object??!?)
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); // This defaults payload to ProblemDetails which is wrong. So Schema is later removed from Swagger.json via an OperationProcessor
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
+               })
+               .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
+               .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly);
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             ConfigureDI(services);
         }
@@ -78,13 +117,15 @@ namespace Kubera.App
                 app.UseHsts();
             }
 
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
             {
                 app.UseSpaStaticFiles();
             }
-
             app.UseRouting();
 
             app.UseAuthentication();
@@ -129,7 +170,7 @@ namespace Kubera.App
             services.AddMemoryCache();
 
             services.AddSingleton<IAppSettings, AppSettings>(i => settings);
-            services.AddSingleton(i => settings.CacheOptions);
+            services.AddSingleton(i => settings?.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
@@ -161,6 +202,32 @@ namespace Kubera.App
 
             await seeder.Seed(cancellationToken)
                 .ConfigureAwait(false);
+        }
+
+        private void GenerateSwaggerDocument(AspNetCoreOpenApiDocumentGeneratorSettings settings, IServiceProvider sp, string name, string group)
+        {
+            var fluentValidationSchemaProcessor = sp.GetRequiredService<FluentValidationSchemaProcessor>();
+            settings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
+
+            settings.DocumentName = name;
+            settings.ApiGroupNames = new[] { group };
+
+            settings.FlattenInheritanceHierarchy = true;
+            settings.GenerateEnumMappingDescription = true;
+
+            settings.PostProcess = doc =>
+            {
+                doc.Schemes = new[] { OpenApiSchema.Https };
+                doc.Info.Version = name;
+                doc.Info.Title = "Kubera API";
+                doc.Info.Description = "The Kubera API used for Kubera Angular UI";
+                doc.Info.TermsOfService = "None";
+                doc.Info.Contact = new OpenApiContact
+                {
+                    Name = "Kubera",
+                    Email = ""
+                };
+            };
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Kubera.General.Store
     public interface IStore<TEntity, TKey> : ISingleEntityStore<TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
-        ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default);
+        IQueryable<TEntity> GetAll();
     }
 
     public interface IStore<TEntity> : IStore<TEntity, Guid>, ISingleEntityStore<TEntity>

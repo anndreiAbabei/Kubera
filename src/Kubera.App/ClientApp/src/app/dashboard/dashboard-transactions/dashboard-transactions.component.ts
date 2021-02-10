@@ -16,7 +16,7 @@ import { DashboardCreateTransactionComponent } from '../dashboard-create-transac
 })
 export class DashboardTransactionsComponent implements AfterViewInit {
   public resultsLength = 0;
-  public isLoadingResults = true;
+  public isLoadingResults: boolean;
   public noResult = false;
   public displayedColumns: string[] = ['createdAt', 'group', 'asset', 'wallet', 'action', 'amount', 'rate', 'totalFormated', 'feeFormated'];
   public canLoadMore = true;
@@ -32,41 +32,7 @@ export class DashboardTransactionsComponent implements AfterViewInit {
   public ngAfterViewInit(): void {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-    merge(this.sort.sortChange, this.paginator.page)
-      .pipe(startWith({}), switchMap(() => {
-        this.isLoadingResults = true;
-
-        const order = this.sort.active && this.sort.direction === 'asc'
-                        ? Order.ascending
-                        : Order.descending;
-
-        const page = new Paging();
-        page.page = this.paginator.pageIndex;
-        page.items = 30;
-
-        return this.transactionService.getAll(page, order);
-      }),
-      map(data => {
-        this.isLoadingResults = false;
-        this.noResult = data.transactions.length === 0;
-        this.resultsLength = data.totalItems;
-
-        data.transactions.forEach(t => {
-          t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
-          t.feeFormated = t.fee
-                            ? `${t.fee} ${t.feeCurrency?.symbol}`
-                            : `${0.00} ${t.currency?.symbol}`;
-          t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
-        });
-
-        return data.transactions;
-      }),
-      catchError(() => {
-        this.isLoadingResults = false;
-        this.noResult = true;
-
-        return observableOf([]);
-      })).subscribe(data => this.transactions = data);
+    this.refreshTransactions();
   }
 
   public addTransaction(): void {
@@ -80,7 +46,45 @@ export class DashboardTransactionsComponent implements AfterViewInit {
           this.transactions.push(p);
         }
       });
-    }
+  }
+
+  public refreshTransactions(): void {
+    merge(this.sort.sortChange, this.paginator.page)
+    .pipe(startWith({}), switchMap(() => {
+      this.isLoadingResults = true;
+
+      const order = this.sort.active && this.sort.direction === 'asc'
+                      ? Order.ascending
+                      : Order.descending;
+
+      const page = new Paging();
+      page.page = this.paginator.pageIndex;
+      page.items = 30;
+
+      return this.transactionService.getAll(page, order);
+    }),
+    map(data => {
+      this.isLoadingResults = false;
+      this.noResult = data.transactions.length === 0;
+      this.resultsLength = data.totalItems;
+
+      data.transactions.forEach(t => {
+        t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
+        t.feeFormated = t.fee
+                          ? `${t.fee} ${t.feeCurrency?.symbol}`
+                          : `${0.00} ${t.currency?.symbol}`;
+        t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+      });
+
+      return data.transactions;
+    }),
+    catchError(() => {
+      this.isLoadingResults = false;
+      this.noResult = true;
+
+      return observableOf([]);
+    })).subscribe(data => this.transactions = data);
+  }
 
   public removeTransaction(transaction: Transaction): void {
     if (this.isLoadingResults || !transaction) {

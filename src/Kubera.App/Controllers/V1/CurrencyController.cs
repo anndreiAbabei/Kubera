@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using Kubera.App.Infrastructure;
-using Kubera.App.Models;
-using Kubera.Business.Repository;
-using Kubera.Data.Entities;
+﻿using Kubera.App.Infrastructure;
+using Kubera.App.Infrastructure.Extensions;
+using Kubera.Application.Common.Models;
+using Kubera.Application.Features.Queries.GetCurrencies.V1;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Kubera.App.Controllers.V1
@@ -15,13 +13,9 @@ namespace Kubera.App.Controllers.V1
     [ApiVersion("1.0")]
     public class CurrencyController : BaseController
     {
-        private readonly ICurrencyRepository _currencyRepository;
-        private readonly IMapper _mapper;
-
-        public CurrencyController(ICurrencyRepository currencyRepository, IMapper mapper)
+        public CurrencyController(IMediator mediator)
+            : base(mediator)
         {
-            _currencyRepository = currencyRepository;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -32,15 +26,11 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<CurrencyModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<CurrencyModel>>> GetCurrencies()
         {
-            var ct = HttpContext.RequestAborted;
-            var query = await _currencyRepository.GetAll(cancellationToken: ct)
+            var query = new GetCurrenciesQuery();
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var currencies = await query
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-
-            return Ok(currencies.Select(_mapper.Map<Currency, CurrencyModel>));
+            return result.AsActionResult();
         }
     }
 }

@@ -18,9 +18,14 @@
   position: relative;
 }
 
-.add-button-container {
+.add-button-container,
+.refresh-button-container {
   float: left;
   margin-left: 1em;
+}
+
+.refresh-button-container{
+  margin-top: 1em;
 }
 
 .paginator {

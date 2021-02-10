@@ -1,46 +1,28 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using AutoMapper;
 using Kubera.App.Models;
 using Kubera.App.Infrastructure;
-using Kubera.Business.Repository;
-using Kubera.Data.Entities;
-using Kubera.General.Extensions;
-using Microsoft.EntityFrameworkCore;
 using Kubera.App.Infrastructure.Extensions;
-using Kubera.Data.Extensions;
 using Kubera.General.Models;
-using Kubera.General.Services;
+using Kubera.Application.Common.Models;
+using MediatR;
+using Kubera.Application.Features.Queries.GetTransactions.V1;
+using Kubera.Application.Features.Queries.GetTransaction.V1;
+using Kubera.Application.Features.Commands.CreateTransaction.V1;
+using Kubera.Application.Features.Commands.UpdateTransaction.V1;
+using Kubera.Application.Features.Commands.DeleteTransaction.V1;
 
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
     public class TransactionController : BaseController
     {
-        private readonly ITransactionRepository _transactionRepository;
-        private readonly IAssetRepository _assetRepository;
-        private readonly IGroupRepository _groupRepository;
-        private readonly ICurrencyRepository _currencyRepository;
-        private readonly IMapper _mapper;
-        private readonly IUserIdAccesor _userIdAccesor;
-
-        public TransactionController(ITransactionRepository transactionRepository, 
-                                     IAssetRepository assetRepository,
-                                     IGroupRepository groupRepository,
-                                     ICurrencyRepository currencyRepository,
-                                     IMapper mapper,
-                                     IUserIdAccesor userIdAccesor)
+        public TransactionController(IMediator mediator)
+            : base(mediator)
         {
-            _transactionRepository = transactionRepository;
-            _assetRepository = assetRepository;
-            _groupRepository = groupRepository;
-            _currencyRepository = currencyRepository;
-            _mapper = mapper;
-            _userIdAccesor = userIdAccesor;
         }
 
         /// <summary>
@@ -51,55 +33,16 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<TransactionModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
         {
-            paging ??= new Paging();
-            order ??= Order.Descending;
-
-            var ct = HttpContext.RequestAborted;
-
-             var query = await _transactionRepository.GetAll(paging, filter, ct)
-                .ConfigureAwait(false);
-
-            query = order.Value == Order.Descending
-                        ? query.OrderByDescending(t => t.CreatedAt)
-                        : query.OrderBy(t => t.CreatedAt);
-
-            var transactions = await query.ToListAsync(ct)
-                .ConfigureAwait(false);
-            var currencies = await _currencyRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-            var assets = await _assetRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-            var groups = await _groupRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-
-
-            HttpContext.AddPaging(paging.Result);
-
-            var models = transactions.Select(_mapper.Map<Transaction, TransactionModel>).ToList();
-
-            foreach (var model in models)
+            var query = new GetTransactionsQuery
             {
-                if (currencies.Found(model.CurrencyId, out var currency))
-                    model.Currency = _mapper.Map<Currency, CurrencyModel>(currency);
+                Paging = paging,
+                Date = filter,
+                Order = order
+            };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
 
-                if (assets.Found(model.AssetId, out var asset))
-                {
-                    model.Asset = _mapper.Map<Asset, AssetModel>(asset);
-
-
-                    if (groups.Found(asset.GroupId, out var group))
-                        model.Asset.Group = _mapper.Map<Group, GroupModel>(group);
-                }
-
-                if (model.FeeCurrencyId.HasValue && currencies.Found(model.FeeCurrencyId.Value, out var feeCurrency))
-                    model.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
-            }
-
-
-            return Ok(models);
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -113,16 +56,14 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(TransactionModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<TransactionModel>> GetTransaction(Guid id)
         {
-            var transaction = await _transactionRepository.GetById(id, HttpContext.RequestAborted)
+            var query = new GetTransactionQuery
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            if (transaction == null)
-                return NotFound();
-
-            if (transaction.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            return Ok(_mapper.Map<Transaction, TransactionModel>(transaction));
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -132,55 +73,22 @@ namespace Kubera.App.Controllers.V1
         /// <returns>The new transaction</returns>
         [HttpPost]
         [ProducesResponseType(typeof(TransactionModel), StatusCodes.Status201Created)]
-        public async Task<ActionResult<TransactionModel>> PostTransaction(TransactionPostModel model)
+        public async Task<ActionResult<TransactionModel>> PostTransaction(TransactionInputModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var transaction = new Transaction
+            var command = new CreateTransactionCommand
             {
-                AssetId = model.AssetId,
-                Wallet = model.Wallet,
-                CreatedAt = model.CreatedAt,
-                Amount = model.Amount,
-                CurrencyId = model.CurrencyId,
-                Rate = model.Rate,
-                Fee = model.Fee,
-                FeeCurrencyId = model.FeeCurrencyId,
-                OwnerId = _userIdAccesor.Id
+                Input = model
             };
-
-            transaction = await _transactionRepository.Add(transaction, ct)
-                .ConfigureAwait(false);
-            var currencies = await _currencyRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-            var assets = await _assetRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-            var groups = await _groupRepository.GetAll(cancellationToken: ct)
-                .ToListAsync(ct)
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var result = _mapper.Map<Transaction, TransactionModel>(transaction);
+            if (result.IsFailure)
+                return result.AsActionResult();
 
-            if (currencies.Found(model.CurrencyId, out var currency))
-                result.Currency = _mapper.Map<Currency, CurrencyModel>(currency);
-
-            if (assets.Found(model.AssetId, out var asset))
-            {
-                result.Asset = _mapper.Map<Asset, AssetModel>(asset);
-
-
-                if (groups.Found(asset.GroupId, out var group))
-                    result.Asset.Group = _mapper.Map<Group, GroupModel>(group);
-            }
-
-            if (result.FeeCurrencyId.HasValue && currencies.Found(model.FeeCurrencyId.Value, out var feeCurrency))
-                result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
-
-            return CreatedAtAction(nameof(GetTransaction), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetTransaction), new { id = result.Value.Id }, result.Value);
         }
 
         /// <summary>
@@ -193,32 +101,20 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> PutTransaction(Guid id, TransactionPutModel model)
+        public async Task<IActionResult> PutTransaction(Guid id, TransactionUpdateModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var transaction = await _transactionRepository.GetById(id).ConfigureAwait(false);
+            var command = new UpdateTransactionCommand
+            {
+                Id = id,
+                Input = model
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
 
-            if (transaction == null)
-                return NotFound();
-
-            if (transaction.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            transaction.AssetId = model.AssetId;
-            transaction.Wallet = model.Wallet;
-            transaction.Amount = model.Amount;
-            transaction.CurrencyId = model.CurrencyId;
-            transaction.Rate = model.Rate;
-            transaction.Fee = model.Fee;
-            transaction.FeeCurrencyId = model.FeeCurrencyId;
-
-            await _transactionRepository.Update(transaction, ct)
-                    .ConfigureAwait(false);
-
-            return NoContent();
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -232,19 +128,17 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteTransaction(Guid id)
         {
-            var ct = HttpContext.RequestAborted;
-            var group = await _transactionRepository.GetById(id, ct);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (group == null)
-                return NotFound();
-
-            if (group.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            await _transactionRepository.Delete(group.Id, ct)
+            var command = new DeleteTransactionCommand
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            return NoContent();
+            return result.AsActionResult();
         }
     }
 }

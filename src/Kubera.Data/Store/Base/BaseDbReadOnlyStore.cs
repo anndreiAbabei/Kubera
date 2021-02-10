@@ -21,7 +21,7 @@ namespace Kubera.Data.Store.Base
             ApplicationDbContext = applicationDbContext;
         }
 
-        public virtual async ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
+        public virtual IQueryable<TEntity> GetAll()
         {
             IQueryable<TEntity> query;
 
@@ -30,28 +30,6 @@ namespace Kubera.Data.Store.Base
                     .Where(e => !((ISoftDeletable)e).Deleted);
             else
                 query = ApplicationDbContext.Set<TEntity>();
-
-            if (dateFilter != null && typeof(TEntity).Implements<IDateEntity>())
-            {
-                if(dateFilter.From.HasValue)
-                    query = ApplicationDbContext.Set<TEntity>()
-                        .Where(e => ((IDateEntity)e).CreatedAt >= dateFilter.From.Value);
-
-                if (dateFilter.To.HasValue)
-                    query = ApplicationDbContext.Set<TEntity>()
-                        .Where(e => ((IDateEntity)e).CreatedAt >= dateFilter.To.Value);
-            }
-
-            if(paging != null)
-            {
-                var total = await query.CountAsync(cancellationToken)
-                    .ConfigureAwait(false);
-
-                query = query.Skip((int)(paging.Page * paging.Items))
-                            .Take((int)paging.Items);
-
-                paging.Result = new PagingResult(total);
-            }
 
             return query;
         }

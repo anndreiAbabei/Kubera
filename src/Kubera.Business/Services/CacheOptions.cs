@@ -2,8 +2,13 @@
 
 namespace Kubera.Business.Services
 {
-    public class CacheOptions : General.Services.ICacheOptions
+    public class CacheOptions : ICacheOptions
     {
         public bool UseCache { get; set; }
+
+        public static ICacheOptions Default { get; } = new CacheOptions
+        {
+            UseCache = false
+        };
     }
 }

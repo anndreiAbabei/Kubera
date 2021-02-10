@@ -1,29 +1,26 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using AutoMapper;
-using Kubera.App.Models;
 using Kubera.App.Infrastructure;
-using Kubera.Business.Repository;
-using Kubera.Data.Entities;
-using Kubera.General.Extensions;
-using Microsoft.EntityFrameworkCore;
+using Kubera.Application.Common.Models;
+using Kubera.Application.Features.Queries.GetAllGroups.V1;
+using Kubera.App.Infrastructure.Extensions;
+using Kubera.Application.Features.Queries.GetGroup.V1;
+using Kubera.Application.Features.Commands.CreateGroup;
+using Kubera.Application.Features.Commands.UpdateGroup.V1;
+using MediatR;
+using Kubera.Application.Features.Commands.DeleteGroup.V1;
 
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
     public class GroupsController : BaseController
     {
-        private readonly IGroupRepository _groupRepository;
-        private readonly IMapper _mapper;
-
-        public GroupsController(IGroupRepository groupRepository, IMapper mapper)
+        public GroupsController(IMediator mediator)
+            : base(mediator)
         {
-            _groupRepository = groupRepository;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -34,15 +31,11 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<GroupModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GroupModel>>> GetGroups()
         {
-            var ct = HttpContext.RequestAborted;
-            var query = await _groupRepository.GetAll(cancellationToken: ct)
+            var query = new GetAllGroupsQuery();
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var groups = await query
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-
-            return Ok(groups.Select(_mapper.Map<Group, GroupModel>));
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -56,16 +49,14 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(GroupModel), StatusCodes.Status200OK)]
         public async Task<ActionResult<GroupModel>> GetGroup(Guid id)
         {
-            var group = await _groupRepository.GetById(id, HttpContext.RequestAborted)
+            var query = new GetGroupQuery
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            if (group == null)
-                return NotFound();
-
-            if (group.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            return Ok(_mapper.Map<Group, GroupModel>(group));
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -76,29 +67,22 @@ namespace Kubera.App.Controllers.V1
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(GroupModel), StatusCodes.Status201Created)]
-        public async Task<ActionResult<GroupModel>> PostGroup(GroupPostModel model)
+        public async Task<ActionResult<GroupModel>> PostGroup(GroupInputModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var group = new Group
+            var command = new CreateGroupCommand
             {
-                Code = model.Code,
-                Name = model.Name,
-                CreatedAt = DateTime.UtcNow,
-                OwnerId = User.Identity.Name
+                Input = model
             };
-
-            if (await _groupRepository.Exists(group, ct).ConfigureAwait(false))
-                return Conflict("Code or Name alredy exists");
-
-            group = await _groupRepository.Add(group, ct)
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var result = _mapper.Map<Group, GroupModel>(group);
+            if (result.IsFailure)
+                return result.AsActionResult();
 
-            return CreatedAtAction(nameof(GetGroups), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetGroup), new { id = result.Value.Id }, result.Value);
         }
 
         /// <summary>
@@ -112,30 +96,20 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> PutGroup(Guid id, GroupPutModel model)
+        public async Task<IActionResult> PutGroup(Guid id, GroupUpdateModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var group = await _groupRepository.GetById(id).ConfigureAwait(false);
+            var command = new UpdateGroupCommand
+            {
+                Id = id,
+                Input = model
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
 
-            if (group == null)
-                return NotFound();
-
-            if (group.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            if (await _groupRepository.Exists(group, ct).ConfigureAwait(false))
-                return Conflict("Code or Name alredy exists");
-
-            group.Code = model.Code;
-            group.Name = model.Name;
-
-            await _groupRepository.Update(group, ct)
-                    .ConfigureAwait(false);
-
-            return NoContent();
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -149,19 +123,14 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteGroup(Guid id)
         {
-            var ct = HttpContext.RequestAborted;
-            var group = await _groupRepository.GetById(id, ct);
-
-            if (group == null)
-                return NotFound();
-
-            if (group.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            await _groupRepository.Delete(group.Id, ct)
+            var command = new DeleteGroupCommand
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            return NoContent();
+            return result.AsActionResult();
         }
     }
 }

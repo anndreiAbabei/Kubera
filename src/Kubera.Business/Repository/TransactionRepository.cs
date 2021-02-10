@@ -1,4 +1,5 @@
-﻿using Kubera.Data.Entities;
+﻿using Kubera.Application.Services;
+using Kubera.Data.Entities;
 using Kubera.Data.Store;
 using Kubera.General.Models;
 using Kubera.General.Repository;
@@ -22,17 +23,11 @@ namespace Kubera.Business.Repository
             _userIdAccesor = userIdAccesor;
         }
 
-        public override async ValueTask<IQueryable<Transaction>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
+        public override IQueryable<Transaction> GetAll()
         {
             var user = _userIdAccesor.Id;
-            var query = await base.GetAll(paging, dateFilter, cancellationToken)
-                .ConfigureAwait(false);
 
-            return query.Where(a => a.OwnerId == user);
+            return base.GetAll().Where(a => a.OwnerId == user);
         }
-    }
-
-    public interface ITransactionRepository : ICrudRepository<Transaction>
-    {
     }
 }

@@ -65,6 +65,11 @@
           <mat-icon>add</mat-icon>
         </button>
       </div>
+      <div class="refresh-button-container">
+        <button mat-mini-fab color="accent" aria-label="Refresh transactions" [disabled]="isLoadingResults" (click)="refreshTransactions()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
 
       <mat-paginator [length]="resultsLength" [pageSize]="30" class="paginator"></mat-paginator>
     </div>

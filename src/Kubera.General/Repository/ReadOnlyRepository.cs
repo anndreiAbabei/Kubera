@@ -30,8 +30,7 @@ namespace Kubera.General.Repository
 
         public virtual ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken = default) => Store.GetById(keys, cancellationToken);
         
-        public virtual ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default) 
-            => Store.GetAll(paging, dateFilter, cancellationToken);
+        public virtual IQueryable<TEntity> GetAll() => Store.GetAll();
     }
 
     public abstract class ReadOnlyRepository<TEntity> : ReadOnlyRepository<TEntity, Guid>, IReadOnlyRepository<TEntity>

@@ -1,29 +1,28 @@
-﻿using AutoMapper;
-using Kubera.App.Infrastructure;
-using Kubera.App.Models;
-using Kubera.Business.Repository;
-using Kubera.Data.Entities;
+﻿using Kubera.App.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Kubera.General.Extensions;
-using Microsoft.EntityFrameworkCore;
+using Kubera.Application.Common.Models;
+using MediatR;
+using Kubera.Application.Features.Queries.GetAllAssets.V1;
+using Kubera.App.Infrastructure.Extensions;
+using Kubera.Application.Features.Queries.GetAsset.V1;
+using Kubera.Application.Features.Commands.CreateAsset.V1;
+using Kubera.Application.Features.Commands.UpdateAsset.V1;
+using Kubera.Application.Features.Commands.DeleteAsset.V1;
 
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
     public class AssetController : BaseController
     {
-        private readonly IAssetRepository _assetRepository;
-        private readonly IMapper _mapper;
 
-        public AssetController(IAssetRepository assetRepository, IMapper mapper)
+        public AssetController(IMediator mediator)
+            : base(mediator)
         {
-            _assetRepository = assetRepository;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -34,15 +33,11 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<AssetModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<AssetModel>>> GetAssets()
         {
-            var ct = HttpContext.RequestAborted;
-            var query = await _assetRepository.GetAll(cancellationToken: ct)
+            var query = new GetAllAssetsQuery();
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var asstes = await query
-                .ToListAsync(ct)
-                .ConfigureAwait(false);
-
-            return Ok(asstes.Select(_mapper.Map<Asset, AssetModel>));
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -54,18 +49,16 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(AssetModel), StatusCodes.Status200OK)]
-        public async Task<ActionResult<AssetModel>> GetAssets(Guid id)
+        public async Task<ActionResult<AssetModel>> GetAsset(Guid id)
         {
-            var asset = await _assetRepository.GetById(id, HttpContext.RequestAborted)
+            var query = new GetAssetQuery
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            if (asset == null)
-                return NotFound();
-
-            if (asset.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            return Ok(_mapper.Map<Asset, AssetModel>(asset));
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -76,33 +69,22 @@ namespace Kubera.App.Controllers.V1
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(AssetModel), StatusCodes.Status201Created)]
-        public async Task<ActionResult<AssetModel>> PostAsset(AssetPostModel model)
+        public async Task<ActionResult<AssetModel>> PostAsset(AssetInputModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var asset = new Asset
+            var command = new CreateAssetCommand
             {
-                Code = model.Code,
-                Name = model.Name,
-                GroupId = model.GroupId,
-                Order = model.Order,
-                Icon = model.Icon,
-                Symbol = model.Symbol,
-                CreatedAt = DateTime.UtcNow,
-                OwnerId = User.Identity.Name
+                Input = model
             };
-
-            if (await _assetRepository.Exists(asset, ct).ConfigureAwait(false))
-                return Conflict("Code or Name alredy exists");
-
-            asset = await _assetRepository.Add(asset, ct)
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            var result = _mapper.Map<Asset, AssetModel>(asset);
+            if(result.IsFailure)
+                return result.AsActionResult();
 
-            return CreatedAtAction(nameof(GetAssets), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetAsset), new { id = result.Value.Id }, result.Value);
         }
 
         /// <summary>
@@ -116,31 +98,20 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> PutAsset(Guid id, AssetPutModel model)
+        public async Task<IActionResult> PutAsset(Guid id, AssetUpdateModel model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var ct = HttpContext.RequestAborted;
-            var asset = await _assetRepository.GetById(id).ConfigureAwait(false);
+            var command = new UpdateAssetCommand
+            {
+                Id = id,
+                Input = model
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
 
-            if (asset.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            if (await _assetRepository.Exists(asset, ct).ConfigureAwait(false))
-                return Conflict("Code or Name alredy exists");
-
-            asset.Code = model.Code;
-            asset.Name = model.Name;
-            asset.Symbol = model.Symbol;
-            asset.Icon = model.Icon;
-            asset.GroupId = model.GroupId;
-            asset.Order = model.Order;
-
-            await _assetRepository.Update(asset, ct)
-                    .ConfigureAwait(false);
-
-            return NoContent();
+            return result.AsActionResult();
         }
 
         /// <summary>
@@ -152,21 +123,19 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteGroup(Guid id)
+        public async Task<IActionResult> DeleteAsset(Guid id)
         {
-            var ct = HttpContext.RequestAborted;
-            var asset = await _assetRepository.GetById(id, ct);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (asset == null)
-                return NotFound();
-
-            if (asset.OwnerId != User.Identity.Name)
-                return Forbid();
-
-            await _assetRepository.Delete(asset.Id, ct)
+            var command = new DeleteAssetCommand
+            {
+                Id = id
+            };
+            var result = await Mediator.Send(command, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            return NoContent();
+            return result.AsActionResult();
         }
     }
 }

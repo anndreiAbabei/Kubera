@@ -1,4 +1,5 @@
-﻿using Kubera.Data.Entities;
+﻿using Kubera.Application.Services;
+using Kubera.Data.Entities;
 using Kubera.Data.Store;
 using Kubera.General.Repository;
 using Kubera.General.Services;
@@ -25,10 +26,5 @@ namespace Kubera.Business.Repository
             return await GetById(new[] { _userIdAccesor.Id }, cancellationToken)
                 .ConfigureAwait(false);
         }
-    }
-
-    public interface IUserRepository
-    {
-        ValueTask<ApplicationUser> GetMe(CancellationToken cancellationToken = default);
     }
 }

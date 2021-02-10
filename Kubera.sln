@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App", "src\Kubera.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App.IntegrationTests", "tests\Kubera.App.IntegrationTests\Kubera.App.IntegrationTests.csproj", "{62C2F8D7-5D40-450E-A665-3AE1F832DBCB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.Application", "Kubera.Application\Kubera.Application.csproj", "{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{62C2F8D7-5D40-450E-A665-3AE1F832DBCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62C2F8D7-5D40-450E-A665-3AE1F832DBCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62C2F8D7-5D40-450E-A665-3AE1F832DBCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +65,7 @@ Global
 		{B0A9901E-2D4C-471D-AF31-6AA59912F4A6} = {A8F96EC4-FD37-4787-AE65-84223962BC85}
 		{722C92A8-9C35-4946-AB15-8C70EC16199A} = {63BA477D-54AA-4EA7-B4ED-DEB38671F839}
 		{62C2F8D7-5D40-450E-A665-3AE1F832DBCB} = {14293EF7-36E1-4EFF-8123-F4CA5A9136EE}
+		{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6} = {B0A9901E-2D4C-471D-AF31-6AA59912F4A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05EBE7AE-548C-4A7C-8E26-47A11FC7D853}

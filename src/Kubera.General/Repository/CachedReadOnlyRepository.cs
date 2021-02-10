@@ -53,15 +53,14 @@ namespace Kubera.General.Repository
                 .ConfigureAwait(false);
         }
 
-        public override async ValueTask<IQueryable<TEntity>> GetAll(IPaging paging = null, IDateFilter dateFilter = null, CancellationToken cancellationToken = default)
+        public override IQueryable<TEntity> GetAll()
         {
             if (!Options.UseCache)
-                return await base.GetAll(paging, dateFilter, cancellationToken).ConfigureAwait(false);
+                return base.GetAll();
 
-            var keys = CalculateGetAllKey(paging, dateFilter);
+            var keys = "All";
 
-            return await CacheService.GetOrAdd(keys, async () => await base.GetAll(paging, dateFilter, cancellationToken).ConfigureAwait(false))
-                .ConfigureAwait(false);
+            return CacheService.GetOrAdd(keys, () => base.GetAll());
         }
 
         protected virtual object[] CalculateGetAllKey(IPaging paging, IDateFilter dateFilter)

@@ -1,5 +1,5 @@
 ﻿using Kubera.App.IntegrationTests.TestData;
-using Kubera.App.Models;
+using Kubera.Application.Common.Models;
 using Kubera.Data.Entities;
 using Xunit;
 
