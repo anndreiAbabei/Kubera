@@ -29,11 +29,11 @@ namespace Kubera.General.Repository
             Store = store;
         }
 
-        public ValueTask<TEntity> Add(TEntity entity, CancellationToken cancellationToken = default) => Store.Add(entity, cancellationToken);
+        public virtual ValueTask<TEntity> Add(TEntity entity, CancellationToken cancellationToken = default) => Store.Add(entity, cancellationToken);
 
-        public ValueTask Update(TEntity entity, CancellationToken cancellationToken = default) => Store.Update(entity, cancellationToken);
+        public virtual ValueTask Update(TEntity entity, CancellationToken cancellationToken = default) => Store.Update(entity, cancellationToken);
 
-        public ValueTask Delete(TKey[] keys, bool hardDelete = false, CancellationToken cancellationToken = default) => Store.Delete(keys, hardDelete, cancellationToken);
+        public virtual ValueTask Delete(TKey[] keys, bool hardDelete = false, CancellationToken cancellationToken = default) => Store.Delete(keys, hardDelete, cancellationToken);
     }
 
     public class CrudRepository<TEntity> : CrudRepository<TEntity, Guid>, ICrudRepository<TEntity>
