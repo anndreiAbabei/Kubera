@@ -1,16 +1,17 @@
 ﻿using Kubera.Data.Entities;
 using Kubera.Data.Store;
 using Kubera.General.Repository;
+using Kubera.General.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kubera.Business.Repository
 {
-    public class CurrencyRepository : CrudRepository<Currency>, ICurrencyRepository
+    public class CurrencyRepository : CachedCrudRepository<Currency>, ICurrencyRepository
     {
-        public CurrencyRepository(ICurrencyStore store) 
-            : base(store)
+        public CurrencyRepository(ICurrencyStore store, ICacheService cacheService) 
+            : base(store, cacheService)
         {
         }
 

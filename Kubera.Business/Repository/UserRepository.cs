@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Kubera.Business.Repository
 {
-    public class UserRepository : ReadOnlyRepository<ApplicationUser, string>, IUserRepository
+    public class UserRepository : CachedReadOnlyRepository<ApplicationUser, string>, IUserRepository
     {
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public UserRepository(IUserStore store, IUserIdAccesor userIdAccesor) 
-            : base(store)
+        public UserRepository(IUserStore store, ICacheService cacheService, IUserIdAccesor userIdAccesor) 
+            : base(store, cacheService)
         {
             _userIdAccesor = userIdAccesor;
         }

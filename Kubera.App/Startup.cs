@@ -21,6 +21,7 @@ using Kubera.App.Mapper;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
+using Kubera.Business.Services;
 
 namespace Kubera.App
 {
@@ -123,8 +124,11 @@ namespace Kubera.App
         private static void ConfigureDI(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddMemoryCache();
 
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
+            services.AddScoped<ICacheService, CacheService>();
+
             services.AddScoped<IAssetRepository, AssetRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<IGroupRepository, GroupRepository>();

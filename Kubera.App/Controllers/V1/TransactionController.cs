@@ -153,8 +153,32 @@ namespace Kubera.App.Controllers.V1
 
             transaction = await _transactionRepository.Add(transaction, ct)
                 .ConfigureAwait(false);
+            var currencies = await _currencyRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+            var assets = await _assetRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
+            var groups = await _groupRepository.GetAll(cancellationToken: ct)
+                .ToListAsync(ct)
+                .ConfigureAwait(false);
 
             var result = _mapper.Map<Transaction, TransactionModel>(transaction);
+
+            if (currencies.Found(model.CurrencyId, out var currency))
+                result.Currency = _mapper.Map<Currency, CurrencyModel>(currency);
+
+            if (assets.Found(model.AssetId, out var asset))
+            {
+                result.Asset = _mapper.Map<Asset, AssetModel>(asset);
+
+
+                if (groups.Found(asset.GroupId, out var group))
+                    result.Asset.Group = _mapper.Map<Group, GroupModel>(group);
+            }
+
+            if (result.FeeCurrencyId.HasValue && currencies.Found(model.FeeCurrencyId.Value, out var feeCurrency))
+                result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
 
             return CreatedAtAction(nameof(GetTransaction), new { id = result.Id }, result);
         }
