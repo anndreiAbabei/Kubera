@@ -5,5 +5,6 @@ namespace Kubera.General
     public interface IAppSettings
     {
         ICacheOptions CacheOptions { get; }
+        string AlphaVantageApiKey { get; }
     }
 }

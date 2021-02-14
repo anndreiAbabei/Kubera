@@ -1,6 +1,7 @@
 ﻿using Kubera.Application.Services;
 using Kubera.Business.Entities.Defaults;
 using Kubera.Data.Entities;
+using Kubera.General;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
@@ -11,16 +12,22 @@ namespace Kubera.Business.Entities
         IDefaultGroups Groups { get; }
     }
 
-    public class DefaultEntities : IDefaultEntities
+    public class DefaultEntities : IDefaultEntities, IDefaults
     {
-        public virtual IDefaultGroups Groups { get; }
+        private readonly DefaultGroups _groups;
+
+        public virtual string Currency => "EUR";
+
+        IDefaultGroupsCodes IDefaults.Groups => _groups;
+
+        IDefaultGroups IDefaultEntities.Groups => _groups;
 
         public DefaultEntities(IGroupRepository groupRepository)
         {
-            Groups = new DefaultGroups(groupRepository);
+            _groups = new DefaultGroups(groupRepository);
         }
 
-        private class DefaultGroups : IDefaultGroups
+        private class DefaultGroups : IDefaultGroups, IDefaultGroupsCodes
         {
             private readonly IGroupRepository _groupRepository;
             private readonly ConcurrentDictionary<string, Group> _dictionary;
@@ -31,11 +38,17 @@ namespace Kubera.Business.Entities
                 _dictionary = new ConcurrentDictionary<string, Group>();
             }
 
-            public async ValueTask<Group> Commodity() => await GetAndOrAdd(Codes.Group.Commodity);
+            public string Commodity => Codes.Group.Commodity;
 
-            public async ValueTask<Group> Crypto() => await GetAndOrAdd(Codes.Group.Crypto);
+            public string Crypto => Codes.Group.Crypto;
 
-            public async ValueTask<Group> Stock() => await GetAndOrAdd(Codes.Group.Stock);
+            public string Stock => Codes.Group.Stock;
+
+            public async ValueTask<Group> GetCommodity() => await GetAndOrAdd(Commodity);
+
+            public async ValueTask<Group> GetCrypto() => await GetAndOrAdd(Crypto);
+
+            public async ValueTask<Group> GetStock() => await GetAndOrAdd(Stock);
 
             private async ValueTask<Group> GetAndOrAdd(string code)
             {

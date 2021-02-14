@@ -20,8 +20,6 @@ using FluentValidation.AspNetCore;
 using Kubera.App.Mapper;
 using Kubera.Application;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 using Kubera.Business.Services;
 using ZymLabs.NSwag.FluentValidation;
 using NSwag.Generation.AspNetCore;
@@ -34,6 +32,7 @@ using System.Reflection;
 using Kubera.App.Infrastructure.Behaviours;
 using Kubera.Application.Services;
 using Kubera.App.Infrastructure;
+using Kubera.Business.Entities;
 
 namespace Kubera.App
 {
@@ -99,9 +98,8 @@ namespace Kubera.App
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly);
-
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddHostedService<StartupSeedService>();
 
@@ -165,8 +163,11 @@ namespace Kubera.App
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
 
+            services.AddHttpClient<IForexService, AlphaVantageService>();
+
             services.AddSingleton<IAppSettings, AppSettings>(i => settings);
             services.AddSingleton(i => settings?.CacheOptions ?? CacheOptions.Default);
+            services.AddSingleton<DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 

@@ -1,6 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿using AutoMapper;
+using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
+using Kubera.Data.Entities;
+using Kubera.Data.Extensions;
 using MediatR;
 using System.Text.Json;
 using System.Threading;
@@ -11,10 +14,12 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
     public class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, Result<UserInfoModel>>
     {
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public GetUserInfoQueryHandler(IUserRepository userRepository)
+        public GetUserInfoQueryHandler(IUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         public async Task<Result<UserInfoModel>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
@@ -26,7 +31,7 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
             {
                 Email = user.Email,
                 FullName = user.FullName,
-                Settings = JsonSerializer.Deserialize<UserSettingsModel>(user.Settings)
+                Settings = _mapper.Map<UserSettings, UserSettingsModel>(user.GetSettings())
             };
 
             return result;

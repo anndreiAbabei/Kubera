@@ -14,4 +14,9 @@
     <ProjectReference Include="..\Kubera.General\Kubera.General.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Models\AlphaVantage\" />
+  </ItemGroup>
 </Project>

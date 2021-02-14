@@ -5,8 +5,8 @@ namespace Kubera.Business.Entities
 {
     public interface IDefaultGroups
     {
-        ValueTask<Group> Commodity();
-        ValueTask<Group> Crypto();
-        ValueTask<Group> Stock();
+        ValueTask<Group> GetCommodity();
+        ValueTask<Group> GetCrypto();
+        ValueTask<Group> GetStock();
     }
 }
