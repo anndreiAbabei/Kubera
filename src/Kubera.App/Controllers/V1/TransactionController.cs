@@ -14,6 +14,7 @@ using Kubera.Application.Features.Queries.GetTransaction.V1;
 using Kubera.Application.Features.Commands.CreateTransaction.V1;
 using Kubera.Application.Features.Commands.UpdateTransaction.V1;
 using Kubera.Application.Features.Commands.DeleteTransaction.V1;
+using Kubera.Application.Features.Queries.GetGroupedTransactions.V1;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -39,6 +40,21 @@ namespace Kubera.App.Controllers.V1
                 Date = filter,
                 Order = order
             };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
+
+            return result.AsActionResult();
+        }
+        
+        /// <summary>
+        /// Get all groups for the logged user
+        /// </summary>
+        /// <returns>Collection of logged user groups</returns>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
+        {
+            var query = new GetGroupedTransactionsQuery();
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
