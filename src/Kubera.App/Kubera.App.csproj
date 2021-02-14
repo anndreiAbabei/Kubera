@@ -67,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Kubera.Application\Kubera.Application.csproj" />
+    <ProjectReference Include="..\Kubera.Application\Kubera.Application.csproj" />
     <ProjectReference Include="..\Kubera.Business\Kubera.Business.csproj" />
     <ProjectReference Include="..\Kubera.Data\Kubera.Data.csproj" />
     <ProjectReference Include="..\Kubera.General\Kubera.General.csproj" />

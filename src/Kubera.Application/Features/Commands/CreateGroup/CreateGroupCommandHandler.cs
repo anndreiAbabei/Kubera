@@ -16,9 +16,8 @@ namespace Kubera.Application.Features.Commands.CreateGroup
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
-        private readonly IUserIdAccesor _userIdAccesor;
 
-        public CreateGroupCommandHandler(IGroupRepository groupRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
+        public CreateGroupCommandHandler(IGroupRepository groupRepository, IMapper mapper)
         {
             _groupRepository = groupRepository;
             _mapper = mapper;

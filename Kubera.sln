@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App", "src\Kubera.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kubera.App.IntegrationTests", "tests\Kubera.App.IntegrationTests\Kubera.App.IntegrationTests.csproj", "{62C2F8D7-5D40-450E-A665-3AE1F832DBCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.Application", "Kubera.Application\Kubera.Application.csproj", "{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kubera.Application", "src\Kubera.Application\Kubera.Application.csproj", "{9A0D7D37-1649-4750-BCF2-6CA0602F2DD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

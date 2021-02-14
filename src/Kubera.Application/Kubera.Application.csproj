@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Kubera.Data\Kubera.Data.csproj" />
-    <ProjectReference Include="..\src\Kubera.General\Kubera.General.csproj" />
+    <ProjectReference Include="..\Kubera.Data\Kubera.Data.csproj" />
+    <ProjectReference Include="..\Kubera.General\Kubera.General.csproj" />
   </ItemGroup>
 
 </Project>
