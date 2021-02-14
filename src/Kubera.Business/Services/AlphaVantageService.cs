@@ -134,7 +134,7 @@ namespace Kubera.Business.Services
             };
         }
 
-        private async ValueTask<IStockCompanyResponse> GetCompanyImpl(string company, CancellationToken cancellationToken)
+        private async ValueTask<IStockCompanyResponse> GetCompanyImpl(string company, CancellationToken cancellationToken = default)
         {
             var qs = new
             {
@@ -147,7 +147,7 @@ namespace Kubera.Business.Services
                 .ConfigureAwait(false);
         }
 
-        private async Task<T> GetResult<T>(object queryString, CancellationToken token)
+        private async Task<T> GetResult<T>(object queryString, CancellationToken token = default)
         {
             var ub = new UriBuilder("https", "www.alphavantage.co")
             {
