@@ -33,6 +33,7 @@ using MediatR;
 using System.Reflection;
 using Kubera.App.Infrastructure.Behaviours;
 using Kubera.Application.Services;
+using Kubera.App.Infrastructure;
 
 namespace Kubera.App
 {
@@ -68,11 +69,11 @@ namespace Kubera.App
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ReportApiVersions = true;
             })
-            //.AddVersionedApiExplorer(options =>
-            //{
-            //    options.GroupNameFormat = "VVV";
-            //    options.SubstituteApiVersionInUrl = true;
-            //})
+            /*.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "VVV";
+                options.SubstituteApiVersionInUrl = true;
+            })*/
             .AddSingleton<FluentValidationSchemaProcessor>()
             .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
 
@@ -101,6 +102,8 @@ namespace Kubera.App
             services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly);
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+
+            services.AddHostedService<StartupSeedService>();
 
             ConfigureDI(services);
         }
@@ -141,9 +144,6 @@ namespace Kubera.App
 
             app.UseSpa(spa =>
             {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
                 spa.Options.SourcePath = "ClientApp";
 
                 if (env.IsDevelopment())
@@ -151,10 +151,6 @@ namespace Kubera.App
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-
-            MigrateAndSeed(app).ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
         }
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
@@ -191,20 +187,7 @@ namespace Kubera.App
             services.AddAutoMapper(typeof(AppMapper).Assembly);
         }
 
-        private static async ValueTask MigrateAndSeed(IApplicationBuilder app, CancellationToken cancellationToken = default)
-        {
-            using var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
-            var seeder = serviceScope.ServiceProvider.GetService<ISeeder>();
-
-            await context.Database.MigrateAsync(cancellationToken)
-                .ConfigureAwait(false);
-
-            await seeder.Seed(cancellationToken)
-                .ConfigureAwait(false);
-        }
-
-        private void GenerateSwaggerDocument(AspNetCoreOpenApiDocumentGeneratorSettings settings, IServiceProvider sp, string name, string group)
+        private static void GenerateSwaggerDocument(AspNetCoreOpenApiDocumentGeneratorSettings settings, IServiceProvider sp, string name, string group)
         {
             var fluentValidationSchemaProcessor = sp.GetRequiredService<FluentValidationSchemaProcessor>();
             settings.SchemaProcessors.Add(fluentValidationSchemaProcessor);

@@ -5,7 +5,7 @@ using Kubera.Application.Common.Models;
 
 namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
 {
-    public class GetGroupedTransactionsQuery : IRequest<Result<IEnumerable<GroupedTransactions>>>
+    public class GetGroupedTransactionsQuery : IRequest<Result<IEnumerable<GroupedTransactionsModel>>>
     {
         
     }

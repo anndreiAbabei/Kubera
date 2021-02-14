@@ -16,11 +16,13 @@ namespace Kubera.Application.Features.Commands.CreateGroup
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
+        private readonly IUserIdAccesor _userIdAccesor;
 
-        public CreateGroupCommandHandler(IGroupRepository groupRepository, IMapper mapper)
+        public CreateGroupCommandHandler(IGroupRepository groupRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
         {
             _groupRepository = groupRepository;
             _mapper = mapper;
+            _userIdAccesor = userIdAccesor;
         }
 
         public async Task<Result<GroupModel>> Handle(CreateGroupCommand request, CancellationToken cancellationToken)

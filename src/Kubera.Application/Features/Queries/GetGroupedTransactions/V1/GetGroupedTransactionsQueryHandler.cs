@@ -9,7 +9,7 @@ using AutoMapper;
 
 namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
 {
-    public class GetGroupedTransactionsQueryHandler : IRequestHandler<GetGroupedTransactionsQuery, Result<IEnumerable<GroupedTransactions>>>
+    public class GetGroupedTransactionsQueryHandler : IRequestHandler<GetGroupedTransactionsQuery, Result<IEnumerable<GroupedTransactionsModel>>>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
@@ -20,9 +20,9 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
             _mapper = mapper;
         }
 
-        public Task<Result<IEnumerable<GroupedTransactions>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
+        public Task<Result<IEnumerable<GroupedTransactionsModel>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
         {
-            _groupRepository.GetAll()
+            return null;
         }
     }
 }
