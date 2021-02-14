@@ -1,11 +1,13 @@
-using System.Collections.Generic;
-
 namespace Kubera.Application.Common.Models
 {
     public class GroupedTransactionsModel
     {
-        public GroupModel Group { get; set; }
+        public AssetModel Asset { get; set; }
 
-        public IEnumerable<TransactionModel> Transactions { get; set; }
+        public decimal Amount { get; set; }
+
+        public decimal TotalBought { get; set; }
+
+        public decimal ActualValue { get; set; }
     }
 }
