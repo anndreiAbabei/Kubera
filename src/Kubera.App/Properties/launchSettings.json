@@ -12,7 +12,6 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "CONNECTION_STR_KUBERA_DB": "Server=tcp:kubera.database.windows.net,1433;Initial Catalog=Kubera.Db;Persist Security Info=False;User ID=kubera;Password=pC%LL34Li@aW6CaX;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },

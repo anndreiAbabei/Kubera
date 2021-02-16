@@ -20,8 +20,6 @@ using FluentValidation.AspNetCore;
 using Kubera.App.Mapper;
 using Kubera.Application;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 using Kubera.Business.Services;
 using ZymLabs.NSwag.FluentValidation;
 using NSwag.Generation.AspNetCore;
@@ -44,7 +42,7 @@ namespace Kubera.App
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -105,15 +103,13 @@ namespace Kubera.App
 
             services.AddHostedService<StartupSeedService>();
 
-            ConfigureDI(services);
+            ConfigureDi(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
             {
                 app.UseExceptionHandler("/Error");
@@ -126,9 +122,8 @@ namespace Kubera.App
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
-            {
                 app.UseSpaStaticFiles();
-            }
+            
             app.UseRouting();
 
             app.UseAuthentication();
@@ -136,9 +131,7 @@ namespace Kubera.App
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
 
@@ -146,19 +139,17 @@ namespace Kubera.App
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
+                if (env.IsDevelopment()) 
+                    spa.UseAngularCliServer("start");
             });
         }
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            builder.UseSqlServer(Configuration["ConnectionStrKuberaDb"]);
         }
 
-        private void ConfigureDI(IServiceCollection services)
+        private void ConfigureDi(IServiceCollection services)
         {
             var settings = Configuration.GetSection("AppSettings").Get<AppSettings>();
 
