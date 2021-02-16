@@ -2,6 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <Company>Andrei Ababei</Company>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <Configurations>Debug;UAT;Production</Configurations>
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Production' ">
+    <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
