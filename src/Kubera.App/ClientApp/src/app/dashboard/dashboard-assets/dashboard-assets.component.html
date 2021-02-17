@@ -1,1 +1,44 @@
-﻿<div style="border: 1px solid red">dashboard-assets Component</div>
+﻿<div class="root">
+    <div class="mat-elevation-z8 content">
+      <div class="table">
+        <mat-progress-bar mode="query" *ngIf="isLoadingResults" aria-label="Loading assets"></mat-progress-bar>
+        <table mat-table [dataSource]="assets" matSort matSortActive="name" matSortDisableClear matSortDirection="desc">
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>
+                  Asset
+                  <td mat-cell *matCellDef="let row">{{row.name}}</td>
+                </th>
+              </ng-container>
+      
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef>Total</th>
+                <td mat-cell *matCellDef="let row">{{row.total | currency}}</td>
+              </ng-container>
+      
+              <ng-container matColumnDef="actual">
+                <th mat-header-cell *matHeaderCellDef>Now</th>
+                <td mat-cell *matCellDef="let row">{{row.totalNow | currency}}</td>
+              </ng-container>
+      
+              <ng-container matColumnDef="increase">
+                <th mat-header-cell *matHeaderCellDef>Procent</th>
+                <td mat-cell *matCellDef="let row">{{row.procent}}</td>
+              </ng-container>
+      
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <p class="no-item" *ngIf="noResult">No available transaction, you can always add one 😉</p>
+      </div>
+  
+      <div>
+        <div class="refresh-button-container">
+          <button mat-mini-fab color="accent" aria-label="Refresh transactions" [disabled]="isLoadingResults" (click)="refreshTransactions()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  

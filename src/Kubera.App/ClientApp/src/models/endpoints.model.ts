@@ -1,6 +1,7 @@
 export class EndpointsGet {
   transactions = `${this.base}/transaction`;
   assets = `${this.base}/asset`;
+  assetsTotal = `${this.base}/asset/total`;
   currencies = `${this.base}/currency`;
 
   constructor(private base: string) { }
