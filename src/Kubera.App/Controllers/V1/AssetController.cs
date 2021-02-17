@@ -9,9 +9,11 @@ using MediatR;
 using Kubera.Application.Features.Queries.GetAllAssets.V1;
 using Kubera.App.Infrastructure.Extensions;
 using Kubera.Application.Features.Queries.GetAsset.V1;
+using Kubera.Application.Features.Queries.GetAssetsTotal.V1;
 using Kubera.Application.Features.Commands.CreateAsset.V1;
 using Kubera.Application.Features.Commands.UpdateAsset.V1;
 using Kubera.Application.Features.Commands.DeleteAsset.V1;
+
 
 namespace Kubera.App.Controllers.V1
 {
@@ -132,6 +134,21 @@ namespace Kubera.App.Controllers.V1
                 Id = id
             };
             var result = await Mediator.Send(command, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
+
+            return result.AsActionResult();
+        }
+
+        /// <summary>
+        /// Get all assets with their total of a user
+        /// </summary>
+        /// <returns>Collection of assets with their respective assets</returns>
+        [HttpGet("totals")]
+        [ProducesResponseType(typeof(IEnumerable<AssetTotalModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<AssetTotalModel>>> GetAssetsTotals()
+        {
+            var query = new GetAssetsTotalQuery();
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
             return result.AsActionResult();

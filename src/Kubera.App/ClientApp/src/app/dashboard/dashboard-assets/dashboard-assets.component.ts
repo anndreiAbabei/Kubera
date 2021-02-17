@@ -10,7 +10,7 @@ import { ErrorHandlerService } from 'src/services/errorHandler.service';
     styleUrls: ['./dashboard-assets.component.scss']
 })
 /** dashboard-assets component*/
-export class DashboardAssetsComponent  implements AfterViewInit {
+export class DashboardAssetsComponent implements AfterViewInit {
     public resultsLength = 0;
     public isLoadingResults = false;
     public noResult = false;
@@ -30,10 +30,10 @@ export class DashboardAssetsComponent  implements AfterViewInit {
             this.assets = this.sortAssets(this.assets);
         });
   
-      this.refreshTransactions();
+      this.refreshAssets();
     }
   
-    public refreshTransactions(): void {
+    public refreshAssets(): void {
         this.isLoadingResults = true;
 
         this.assetService.getTotals()
