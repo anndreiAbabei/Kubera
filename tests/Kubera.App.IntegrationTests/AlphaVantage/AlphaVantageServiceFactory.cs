@@ -5,10 +5,10 @@ using Kubera.General.Services;
 
 namespace Kubera.App.IntegrationTests.AlphaVantage
 {
-    public class AlphaVantageServiceFactory : IntegrationTestingFactory, IDisposable
+    public sealed class AlphaVantageServiceFactory : IntegrationTestingFactory, IDisposable
     {
         private readonly HttpClient _httpClient;
-        private bool disposedValue;
+        private bool _disposedValue;
 
         public IForexService Forex { get; }
 
@@ -19,17 +19,15 @@ namespace Kubera.App.IntegrationTests.AlphaVantage
             Forex = service;
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    _httpClient.Dispose();
-                }
+            if (_disposedValue)
+                return;
 
-                disposedValue = true;
-            }
+            if (disposing)
+                _httpClient.Dispose();
+
+            _disposedValue = true;
         }
 
         ~AlphaVantageServiceFactory()

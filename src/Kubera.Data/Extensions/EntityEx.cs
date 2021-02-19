@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Kubera.Data.Entities;
+using Kubera.Data.Entities.Meta;
 
 namespace Kubera.Data.Extensions
 {

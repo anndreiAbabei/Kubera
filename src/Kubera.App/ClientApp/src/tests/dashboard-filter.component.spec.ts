@@ -1,6 +1,6 @@
 /// <reference path="../../node_modules/@types/jasmine/index.d.ts" />
 import { TestBed, ComponentFixture, ComponentFixtureAutoDetect, waitForAsync } from '@angular/core/testing';
-import { BrowserModule, By } from "@angular/platform-browser";
+import { BrowserModule } from '@angular/platform-browser';
 import { DashboardFilterComponent } from '../app/dashboard/dashboard-filter/dashboard-filter.component';
 
 let component: DashboardFilterComponent;

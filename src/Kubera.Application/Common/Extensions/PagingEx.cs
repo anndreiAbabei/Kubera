@@ -1,9 +1,9 @@
-﻿using Kubera.General.Models;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Globalization;
+using Kubera.General.Models;
+using Microsoft.AspNetCore.Http;
 
-namespace Kubera.App.Infrastructure.Extensions
+namespace Kubera.Application.Common.Extensions
 {
     public static class PagingEx
     {

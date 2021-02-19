@@ -3,7 +3,6 @@ using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.Data.Entities;
-using Kubera.Data.Extensions;
 using Kubera.General.Services;
 using MediatR;
 using Kubera.General.Extensions;
@@ -78,7 +77,7 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
                     result.Asset.Group = _mapper.Map<Group, GroupModel>(group);
             }
 
-            if (result.FeeCurrencyId.HasValue && currencies.Found(request.Input.FeeCurrencyId.Value, out var feeCurrency))
+            if (request.Input.FeeCurrencyId != null && currencies.Found(request.Input.FeeCurrencyId.Value, out var feeCurrency))
                 result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
 
             return result;

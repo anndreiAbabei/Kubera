@@ -12,7 +12,7 @@ using Kubera.Data.Entities;
 using Kubera.General.Services;
 using Kubera.Data.Extensions;
 using Kubera.General.Extensions;
-using Kubera.General;
+using Kubera.General.Defaults;
 
 namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
 {

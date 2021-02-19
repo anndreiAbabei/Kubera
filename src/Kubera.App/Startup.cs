@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
-using Kubera.App.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +32,7 @@ using Kubera.App.Infrastructure.Behaviours;
 using Kubera.Application.Services;
 using Kubera.App.Infrastructure;
 using Kubera.Business.Entities;
+using Kubera.Data.Data;
 
 namespace Kubera.App
 {
@@ -43,10 +43,10 @@ namespace Kubera.App
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
 #if DEBUG
             services.AddDatabaseDeveloperPageExceptionFilter();
 #endif
@@ -68,11 +68,11 @@ namespace Kubera.App
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ReportApiVersions = true;
             })
-            /*.AddVersionedApiExplorer(options =>
+            .AddVersionedApiExplorer(options =>
             {
                 options.GroupNameFormat = "VVV";
                 options.SubstituteApiVersionInUrl = true;
-            })*/
+            })
             .AddSingleton<FluentValidationSchemaProcessor>()
             .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
 
@@ -84,34 +84,29 @@ namespace Kubera.App
                    options.ReturnHttpNotAcceptable = true;
 
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); // Even if Axway is returning this then we want it visible in the OpenAPI/Swagger doc (TODO: Will Axway return a ProblemDetails object??!?)
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); 
                    options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); // This defaults payload to ProblemDetails which is wrong. So Schema is later removed from Swagger.json via an OperationProcessor
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); 
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
                })
                .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
                .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
 
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
 
             services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
                 .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddHostedService<StartupSeedService>();
 
-            ConfigureDI(services);
+            ConfigureDi(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
             {
                 app.UseExceptionHandler("/Error");
@@ -124,9 +119,8 @@ namespace Kubera.App
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
-            {
                 app.UseSpaStaticFiles();
-            }
+            
             app.UseRouting();
 
             app.UseAuthentication();
@@ -134,9 +128,7 @@ namespace Kubera.App
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
 
@@ -144,19 +136,17 @@ namespace Kubera.App
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
+                if (env.IsDevelopment()) 
+                    spa.UseAngularCliServer("start");
             });
         }
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            builder.UseSqlServer(Configuration["ConnectionStrKuberaDb"]);
         }
 
-        private void ConfigureDI(IServiceCollection services)
+        private void ConfigureDi(IServiceCollection services)
         {
             var settings = Configuration.GetSection("AppSettings").Get<AppSettings>();
 
@@ -164,10 +154,10 @@ namespace Kubera.App
             services.AddMemoryCache();
 
             services.AddHttpClient<IForexService, AlphaVantageService>();
-
-            services.AddSingleton<IAppSettings, AppSettings>(i => settings);
-            services.AddSingleton(i => settings?.CacheOptions ?? CacheOptions.Default);
+            
             services.AddSingleton<DefaultEntities>();
+            services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
+            services.AddSingleton(_ => settings?.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 

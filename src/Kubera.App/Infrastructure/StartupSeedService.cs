@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Kubera.App.Data;
+using Kubera.Data.Data;
 using Kubera.General;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +18,8 @@ namespace Kubera.App.Infrastructure
             _serviceProvider = serviceProvider;
         }
 
+
+
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             using var serviceScope = _serviceProvider.CreateScope();
@@ -25,12 +27,16 @@ namespace Kubera.App.Infrastructure
             var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
             var seeder = serviceScope.ServiceProvider.GetService<ISeeder>();
 
-            await context.Database.MigrateAsync(cancellationToken)
-                .ConfigureAwait(false);
+            if (context != null)
+                await context.Database.MigrateAsync(cancellationToken)
+                             .ConfigureAwait(false);
 
-            await seeder.Seed(cancellationToken)
-                .ConfigureAwait(false);
+            if (seeder != null)
+                await seeder.Seed(cancellationToken)
+                            .ConfigureAwait(false);
         }
+
+
 
         public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     }

@@ -36,4 +36,8 @@
     <Folder Include="Entities\Meta\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
 </Project>

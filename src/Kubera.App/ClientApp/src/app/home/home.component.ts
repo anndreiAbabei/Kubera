@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-home',
@@ -7,8 +7,4 @@
 })
 /** home component*/
 export class HomeComponent {
-    /** home ctor */
-    constructor() {
-
-    }
 }

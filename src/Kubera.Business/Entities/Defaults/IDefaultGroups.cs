@@ -1,7 +1,7 @@
-﻿using Kubera.Data.Entities;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Kubera.Data.Entities;
 
-namespace Kubera.Business.Entities
+namespace Kubera.Business.Entities.Defaults
 {
     public interface IDefaultGroups
     {

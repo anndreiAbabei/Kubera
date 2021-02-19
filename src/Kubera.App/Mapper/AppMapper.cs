@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Kubera.Application.Common.Models;
-using Kubera.Business.Entities;
 using Kubera.Data.Entities;
+using Kubera.Data.Entities.Meta;
 
 namespace Kubera.App.Mapper
 {
@@ -15,10 +15,10 @@ namespace Kubera.App.Mapper
                 .ForMember(gm => gm.Name, c => c.MapFrom(g => g.Name));
 
             CreateMap<Currency, CurrencyModel>()
-                .ForMember(cm => cm.Code, c => c.MapFrom(c => c.Code))
-                .ForMember(cm => cm.Name, c => c.MapFrom(c => c.Name))
-                .ForMember(cm => cm.Symbol, c => c.MapFrom(c => c.Symbol))
-                .ForMember(cm => cm.Order, c => c.MapFrom(c => c.Order));
+                .ForMember(cm => cm.Code, cm => cm.MapFrom(c => c.Code))
+                .ForMember(cm => cm.Name, cm => cm.MapFrom(c => c.Name))
+                .ForMember(cm => cm.Symbol, cm => cm.MapFrom(c => c.Symbol))
+                .ForMember(cm => cm.Order, cm => cm.MapFrom(c => c.Order));
 
             CreateMap<Asset, AssetModel>()
                 .ForMember(am => am.Id, c => c.MapFrom(a => a.Id))

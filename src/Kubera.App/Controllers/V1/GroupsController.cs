@@ -89,7 +89,7 @@ namespace Kubera.App.Controllers.V1
         /// Update a group
         /// </summary>
         /// <param name="id">Id of the group</param>
-        /// <param name="group">Group update model</param>
+        /// <param name="model">Group update model</param>
         /// <returns>No content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

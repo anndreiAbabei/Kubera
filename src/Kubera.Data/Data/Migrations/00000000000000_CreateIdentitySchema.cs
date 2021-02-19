@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Kubera.App.Data.Migrations
+namespace Kubera.Data.Data.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

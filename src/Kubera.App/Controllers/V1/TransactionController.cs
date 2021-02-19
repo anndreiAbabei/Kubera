@@ -111,7 +111,7 @@ namespace Kubera.App.Controllers.V1
         /// Update a transaction
         /// </summary>
         /// <param name="id">Id of the transaction</param>
-        /// <param name="group">Transaction update model</param>
+        /// <param name="model">Transaction update model</param>
         /// <returns>No content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

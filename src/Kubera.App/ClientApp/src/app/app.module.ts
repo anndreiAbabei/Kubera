@@ -58,7 +58,6 @@ import { AuthorizeInterceptor } from 'src/api-authorization/authorize.intercepto
 import { HomeComponent } from './home/home.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 
-import { LoadingComponent } from './shared/loading/loading.component';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { DashboardAssetsComponent } from './dashboard/dashboard-assets/dashboard-assets.component';
@@ -78,8 +77,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     DashboardFilterComponent,
     DashboardGroupsComponent,
     DashboardTransactionsComponent,
-    DashboardCreateTransactionComponent,
-    LoadingComponent
+    DashboardCreateTransactionComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -102,7 +100,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatCheckboxModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
-      { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] },
+      { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] }
     ], { relativeLinkResolution: 'legacy' }),
     BrowserAnimationsModule
   ],
@@ -151,7 +149,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatTreeModule,
     OverlayModule,
     PortalModule,
-    ScrollingModule,
+    ScrollingModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthorizeInterceptor, multi: true }

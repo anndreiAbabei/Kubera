@@ -2,12 +2,12 @@
 using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
-using Kubera.Data.Entities;
 using Kubera.Data.Extensions;
 using MediatR;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Kubera.Data.Entities;
+using Kubera.Data.Entities.Meta;
 
 namespace Kubera.Application.Features.Queries.GetUserInfo.V1
 {
@@ -24,8 +24,8 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
 
         public async Task<Result<UserInfoModel>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetMe(cancellationToken)
-                   .ConfigureAwait(false);
+            ApplicationUser user = await _userRepository.GetMe(cancellationToken)
+                                                        .ConfigureAwait(false);
 
             var result = new UserInfoModel
             {

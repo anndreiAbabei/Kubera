@@ -1,4 +1,4 @@
-﻿namespace Kubera.General
+﻿namespace Kubera.General.Defaults
 {
     public interface IDefaults
     {

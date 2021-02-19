@@ -1,5 +1,9 @@
-﻿namespace Kubera.General
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Kubera.General
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("Design", "CA1034:Nested types should not be visible")]
     public static class Constraints
     {
         public static class SQL
