@@ -67,11 +67,11 @@ namespace Kubera.App
                 x.AssumeDefaultVersionWhenUnspecified = true;
                 x.ReportApiVersions = true;
             })
-            /*.AddVersionedApiExplorer(options =>
+            .AddVersionedApiExplorer(options =>
             {
                 options.GroupNameFormat = "VVV";
                 options.SubstituteApiVersionInUrl = true;
-            })*/
+            })
             .AddSingleton<FluentValidationSchemaProcessor>()
             .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
 
@@ -83,19 +83,16 @@ namespace Kubera.App
                    options.ReturnHttpNotAcceptable = true;
 
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); // Even if Axway is returning this then we want it visible in the OpenAPI/Swagger doc (TODO: Will Axway return a ProblemDetails object??!?)
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); 
                    options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); // This defaults payload to ProblemDetails which is wrong. So Schema is later removed from Swagger.json via an OperationProcessor
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); 
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
                    options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
                })
                .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
                .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
 
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
 
             services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly);
 
@@ -156,8 +153,8 @@ namespace Kubera.App
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
 
-            services.AddSingleton<IAppSettings, AppSettings>(i => settings);
-            services.AddSingleton(i => settings?.CacheOptions ?? CacheOptions.Default);
+            services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
+            services.AddSingleton(_ => settings?.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
