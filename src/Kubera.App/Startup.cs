@@ -45,7 +45,7 @@ namespace Kubera.App
         private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-        {
+        { 
 #if DEBUG
             services.AddDatabaseDeveloperPageExceptionFilter();
 #endif
