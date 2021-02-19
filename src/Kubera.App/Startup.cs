@@ -31,6 +31,7 @@ using System.Reflection;
 using Kubera.App.Infrastructure.Behaviours;
 using Kubera.Application.Services;
 using Kubera.App.Infrastructure;
+using Kubera.App.Static;
 using Kubera.Business.Entities;
 using Kubera.Data.Data;
 
@@ -143,12 +144,13 @@ namespace Kubera.App
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration["ConnectionStrKuberaDb"]);
+            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb]);
         }
 
         private void ConfigureDi(IServiceCollection services)
         {
-            var settings = Configuration.GetSection("AppSettings").Get<AppSettings>();
+            var settings = Configuration.GetSection(SettingKeys.AppSettings).Get<AppSettings>();
+            settings.AlphaVantageApiKey = Configuration[SettingKeys.AlphaVantageApiKey];
 
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
@@ -157,7 +159,7 @@ namespace Kubera.App
             
             services.AddSingleton<DefaultEntities>();
             services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
-            services.AddSingleton(_ => settings?.CacheOptions ?? CacheOptions.Default);
+            services.AddSingleton(_ => settings.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
@@ -193,12 +195,12 @@ namespace Kubera.App
             {
                 doc.Schemes = new[] { OpenApiSchema.Https };
                 doc.Info.Version = name;
-                doc.Info.Title = "Kubera API";
-                doc.Info.Description = "The Kubera API used for Kubera Angular UI";
-                doc.Info.TermsOfService = "None";
+                doc.Info.Title = $"{Resources.ApiName} API";
+                doc.Info.Description = $"The {Resources.ApiName} API used for {Resources.AppName} UI App";
+                doc.Info.TermsOfService = "MIT";
                 doc.Info.Contact = new OpenApiContact
                 {
-                    Name = "Kubera",
+                    Name = Resources.AppName,
                     Email = ""
                 };
             };
