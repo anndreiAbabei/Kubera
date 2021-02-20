@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
-using Kubera.App.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +31,10 @@ using System.Reflection;
 using Kubera.App.Infrastructure.Behaviours;
 using Kubera.Application.Services;
 using Kubera.App.Infrastructure;
+using Kubera.App.Static;
+using Kubera.Business.Entities;
+using Kubera.Data.Data;
+using Kubera.General.Defaults;
 
 namespace Kubera.App
 {
@@ -94,9 +97,8 @@ namespace Kubera.App
 
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
 
-            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly);
-
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddHostedService<StartupSeedService>();
 
@@ -143,18 +145,23 @@ namespace Kubera.App
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration["ConnectionStrKuberaDb"]);
+            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb]);
         }
 
         private void ConfigureDi(IServiceCollection services)
         {
-            var settings = Configuration.GetSection("AppSettings").Get<AppSettings>();
+            var settings = Configuration.GetSection(SettingKeys.AppSettings).Get<AppSettings>();
+            settings.AlphaVantageApiKey = Configuration[SettingKeys.AlphaVantageApiKey];
 
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
 
+            services.AddHttpClient<IForexService, AlphaVantageService>();
+            
             services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
-            services.AddSingleton(_ => settings?.CacheOptions ?? CacheOptions.Default);
+            services.AddSingleton(_ => settings.CacheOptions ?? CacheOptions.Default);
+            services.AddScoped<IDefaultEntities, DefaultEntities>();
+            services.AddScoped<IDefaults, DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
@@ -190,12 +197,12 @@ namespace Kubera.App
             {
                 doc.Schemes = new[] { OpenApiSchema.Https };
                 doc.Info.Version = name;
-                doc.Info.Title = "Kubera API";
-                doc.Info.Description = "The Kubera API used for Kubera Angular UI";
-                doc.Info.TermsOfService = "None";
+                doc.Info.Title = $"{Resources.ApiName} API";
+                doc.Info.Description = $"The {Resources.ApiName} API used for {Resources.AppName} UI App";
+                doc.Info.TermsOfService = "MIT";
                 doc.Info.Contact = new OpenApiContact
                 {
-                    Name = "Kubera",
+                    Name = Resources.AppName,
                     Email = ""
                 };
             };

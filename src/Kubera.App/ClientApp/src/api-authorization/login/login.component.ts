@@ -17,9 +17,9 @@ export class LoginComponent implements OnInit {
   public message = new BehaviorSubject<string>(null);
 
   constructor(
-    private authorizeService: AuthorizeService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router) { }
+    private readonly authorizeService: AuthorizeService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router) { }
 
   async ngOnInit() {
     const action = this.activatedRoute.snapshot.url[1];
@@ -100,6 +100,7 @@ export class LoginComponent implements OnInit {
   }
 
   private getReturnUrl(state?: INavigationState): string {
+// ReSharper disable once TsNotResolved
     const fromQuery = (this.activatedRoute.snapshot.queryParams as INavigationState).returnUrl;
     // If the url is comming from the query string, check that is either
     // a relative url or an absolute url
@@ -109,6 +110,7 @@ export class LoginComponent implements OnInit {
       // This is an extra check to prevent open redirects.
       throw new Error('Invalid return url. The return url needs to have the same origin as the current page.');
     }
+// ReSharper disable once TsNotResolved
     return (state && state.returnUrl) ||
       fromQuery ||
       ApplicationPaths.DefaultLoginRedirectPath;

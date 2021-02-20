@@ -8,7 +8,7 @@ namespace Kubera.App.Infrastructure.Services
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public string Id => _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        public string Id => _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         public HttpUserIdAccesor(IHttpContextAccessor httpContextAccessor)
         {

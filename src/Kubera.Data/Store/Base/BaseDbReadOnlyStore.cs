@@ -34,7 +34,7 @@ namespace Kubera.Data.Store.Base
         public virtual async ValueTask<TEntity> GetById(params TKey[] keys) => await GetById(keys, default)
             .ConfigureAwait(false);
 
-        public virtual async ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken = default)
+        public virtual async ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken)
         {
             return await ApplicationDbContext.Set<TEntity>()
                 .FindAsync(keys, cancellationToken)
@@ -42,7 +42,7 @@ namespace Kubera.Data.Store.Base
         }
     }
 
-    public abstract class BaseDbReadOnlyStore<TEntity> : BaseDbReadOnlyStore<TEntity, Guid>, IStore<TEntity>, IDbStore
+    public abstract class BaseDbReadOnlyStore<TEntity> : BaseDbReadOnlyStore<TEntity, Guid>, IStore<TEntity>
         where TEntity : class, IEntity
     {
         protected BaseDbReadOnlyStore(IApplicationDbContext applicationDbContext) 

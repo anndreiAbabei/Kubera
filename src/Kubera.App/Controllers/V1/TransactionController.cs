@@ -50,11 +50,14 @@ namespace Kubera.App.Controllers.V1
         /// Get all groups for the logged user
         /// </summary>
         /// <returns>Collection of logged user groups</returns>
-        [HttpGet]
+        [HttpGet("grouped")]
         [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
+        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Order? order)
         {
-            var query = new GetGroupedTransactionsQuery();
+            var query = new GetGroupedTransactionsQuery
+            {
+                Order = order
+            };
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
@@ -111,7 +114,7 @@ namespace Kubera.App.Controllers.V1
         /// Update a transaction
         /// </summary>
         /// <param name="id">Id of the transaction</param>
-        /// <param name="group">Transaction update model</param>
+        /// <param name="model">Transaction update model</param>
         /// <returns>No content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

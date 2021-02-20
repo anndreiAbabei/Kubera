@@ -7,7 +7,7 @@ var dashboard_transactions_component_1 = require("../app/dashboard/dashboard-tra
 var component;
 var fixture;
 describe('dashboard-transactions component', function () {
-    beforeEach(testing_1.async(function () {
+    beforeEach(testing_1.waitForAsync(function () {
         testing_1.TestBed.configureTestingModule({
             declarations: [dashboard_transactions_component_1.DashboardTransactionsComponent],
             imports: [platform_browser_1.BrowserModule],
@@ -18,7 +18,7 @@ describe('dashboard-transactions component', function () {
         fixture = testing_1.TestBed.createComponent(dashboard_transactions_component_1.DashboardTransactionsComponent);
         component = fixture.componentInstance;
     }));
-    it('should do something', testing_1.async(function () {
+    it('should do something', testing_1.waitForAsync(function () {
         expect(true).toEqual(true);
     }));
 });

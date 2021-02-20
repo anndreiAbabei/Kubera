@@ -90,7 +90,7 @@ namespace Kubera.App.Controllers.V1
         /// Update an asset
         /// </summary>
         /// <param name="id">Id of the asset</param>
-        /// <param name="group">Asset update model</param>
+        /// <param name="model">Asset update model</param>
         /// <returns>No content</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

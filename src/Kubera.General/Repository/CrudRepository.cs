@@ -23,7 +23,9 @@ namespace Kubera.General.Repository
     {
         protected new ICrudStore<TEntity, TKey> Store { get; }
 
-        public CrudRepository(ICrudStore<TEntity, TKey> store)
+
+
+        protected CrudRepository(ICrudStore<TEntity, TKey> store)
             : base(store)
         {
             Store = store;

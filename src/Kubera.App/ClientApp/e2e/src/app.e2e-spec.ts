@@ -1,5 +1,6 @@
 import { AppPage } from './app.po';
 
+// ReSharper disable TsNotResolved
 describe('App', () => {
   let page: AppPage;
 
@@ -12,3 +13,4 @@ describe('App', () => {
     expect(page.getMainHeading()).toEqual('Hello, world!');
   });
 });
+// ReSharper restore TsNotResolved

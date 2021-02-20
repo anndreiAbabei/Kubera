@@ -1,12 +1,13 @@
-﻿using Kubera.Data.Entities;
+﻿using System.Threading;
 using System.Threading.Tasks;
+using Kubera.Data.Entities;
 
-namespace Kubera.Business.Entities
+namespace Kubera.Business.Entities.Defaults
 {
     public interface IDefaultGroups
     {
-        ValueTask<Group> Commodity();
-        ValueTask<Group> Crypto();
-        ValueTask<Group> Stock();
+        ValueTask<Group> GetCommodity(CancellationToken canellationToken = default);
+        ValueTask<Group> GetCrypto(CancellationToken canellationToken = default);
+        ValueTask<Group> GetStock(CancellationToken canellationToken = default);
     }
 }

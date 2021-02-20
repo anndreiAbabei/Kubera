@@ -1,12 +1,10 @@
 ﻿using IdentityServer4.EntityFramework.Options;
+using Kubera.Data.Entities;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Kubera.Data.Entities;
-using Kubera.Data;
-using System.Threading.Tasks;
 
-namespace Kubera.App.Data
+namespace Kubera.Data.Data
 {
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>, IApplicationDbContext
     {
@@ -37,16 +35,6 @@ namespace Kubera.App.Data
                 b.Property(t => t.Rate).HasPrecision(32, 10);
                 b.Property(t => t.Fee).HasPrecision(32, 10);
             });
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-        }
-
-        public override ValueTask DisposeAsync()
-        {
-            return base.DisposeAsync();
         }
     }
 }

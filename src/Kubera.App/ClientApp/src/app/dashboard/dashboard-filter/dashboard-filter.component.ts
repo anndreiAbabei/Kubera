@@ -1,4 +1,4 @@
-﻿import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
     selector: 'app-dashboard-filter',
@@ -7,8 +7,5 @@
 })
 /** dashboard-filter component*/
 export class DashboardFilterComponent {
-    /** dashboard-filter ctor */
-    constructor() {
 
-    }
 }

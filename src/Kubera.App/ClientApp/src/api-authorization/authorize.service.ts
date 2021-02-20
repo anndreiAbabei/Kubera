@@ -3,6 +3,7 @@ import { User, UserManager, WebStorageStateStore } from 'oidc-client';
 import { BehaviorSubject, concat, from, Observable } from 'rxjs';
 import { filter, map, mergeMap, take, tap } from 'rxjs/operators';
 import { ApplicationPaths, ApplicationName } from './api-authorization.constants';
+import { UserManagerSettings } from 'oidc-client/index';
 
 export type IAuthenticationResult =
   SuccessAuthenticationResult |
@@ -58,6 +59,7 @@ export class AuthorizeService {
   public getAccessToken(): Observable<string> {
     return from(this.ensureUserManagerInitialized())
       .pipe(mergeMap(() => from(this.userManager.getUser())),
+// ReSharper disable once TsResolvedFromInaccessibleModule
         map(user => user && user.access_token));
   }
 
@@ -182,7 +184,7 @@ export class AuthorizeService {
     const settings: any = await response.json();
     settings.automaticSilentRenew = true;
     settings.includeIdTokenInSilentRenew = true;
-    this.userManager = new UserManager(settings);
+    this.userManager = new UserManager(<UserManagerSettings>settings);
 
     this.userManager.events.addUserSignedOut(async () => {
       await this.userManager.removeUser();
@@ -194,6 +196,7 @@ export class AuthorizeService {
     return from(this.ensureUserManagerInitialized())
       .pipe(
         mergeMap(() => this.userManager.getUser()),
+// ReSharper disable once TsResolvedFromInaccessibleModule
         map(u => u && u.profile));
   }
 }

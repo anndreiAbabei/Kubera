@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
-using Kubera.App.Infrastructure.Extensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.Data.Entities;
-using Kubera.Data.Extensions;
 using Kubera.General.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +12,7 @@ using System.Linq;
 using Kubera.General.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
+using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
