@@ -8,6 +8,8 @@ namespace Kubera.App
     {
         public CacheOptions CacheOptions { get; set; }
 
+        public string AlphaVantageApiKey { get; set; }
+
         ICacheOptions IAppSettings.CacheOptions => CacheOptions;
     }
 }

@@ -58,14 +58,14 @@ namespace Kubera.General.Repository
             if (!Options.UseCache)
                 return base.GetAll();
 
-            var keys = "All";
+            const string keys = "All";
 
             return CacheService.GetOrAdd(keys, () => base.GetAll());
         }
 
         protected virtual object[] CalculateGetAllKey(IPaging paging, IDateFilter dateFilter)
         {
-            return new[] { $"{paging?.Items}_{paging?.Page}|{dateFilter?.From?.ToString("o")}_{dateFilter?.To?.ToString("o")}" };
+            return new object[] { $"{paging?.Items}_{paging?.Page}|{dateFilter?.From?.ToString("o")}_{dateFilter?.To?.ToString("o")}" };
         }
     }
 

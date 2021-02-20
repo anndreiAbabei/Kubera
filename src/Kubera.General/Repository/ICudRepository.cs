@@ -16,28 +16,26 @@ namespace Kubera.General.Repository
     {
     }
 
-    public interface IUpdateable<TEntity, TKey>
+    public interface IUpdateable<in TEntity, TKey>
         where TEntity : IEntity<TKey>
     {
         ValueTask Update(TEntity entity, CancellationToken cancellationToken = default);
     }
 
-    public interface IUpdateable<TEntity> : IUpdateable<TEntity, Guid>
+    public interface IUpdateable<in TEntity> : IUpdateable<TEntity, Guid>
         where TEntity : IEntity
     {
     }
 
-    public interface IDeleateable<TEntity, TKey>
-        where TEntity : IEntity<TKey>
+    public interface IDeleateable<in TKey>
     {
         ValueTask Delete(TKey[] keys, bool hardDelete = false, CancellationToken cancellationToken = default);
     }
-    public interface IDeleateable<TEntity> : IDeleateable<TEntity, Guid>
-        where TEntity : IEntity
+    public interface IDeleateable : IDeleateable<Guid>
     {
     }
 
-    public interface ICudRepository<TEntity, TKey> : IAddeable<TEntity, TKey>, IUpdateable<TEntity, TKey>, IDeleateable<TEntity, TKey>
+    public interface ICudRepository<TEntity, TKey> : IAddeable<TEntity, TKey>, IUpdateable<TEntity, TKey>, IDeleateable<TKey>
         where TEntity : IEntity<TKey>
     {
 

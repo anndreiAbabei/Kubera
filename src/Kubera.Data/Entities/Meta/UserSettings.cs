@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Kubera.Business.Entities
+namespace Kubera.Data.Entities.Meta
 {
     public class UserSettings
     {

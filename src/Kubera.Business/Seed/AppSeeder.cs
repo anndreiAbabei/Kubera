@@ -34,11 +34,11 @@ namespace Kubera.Business.Seed
         {
             IList<Group> groups = new List<Group>();
 
-            foreach (var (Code, Name) in Codes.Group.Collection)
+            foreach ((string code, string name) in Codes.Group.Collection)
                 if (cancellationToken.IsCancellationRequested)
                     return groups;
                 else
-                    groups.Add(await CreateGroupIfNotExists(Code, Name, cancellationToken));
+                    groups.Add(await CreateGroupIfNotExists(code, name, cancellationToken));
 
             return groups;
         }
@@ -46,45 +46,47 @@ namespace Kubera.Business.Seed
         private async ValueTask SeedCurrency(CancellationToken cancellationToken = default)
         {
             int index = 0;
-            foreach (var (Code, Name, Symbol) in Codes.Currency.Collection)
+            foreach ((string code, string name, string symbol) in Codes.Currency.Collection)
                 if (cancellationToken.IsCancellationRequested)
                     return;
                 else
-                    await CreateCurrencyIfNotExists(Code, Name, Symbol, index++, cancellationToken)
+                    await CreateCurrencyIfNotExists(code, name, symbol, index++, cancellationToken)
                         .ConfigureAwait(false);
         }
+
 
 
         private async ValueTask SeedAssets(IEnumerable<Group> groups, CancellationToken cancellationToken = default)
         {
             int index = 0;
-            foreach (var (Code, Name, Symbol, GroupCode) in Codes.Asset.Collection)
+            var grList = groups as IList<Group> ?? groups.ToList();
+            foreach ((string code, string name, string symbol, string groupCode) in Codes.Asset.Collection)
                 if (cancellationToken.IsCancellationRequested)
                     return;
                 else
-                    await CreateAssetsIfNotExists(Code, Name, Symbol, GroupCode, groups, index++, cancellationToken)
-                        .ConfigureAwait(false);
+                    await CreateAssetsIfNotExists(code, name, symbol, groupCode, grList, index++, cancellationToken)
+                       .ConfigureAwait(false);
         }
+
+
 
         private async ValueTask<Group> CreateGroupIfNotExists(string code, string name, CancellationToken cancellationToken = default)
         {
-            var group = await _groupRepository.GetByCode(code)
+            var group = await _groupRepository.GetByCode(code, cancellationToken)
                             .ConfigureAwait(false);
 
-            if (group == null)
-            {
-                group = new Group
-                {
-                    Code = code,
-                    Name = name,
-                    CreatedAt = DateTime.UtcNow
-                };
+            if (group != null)
+                return group;
 
-                group = await _groupRepository.Add(group, cancellationToken)
-                    .ConfigureAwait(false);
-            }
+            group = new Group
+                    {
+                        Code = code,
+                        Name = name,
+                        CreatedAt = DateTime.UtcNow
+                    };
 
-            return group;
+            return await _groupRepository.Add(group, cancellationToken)
+                                         .ConfigureAwait(false);
         }
 
         private async ValueTask CreateCurrencyIfNotExists(string code, string name, string symbol, int index, CancellationToken cancellationToken = default)
@@ -114,6 +116,9 @@ namespace Kubera.Business.Seed
             if (curAsset == null)
             {
                 var group = groups.FirstOrDefault(g => g.Code == groupCode);
+
+                if(group == null)
+                    return;
 
                 curAsset = new Asset
                 {

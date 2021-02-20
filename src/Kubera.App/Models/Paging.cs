@@ -7,7 +7,7 @@ namespace Kubera.App.Models
     public class Paging : IPaging
     {
         [FromQuery(Name = "page")]
-        public uint Page { get; set; } = 0;
+        public uint Page { get; set; }
 
         [FromQuery(Name = "items")]
         public uint Items { get; set; } = 50;

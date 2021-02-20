@@ -46,7 +46,6 @@ namespace Kubera.App
 
 
                 store.Close();
-                
             }
         }
     }

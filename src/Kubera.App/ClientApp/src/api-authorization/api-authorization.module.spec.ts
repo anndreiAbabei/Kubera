@@ -1,5 +1,6 @@
 import { ApiAuthorizationModule } from './api-authorization.module';
 
+// ReSharper disable TsNotResolved
 describe('ApiAuthorizationModule', () => {
   let apiAuthorizationModule: ApiAuthorizationModule;
 
@@ -11,3 +12,4 @@ describe('ApiAuthorizationModule', () => {
     expect(apiAuthorizationModule).toBeTruthy();
   });
 });
+// ReSharper restore TsNotResolved

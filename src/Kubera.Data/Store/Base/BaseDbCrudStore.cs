@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Data.Store.Base
 {
-    public abstract class BaseDbCrudStore<TEntity, TKey> : BaseDbReadOnlyStore<TEntity, TKey>, ICrudStore<TEntity, TKey>, IDbStore
+    public abstract class BaseDbCrudStore<TEntity, TKey> : BaseDbReadOnlyStore<TEntity, TKey>, ICrudStore<TEntity, TKey>
         where TEntity : class, IEntity<TKey>
     {
         protected BaseDbCrudStore(IApplicationDbContext applicationDbContext)
@@ -54,11 +54,11 @@ namespace Kubera.Data.Store.Base
             }
         }
 
-        protected async ValueTask SaveChanges(CancellationToken cancellationToken = default) => await ApplicationDbContext.SaveChangesAsync(cancellationToken)
+        protected virtual async ValueTask SaveChanges(CancellationToken cancellationToken = default) => await ApplicationDbContext.SaveChangesAsync(cancellationToken)
                 .ConfigureAwait(false);
     }
 
-    public abstract class BaseDbCrudStore<TEntity> : BaseDbCrudStore<TEntity, Guid>, ICrudStore<TEntity>, IDbStore
+    public abstract class BaseDbCrudStore<TEntity> : BaseDbCrudStore<TEntity, Guid>, ICrudStore<TEntity>
         where TEntity : class, IEntity
     {
         protected BaseDbCrudStore(IApplicationDbContext applicationDbContext)

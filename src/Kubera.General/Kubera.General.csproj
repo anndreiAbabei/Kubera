@@ -13,4 +13,7 @@
     <Optimize Condition=" '$(Optimize)' == '' ">true</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Defaults\" />
+  </ItemGroup>
 </Project>

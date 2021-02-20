@@ -9,7 +9,8 @@ import { ApplicationPaths, QueryParameterNames } from './api-authorization.const
   providedIn: 'root'
 })
 export class AuthorizeGuard implements CanActivate {
-  constructor(private authorize: AuthorizeService, private router: Router) {
+  constructor(private readonly authorize: AuthorizeService,
+              private readonly router: Router) {
   }
   canActivate(
     _next: ActivatedRouteSnapshot,

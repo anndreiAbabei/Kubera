@@ -6,15 +6,16 @@ namespace Kubera.App.IntegrationTests.TestData
         where T1 : class
         where T2 : class
     {
-        private static readonly Type stringType = typeof(string);
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly Type StringType = typeof(string);
 
         public virtual bool AreEqual(T1 t1, T2 t2)
         {
-            if (t1 == null && t1 != t2)
+            if (t1 == null && t2 != null)
                 return false;
 
-            var type1 = t1.GetType();
-            var type2 = t2.GetType();
+            var type1 = t1!.GetType();
+            var type2 = t2!.GetType();
 
             foreach(var property1 in type1.GetProperties())
             {
@@ -37,9 +38,9 @@ namespace Kubera.App.IntegrationTests.TestData
                     if (!AreEqualInt(value1, value2))
                         return false;
                 }
-                else if (typeProp1 == stringType)
+                else if (typeProp1 == StringType)
                 {
-                    if (typeProp2 != stringType)
+                    if (typeProp2 != StringType)
                         return false;
 
                     if (!AreEqualInt(value1, value2))
@@ -54,7 +55,7 @@ namespace Kubera.App.IntegrationTests.TestData
 
         private static bool AreEqualInt(object o1, object o2)
         {
-            return (o1 == null && o2 == null) || o1.Equals(o2);
+            return (o1 == null && o2 == null) || o1!.Equals(o2);
         }
     }
 }

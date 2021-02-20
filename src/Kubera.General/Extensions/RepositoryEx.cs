@@ -23,36 +23,31 @@ namespace Kubera.General.Extensions
                 .ConfigureAwait(false);
         }
 
-        public static async ValueTask Delete<TEntity, TKey>(this IDeleateable<TEntity, TKey> delRepo, TKey id, bool forceDelete = false, CancellationToken cancellationToken = default)
-            where TEntity : IEntity<TKey>
+        public static async ValueTask Delete<TKey>(this IDeleateable<TKey> delRepo, TKey id, bool forceDelete = false, CancellationToken cancellationToken = default)
         {
             await DoDelete(delRepo, id, forceDelete, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public static async ValueTask Delete<TEntity>(this IDeleateable<TEntity> delRepo, Guid id, bool forceDelete = false, CancellationToken cancellationToken = default)
-            where TEntity : IEntity
+        public static async ValueTask Delete(this IDeleateable delRepo, Guid id, bool forceDelete = false, CancellationToken cancellationToken = default)
         {
             await DoDelete(delRepo, id, forceDelete, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public static async ValueTask Delete<TEntity, TKey>(this IDeleateable<TEntity, TKey> delRepo, TKey id, CancellationToken cancellationToken = default)
-            where TEntity : IEntity<TKey>
+        public static async ValueTask Delete<TKey>(this IDeleateable<TKey> delRepo, TKey id, CancellationToken cancellationToken = default)
         {
             await DoDelete(delRepo, id, false, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        public static async ValueTask Delete<TEntity>(this IDeleateable<TEntity> delRepo, Guid id, CancellationToken cancellationToken = default)
-            where TEntity : IEntity
+        public static async ValueTask Delete(this IDeleateable delRepo, Guid id, CancellationToken cancellationToken = default)
         {
             await DoDelete(delRepo, id, false, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        private static async ValueTask DoDelete<TEntity, TKey>(IDeleateable<TEntity, TKey> delRepo, TKey id, bool forceDelete, CancellationToken cancellationToken)
-            where TEntity : IEntity<TKey>
+        private static async ValueTask DoDelete<TKey>(IDeleateable<TKey> delRepo, TKey id, bool forceDelete, CancellationToken cancellationToken)
         {
             await delRepo.Delete(new[] { id }, forceDelete, cancellationToken)
                 .ConfigureAwait(false);
