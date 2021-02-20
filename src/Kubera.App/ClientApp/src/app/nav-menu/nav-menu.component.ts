@@ -9,6 +9,7 @@ import { SettingsService } from '../../services/settings.service';
 export class NavMenuComponent implements OnInit {
   public isExpanded = false;
   public appName: string;
+  public dark: boolean;
 
   constructor(private readonly settingService: SettingsService) {
 
@@ -24,5 +25,9 @@ export class NavMenuComponent implements OnInit {
 
   public toggle(): void {
     this.isExpanded = !this.isExpanded;
+  }
+
+  public toggleDarkMode(): void {
+    this.dark = !this.dark; //[ngClass]="'dark': dark"
   }
 }
