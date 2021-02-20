@@ -7,14 +7,14 @@ import { Transaction } from 'src/models/transactions.model';
 import { AssetService } from 'src/services/asset.service';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
-import { TransactionsService } from 'src/services/transactions.service';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard-create-transaction.component.html',
-  styleUrls: ['./dashboard-create-transaction.component.scss']
+  templateUrl: './dashboard-edit-transaction.component.html',
+  styleUrls: ['./dashboard-edit-transaction.component.scss']
 })
-export class DashboardCreateTransactionComponent implements OnInit {
+export class DashboardEditTransactionComponent implements OnInit {
+  public transaction: Transaction;
   public addTransactionForm: FormGroup;
   public assets: Asset[];
   public currencies: Currency[];
@@ -27,8 +27,7 @@ export class DashboardCreateTransactionComponent implements OnInit {
     public readonly formBuilder: FormBuilder,
     private readonly assetsService: AssetService,
     private readonly currencyService: CurrencyService,
-    private readonly errorHandlerService: ErrorHandlerService,
-    private readonly transactionService: TransactionsService) {
+    private readonly errorHandlerService: ErrorHandlerService) {
 
     this.addTransactionForm = new FormGroup({
       date: new FormControl('', [
@@ -60,15 +59,33 @@ export class DashboardCreateTransactionComponent implements OnInit {
     });
   }
 
-  public ngOnInit(): void {
-    this.assetsService.getAll()
-      .subscribe(a => this.assets = a, e => this.errorHandlerService.handle(e));
-
-      this.currencyService.getAll()
-        .subscribe(c => this.currencies = c, e => this.errorHandlerService.handle(e));
-
+  public async ngOnInit(): Promise<void> {
     this.addTransactionForm.get('fee').disable();
     this.addTransactionForm.get('feeCurrency').disable();
+
+    try {
+      this.assets = await this.assetsService.getAll().toPromise();
+      this.currencies = await this.currencyService.getAll().toPromise();
+    } catch (ex) {
+      this.errorHandlerService.handle(ex);
+      this.activeModal.close();
+    }
+
+    if (this.transaction) {
+      this.addTransactionForm.get('date').setValue(this.transaction.createdAt);
+      this.addTransactionForm.get('asset').setValue(this.transaction.assetId);
+      this.addTransactionForm.get('wallet').setValue(this.transaction.wallet);
+      this.addTransactionForm.get('amount').setValue(this.transaction.amount);
+      this.addTransactionForm.get('rate').setValue(this.transaction.rate);
+      this.addTransactionForm.get('currency').setValue(this.transaction.currencyId);
+
+      if (this.transaction.fee) {
+        this.addTransactionForm.get('fee').setValue(this.transaction.fee);
+        this.addTransactionForm.get('feeCurrency').setValue(this.transaction.feeCurrencyId);
+      }
+    } else {
+      this.addTransactionForm.get('date').setValue(new Date(Date.now()));
+    }
   }
 
   public toggleFee(): void {
@@ -90,21 +107,22 @@ export class DashboardCreateTransactionComponent implements OnInit {
       return;
     }
 
-    const transaction = {
-      createdAt: this.addTransactionForm.get('date').value,
-      assetId: this.addTransactionForm.get('asset').value,
-      wallet: this.addTransactionForm.get('wallet').value,
-      amount: this.addTransactionForm.get('amount').value,
-      rate: this.addTransactionForm.get('rate').value,
-      currencyId: this.addTransactionForm.get('currency').value
-    } as Transaction;
-
-    if (this.haveFee) {
-      transaction.fee = this.addTransactionForm.get('currency').value;
-      transaction.feeCurrencyId = this.addTransactionForm.get('feeCurrency').value;
+    if (!this.transaction) {
+      this.transaction = new Transaction();
     }
 
-    this.transactionService.create(transaction)
-      .subscribe(t => this.activeModal.close(t), e => this.errorHandlerService.handle(e));
+    this.transaction.createdAt = this.addTransactionForm.get('date').value;
+    this.transaction.assetId = this.addTransactionForm.get('asset').value;
+    this.transaction.wallet = this.addTransactionForm.get('wallet').value;
+    this.transaction.amount = this.addTransactionForm.get('amount').value;
+    this.transaction.rate = this.addTransactionForm.get('rate').value;
+    this.transaction.currencyId = this.addTransactionForm.get('currency').value;
+
+    if (this.haveFee) {
+      this.transaction.fee = this.addTransactionForm.get('fee').value;
+      this.transaction.feeCurrencyId = this.addTransactionForm.get('feeCurrency').value;
+    }
+
+    this.activeModal.close(this.transaction);
   }
 }

@@ -64,8 +64,12 @@ import { DashboardAssetsComponent } from './dashboard/dashboard-assets/dashboard
 import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard-filter.component';
 import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
 import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
-import { DashboardCreateTransactionComponent } from './dashboard/dashboard-create-transaction/dashboard-create-transaction.component';
+import { DashboardEditTransactionComponent } from './dashboard/dashboard-edit-transaction/dashboard-edit-transaction.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { AssetComponent } from './shared/asset/asset.component';
+import { WalletComponent } from './shared/wallet/wallet.component';
+import { CurrencyComponent } from './shared/currency/currency.component';
+import { PercentComponent } from './shared/percent/percent.component';
 
 @NgModule({
   declarations: [
@@ -77,7 +81,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     DashboardFilterComponent,
     DashboardGroupsComponent,
     DashboardTransactionsComponent,
-    DashboardCreateTransactionComponent
+    DashboardEditTransactionComponent,
+    AssetComponent,
+    WalletComponent,
+    PercentComponent,
+    CurrencyComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -98,6 +106,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatMenuModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
       { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [AuthorizeGuard] }

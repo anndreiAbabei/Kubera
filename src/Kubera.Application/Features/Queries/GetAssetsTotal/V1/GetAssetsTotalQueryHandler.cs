@@ -51,17 +51,17 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            foreach(var group in transactions.GroupBy(t => t.AssetId)) 
+            foreach(var group in transactions.GroupBy(t => t.AssetId))
             {
-                if(cancellationToken.IsCancellationRequested)
+                if (cancellationToken.IsCancellationRequested)
                     return await Task.FromCanceled<IResult<IEnumerable<AssetTotalModel>>>(cancellationToken);
 
                 var asset = assets.FirstOrDefault(a => a.Id == group.Key);
-                if(asset == null)
+                if (asset == null)
                     continue;
 
                 decimal total = 0m;
-                foreach(var transaction in group)
+                foreach (var transaction in group)
                 {
                     var price = transaction.Amount * transaction.Rate;
                     total += transaction.CurrencyId != request.CurrencyId
@@ -85,11 +85,11 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     Symbol = asset.Symbol,
                     SumAmount = amount,
                     Total = total,
-                    TotalNow = totalNow, 
-                    Increase = total != 0 ? (float)(100/total*totalNow) : 0f
+                    TotalNow = totalNow,
+                    Increase = totalNow.HasValue ? CalculateProcent(total, totalNow.Value) : 0
                 };
 
-                if(asset.Group != null)
+                if (asset.Group != null)
                     model.Group = _mapper.Map<Group, GroupModel>(asset.Group);
 
                 result.Add(model);
@@ -108,6 +108,17 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     .ConfigureAwait(false);
 
             return rate.IsSuccess ? amount * rate.Value.Rate : amount;
+        }
+
+        private static float CalculateProcent(decimal previous, decimal current)
+        {
+            if (previous == 0)
+                return 0f;
+
+            if (current == 0)
+                return -100f;
+
+            return (float)((current - previous) / previous * 100m);
         }
     }
 }

@@ -8,6 +8,10 @@
   height: 100%;
 }
 
+.red {
+  color: red;
+}
+
 .root > div.content {
   height: 100%;
   display: flex;
@@ -45,6 +49,10 @@
     td.right,
     th.right {
       text-align: end;
+    }
+
+    th.tight {
+      width: 7em;
     }
   }
 }

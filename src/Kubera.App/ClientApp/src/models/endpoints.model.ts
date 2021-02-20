@@ -13,6 +13,12 @@ export class EndpointsPost {
   constructor(private base: string) { }
 }
 
+export class EndpointsPut {
+  transaction = `${this.base}/transaction`;
+
+  constructor(private base: string) { }
+}
+
 export class EndpointsDelete {
   transaction = `${this.base}/transaction`;
 
@@ -24,5 +30,6 @@ export class Endpoints {
 
   get = new EndpointsGet(this.base)
   post = new EndpointsPost(this.base);
+  put = new EndpointsPut(this.base);
   delete = new EndpointsDelete(this.base);
 }

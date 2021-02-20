@@ -1,10 +1,11 @@
-﻿import { AfterViewInit, Component, ViewChild } from '@angular/core';
+﻿import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { AssetTotal } from 'src/models/assetTotal.model';
 import { Currency } from 'src/models/currency.model';
 import { AssetService } from 'src/services/asset.service';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
+import { EventService } from 'src/services/event.service';
 
 @Component({
     selector: 'app-dashboard-assets',
@@ -12,7 +13,7 @@ import { ErrorHandlerService } from 'src/services/errorHandler.service';
     styleUrls: ['./dashboard-assets.component.scss']
 })
 /** dashboard-assets component*/
-export class DashboardAssetsComponent implements AfterViewInit {
+export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
     public resultsLength = 0;
     public isLoadingResults = false;
     public noResult = false;
@@ -27,15 +28,18 @@ export class DashboardAssetsComponent implements AfterViewInit {
 
     constructor(private readonly assetService: AssetService,
         private readonly currencyService: CurrencyService,
-        private readonly errorHandlering: ErrorHandlerService) {  }
+        private readonly errorHandlering: ErrorHandlerService,
+        private readonly eventService: EventService) {  }
 
     public async ngAfterViewInit(): Promise<void> {
-      this.sort.sortChange
-        .subscribe(() => {
-            this.assets = this.sortAssets(this.assets);
-        });
+      this.sort.sortChange.subscribe(() => this.assets = this.sortAssets(this.assets));
 
       await this.refreshAssets();
+      this.eventService.updateTransaction.subscribe(async () => await this.refreshAssets());
+    }
+
+    public ngOnDestroy(): void {
+      this.eventService.updateTransaction.unsubscribe();
     }
 
     public async refreshAssets(): Promise<void> {
@@ -49,7 +53,8 @@ export class DashboardAssetsComponent implements AfterViewInit {
           this.selectedCurrency = this.currencies[0];
           this.assets = await this.assetService.getTotals(this.selectedCurrency.id).toPromise();
         }
-      } catch {
+      } catch (ex) {
+        this.errorHandlering.handle(ex);
         this.noResult = true;
       } finally {
         this.setIsLoading(false);
