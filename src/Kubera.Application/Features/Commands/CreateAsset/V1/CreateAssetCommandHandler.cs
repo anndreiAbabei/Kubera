@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Commands.CreateAsset.V1
 {
-    public class CreateAssetCommandHandler : IRequestHandler<CreateAssetCommand, Result<AssetModel>>
+    public class CreateAssetCommandHandler : IRequestHandler<CreateAssetCommand, IResult<AssetModel>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ namespace Kubera.Application.Features.Commands.CreateAsset.V1
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<AssetModel>> Handle(CreateAssetCommand request, CancellationToken cancellationToken)
+        public async Task<IResult<AssetModel>> Handle(CreateAssetCommand request, CancellationToken cancellationToken)
         {
             var asset = new Asset
             {
@@ -45,7 +46,7 @@ namespace Kubera.Application.Features.Commands.CreateAsset.V1
             asset = await _assetRepository.Add(asset, cancellationToken)
                 .ConfigureAwait(false);
 
-            return _mapper.Map<Asset, AssetModel>(asset);
+            return _mapper.Map<Asset, AssetModel>(asset).AsResult();
         }
     }
 }

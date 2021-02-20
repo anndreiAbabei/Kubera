@@ -10,28 +10,33 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Kubera.General.Services;
+using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
-    public class GetAssetsTotalQueryHandler : IRequestHandler<GetAssetsTotalQuery, Result<IEnumerable<AssetTotalModel>>>
+    public class GetAssetsTotalQueryHandler : IRequestHandler<GetAssetsTotalQuery, IResult<IEnumerable<AssetTotalModel>>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly IForexService _forexService;
         private readonly IMapper _mapper;
 
         public GetAssetsTotalQueryHandler(IAssetRepository assetRepository, 
             ITransactionRepository transactionRepository,
             ICurrencyRepository currencyRepository,
+            IForexService forexService,
             IMapper mapper)
         {
             _assetRepository = assetRepository;
             _transactionRepository = transactionRepository;
             _currencyRepository = currencyRepository;
+            _forexService = forexService;
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<AssetTotalModel>>> Handle(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<AssetTotalModel>>> Handle(GetAssetsTotalQuery request, CancellationToken cancellationToken)
         {
             var result = new List<AssetTotalModel>();
             var assets = await _assetRepository.GetAll()
@@ -43,29 +48,31 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             var transactions = await _transactionRepository
                 .GetAll()
                 .Include(t => t.Currency)
-                .GroupBy(t => t.AssetId)
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            foreach(var group in transactions) 
+            foreach(var group in transactions.GroupBy(t => t.AssetId)) 
             {
                 if(cancellationToken.IsCancellationRequested)
-                    return await Task.FromCanceled<Result<IEnumerable<AssetTotalModel>>>(cancellationToken);
+                    return await Task.FromCanceled<IResult<IEnumerable<AssetTotalModel>>>(cancellationToken);
 
                 var asset = assets.FirstOrDefault(a => a.Id == group.Key);
                 if(asset == null)
                     continue;
 
                 decimal total = 0m;
-                decimal totalNow = 0m; //todo
                 foreach(var transaction in group)
                 {
                     var price = transaction.Amount * transaction.Rate;
                     total += transaction.CurrencyId != request.CurrencyId
-                            ? await Exchange(transaction.Currency.Code, currency.Code, price)
+                            ? await Exchange(transaction.Currency.Code, currency.Code, price, cancellationToken)
                                 .ConfigureAwait(false)
                             : price;
                 }
+                var rate = await _forexService.GetPriceOf(asset.Code, currency.Code, cancellationToken)
+                    .ConfigureAwait(false);
+                var amount = group.Sum(t => t.Amount);
+                decimal? totalNow = rate.IsSuccess ? amount * rate.Value.Rate : null;
 
                 var model = new AssetTotalModel
                 {
@@ -76,9 +83,10 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     Name = asset.Name,
                     Order = asset.Order,
                     Symbol = asset.Symbol,
+                    SumAmount = amount,
                     Total = total,
                     TotalNow = totalNow, 
-                    Increase = 100/total*totalNow
+                    Increase = total != 0 ? (float)(100/total*totalNow) : 0f
                 };
 
                 if(asset.Group != null)
@@ -87,13 +95,19 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                 result.Add(model);
             }
 
-            return result;
+            return result.AsResult();
 
         }
 
-        private async ValueTask<decimal> Exchange(string from, string to, decimal amount)
+        private async ValueTask<decimal> Exchange(string from, string to, decimal amount, CancellationToken cancellationToken = default)
         {
-            return amount;
+            if (amount == 0)
+                return amount;
+
+            var rate = await _forexService.GetPriceOf(from, to, cancellationToken)
+                    .ConfigureAwait(false);
+
+            return rate.IsSuccess ? amount * rate.Value.Rate : amount;
         }
     }
 }

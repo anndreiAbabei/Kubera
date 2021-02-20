@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetAllGroups.V1
 {
-    public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, Result<IEnumerable<GroupModel>>>
+    public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, IResult<IEnumerable<GroupModel>>>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Kubera.Application.Features.Queries.GetAllGroups.V1
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<GroupModel>>> Handle(GetAllGroupsQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<GroupModel>>> Handle(GetAllGroupsQuery request, CancellationToken cancellationToken)
         {
             var groups = await _groupRepository.GetAll()
                 .ToListAsync(cancellationToken)

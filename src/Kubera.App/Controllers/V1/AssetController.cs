@@ -145,9 +145,12 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of assets with their respective assets</returns>
         [HttpGet("totals")]
         [ProducesResponseType(typeof(IEnumerable<AssetTotalModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<AssetTotalModel>>> GetAssetsTotals()
+        public async Task<ActionResult<IEnumerable<AssetTotalModel>>> GetAssetsTotals([FromQuery]Guid currencyId)
         {
-            var query = new GetAssetsTotalQuery();
+            var query = new GetAssetsTotalQuery
+            {
+                CurrencyId = currencyId
+            };
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 

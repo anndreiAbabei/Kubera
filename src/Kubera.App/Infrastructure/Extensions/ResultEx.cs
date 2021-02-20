@@ -25,7 +25,7 @@ namespace Kubera.App.Infrastructure.Extensions
             return new NoContentResult();
         }
 
-        public static ActionResult<T> AsActionResult<T>(this Result<T> result)
+        public static ActionResult<T> AsActionResult<T>(this IResult<T> result)
         {
             if (result.IsFailure)
             {

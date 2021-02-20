@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetGroup.V1
 {
-    public class GetGroupQueryHandler : IRequestHandler<GetGroupQuery, Result<GroupModel>>
+    public class GetGroupQueryHandler : IRequestHandler<GetGroupQuery, IResult<GroupModel>>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ namespace Kubera.Application.Features.Queries.GetGroup.V1
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<GroupModel>> Handle(GetGroupQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<GroupModel>> Handle(GetGroupQuery request, CancellationToken cancellationToken)
         {
             var group = await _groupRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -36,7 +37,8 @@ namespace Kubera.Application.Features.Queries.GetGroup.V1
             if (group.OwnerId != _userIdAccesor.Id)
                 return Result.Failure<GroupModel>(ErrorCodes.Forbid);
 
-            return _mapper.Map<Group, GroupModel>(group);
+            return _mapper.Map<Group, GroupModel>(group)
+                .AsResult();
         }
     }
 }

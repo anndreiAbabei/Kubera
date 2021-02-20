@@ -52,7 +52,7 @@ export class DashboardTransactionsComponent implements AfterViewInit {
   public refreshTransactions(): void {
     merge(this.sort.sortChange, this.paginator.page)
     .pipe(startWith({}), switchMap(() => {
-      this.isLoadingResults = true;
+      this.setIsLoading(true);
 
       const order = this.sort.active && this.sort.direction === 'asc'
                       ? Order.ascending
@@ -65,7 +65,6 @@ export class DashboardTransactionsComponent implements AfterViewInit {
       return this.transactionService.getAll(page, order);
     }),
     map(data => {
-      this.isLoadingResults = false;
       this.noResult = data.transactions.length === 0;
       this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
 
@@ -75,12 +74,13 @@ export class DashboardTransactionsComponent implements AfterViewInit {
                           ? `${t.fee} ${t.feeCurrency?.symbol}`
                           : `${0.00} ${t.currency?.symbol}`;
         t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+        this.setIsLoading(false);
       });
 
       return data.transactions;
     }),
     catchError(() => {
-      this.isLoadingResults = false;
+      this.setIsLoading(false);
       this.noResult = true;
 
       return observableOf([]);
@@ -108,5 +108,9 @@ export class DashboardTransactionsComponent implements AfterViewInit {
 
   public formatTotal(transaction: Transaction): string {
     return transaction.totalFormated;
+  }
+
+  private setIsLoading(isLoading: boolean): void {
+    setTimeout(() => this.isLoadingResults = isLoading);
   }
 }

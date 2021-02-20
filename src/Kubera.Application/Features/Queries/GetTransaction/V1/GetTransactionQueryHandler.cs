@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetTransaction.V1
 {
-    public class GetTransactionQueryHandler : IRequestHandler<GetTransactionQuery, Result<TransactionModel>>
+    public class GetTransactionQueryHandler : IRequestHandler<GetTransactionQuery, IResult<TransactionModel>>
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ namespace Kubera.Application.Features.Queries.GetTransaction.V1
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<TransactionModel>> Handle(GetTransactionQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<TransactionModel>> Handle(GetTransactionQuery request, CancellationToken cancellationToken)
         {
             var transaction = await _transactionRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -36,7 +37,8 @@ namespace Kubera.Application.Features.Queries.GetTransaction.V1
             if (transaction.OwnerId != _userIdAccesor.Id)
                 return Result.Failure<TransactionModel>(ErrorCodes.Forbid);
 
-            return _mapper.Map<Transaction, TransactionModel>(transaction);
+            return _mapper.Map<Transaction, TransactionModel>(transaction)
+                .AsResult();
         }
     }
 }

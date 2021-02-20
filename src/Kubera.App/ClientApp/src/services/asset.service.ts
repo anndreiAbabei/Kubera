@@ -20,8 +20,8 @@ export class AssetService {
     return this.httpClient.get<Asset[]>(url);
   }
 
-  public getTotals(): Observable<AssetTotal[]> {
-    const url = this.settingsService.endpoints.get.assetsTotal;
+  public getTotals(currencyId: string): Observable<AssetTotal[]> {
+    const url = `${this.settingsService.endpoints.get.assetsTotal}?currencyId=${currencyId}`;
 
     return this.httpClient.get<AssetTotal[]>(url);
   }

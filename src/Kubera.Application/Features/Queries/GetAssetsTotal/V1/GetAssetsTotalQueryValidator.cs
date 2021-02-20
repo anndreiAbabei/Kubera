@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Kubera.Application.Features.Queries.etAssetsTotal.V1
+namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
     public class GetAssetsTotalQueryValidator : AbstractValidator<GetAssetsTotalQuery>
     {

@@ -16,7 +16,7 @@ using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
-    public class GetTransactionsQueryHandler : IRequestHandler<GetTransactionsQuery, Result<IEnumerable<TransactionModel>>>
+    public class GetTransactionsQueryHandler : IRequestHandler<GetTransactionsQuery, IResult<IEnumerable<TransactionModel>>>
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAssetRepository _assetRepository;
@@ -40,7 +40,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<Result<IEnumerable<TransactionModel>>> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<TransactionModel>>> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
         {
             var order = request.Order ?? Order.Descending;
 
@@ -104,7 +104,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
             }
 
 
-            return models;
+            return models.AsResult();
         }
     }
 }

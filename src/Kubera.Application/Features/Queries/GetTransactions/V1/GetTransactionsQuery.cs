@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
-    public class GetTransactionsQuery : IRequest<Result<IEnumerable<TransactionModel>>>
+    public class GetTransactionsQuery : IRequest<IResult<IEnumerable<TransactionModel>>>
     {
         public IPaging Paging { get; set; }
 

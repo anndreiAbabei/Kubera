@@ -1,37 +1,41 @@
-﻿<div class="root">
+<div class="root">
     <div class="mat-elevation-z8 content">
       <div class="table">
         <mat-progress-bar mode="query" *ngIf="isLoadingResults" aria-label="Loading assets"></mat-progress-bar>
         <table mat-table [dataSource]="assets" matSort matSortActive="name" matSortDisableClear matSortDirection="desc">
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>
-                  Asset
-                  <td mat-cell *matCellDef="let row">{{row.name}}</td>
-                </th>
-              </ng-container>
-      
-              <ng-container matColumnDef="total">
-                <th mat-header-cell *matHeaderCellDef>Total</th>
-                <td mat-cell *matCellDef="let row">{{row.total | currency}}</td>
-              </ng-container>
-      
-              <ng-container matColumnDef="actual">
-                <th mat-header-cell *matHeaderCellDef>Now</th>
-                <td mat-cell *matCellDef="let row">{{row.totalNow | currency}}</td>
-              </ng-container>
-      
-              <ng-container matColumnDef="increase">
-                <th mat-header-cell *matHeaderCellDef>Procent</th>
-                <td mat-cell *matCellDef="let row">{{row.procent}}</td>
-              </ng-container>
-      
-  
+              <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>
+                Asset
+              </th>
+              <td mat-cell *matCellDef="let row">{{row.name}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="amount">
+              <th mat-header-cell class="right" *matHeaderCellDef>Amount</th>
+              <td mat-cell class="right" *matCellDef="let row">{{row.sumAmount | number:'1.2-8'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="total">
+              <th mat-header-cell class="right" *matHeaderCellDef>Total</th>
+              <td mat-cell class="right" *matCellDef="let row">{{row.total | number:'1.2-2'}} {{selectedCurrency.symbol}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actual">
+              <th mat-header-cell class="right" *matHeaderCellDef>Now</th>
+              <td mat-cell class="right" *matCellDef="let row">{{row.totalNow | number:'1.2-2'}} {{selectedCurrency.symbol}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="increase">
+              <th mat-header-cell class="right" *matHeaderCellDef>Procent</th>
+              <td mat-cell class="right" *matCellDef="let row">{{row.procent | number:'1.2-2'}}</td>
+            </ng-container>
+
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
         <p class="no-item" *ngIf="noResult">No available asset</p>
       </div>
-  
+
       <div>
         <div class="refresh-button-container">
           <button mat-mini-fab color="accent" aria-label="Refresh assets" [disabled]="isLoadingResults" (click)="refreshAssets()">
@@ -41,4 +45,3 @@
       </div>
     </div>
   </div>
-  

@@ -8,10 +8,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kubera.Data.Entities;
 using Kubera.Data.Entities.Meta;
+using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Queries.GetUserInfo.V1
 {
-    public class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, Result<UserInfoModel>>
+    public class GetUserInfoQueryHandler : IRequestHandler<GetUserInfoQuery, IResult<UserInfoModel>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
@@ -22,7 +23,7 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
             _mapper = mapper;
         }
 
-        public async Task<Result<UserInfoModel>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<UserInfoModel>> Handle(GetUserInfoQuery request, CancellationToken cancellationToken)
         {
             ApplicationUser user = await _userRepository.GetMe(cancellationToken)
                                                         .ConfigureAwait(false);
@@ -34,7 +35,7 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
                 Settings = _mapper.Map<UserSettings, UserSettingsModel>(user.GetSettings())
             };
 
-            return result;
+            return result.AsResult();
         }
     }
 }
