@@ -50,11 +50,14 @@ namespace Kubera.App.Controllers.V1
         /// Get all groups for the logged user
         /// </summary>
         /// <returns>Collection of logged user groups</returns>
-        [HttpGet]
+        [HttpGet("grouped")]
         [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
+        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Order? order)
         {
-            var query = new GetGroupedTransactionsQuery();
+            var query = new GetGroupedTransactionsQuery
+            {
+                Order = order
+            };
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 

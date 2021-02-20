@@ -4,7 +4,7 @@ import { LoginMenuComponent } from './login-menu/login-menu.component';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
 import { RouterModule } from '@angular/router';
-import { applicationPaths as ApplicationPaths } from './api-authorization.constants';
+import { ApplicationPaths } from './api-authorization.constants';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
@@ -13,14 +13,14 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule,
     RouterModule.forChild(
       [
-        { path: ApplicationPaths.register, component: LoginComponent },
-        { path: ApplicationPaths.profile, component: LoginComponent },
-        { path: ApplicationPaths.login, component: LoginComponent },
-        { path: ApplicationPaths.loginFailed, component: LoginComponent },
-        { path: ApplicationPaths.loginCallback, component: LoginComponent },
-        { path: ApplicationPaths.logOut, component: LogoutComponent },
-        { path: ApplicationPaths.loggedOut, component: LogoutComponent },
-        { path: ApplicationPaths.logOutCallback, component: LogoutComponent }
+        { path: ApplicationPaths.Register, component: LoginComponent },
+        { path: ApplicationPaths.Profile, component: LoginComponent },
+        { path: ApplicationPaths.Login, component: LoginComponent },
+        { path: ApplicationPaths.LoginFailed, component: LoginComponent },
+        { path: ApplicationPaths.LoginCallback, component: LoginComponent },
+        { path: ApplicationPaths.LogOut, component: LogoutComponent },
+        { path: ApplicationPaths.LoggedOut, component: LogoutComponent },
+        { path: ApplicationPaths.LogOutCallback, component: LogoutComponent }
       ]
     )
   ],

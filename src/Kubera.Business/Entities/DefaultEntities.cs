@@ -1,9 +1,12 @@
-﻿using Kubera.Application.Services;
-using Kubera.Business.Entities.Defaults;
+﻿using Kubera.Business.Entities.Defaults;
 using Kubera.Data.Entities;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Kubera.General.Defaults;
+using Kubera.Data.Store;
+using System.Linq;
+using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kubera.Business.Entities
 {
@@ -22,19 +25,19 @@ namespace Kubera.Business.Entities
 
         IDefaultGroups IDefaultEntities.Groups => _groups;
 
-        public DefaultEntities(IGroupRepository groupRepository)
+        public DefaultEntities(IGroupStore groupStore)
         {
-            _groups = new DefaultGroups(groupRepository);
+            _groups = new DefaultGroups(groupStore);
         }
 
         private class DefaultGroups : IDefaultGroups, IDefaultGroupsCodes
         {
-            private readonly IGroupRepository _groupRepository;
+            private readonly IGroupStore _groupStore;
             private readonly ConcurrentDictionary<string, Group> _dictionary;
 
-            public DefaultGroups(IGroupRepository groupRepository)
+            public DefaultGroups(IGroupStore groupStore)
             {
-                _groupRepository = groupRepository;
+                _groupStore = groupStore;
                 _dictionary = new ConcurrentDictionary<string, Group>();
             }
 
@@ -44,18 +47,20 @@ namespace Kubera.Business.Entities
 
             public string Stock => Codes.Group.Stock;
 
-            public async ValueTask<Group> GetCommodity() => await GetAndOrAdd(Commodity);
+            public async ValueTask<Group> GetCommodity(CancellationToken canellationToken = default) => await GetAndOrAdd(Commodity, canellationToken);
 
-            public async ValueTask<Group> GetCrypto() => await GetAndOrAdd(Crypto);
+            public async ValueTask<Group> GetCrypto(CancellationToken canellationToken = default) => await GetAndOrAdd(Crypto, canellationToken);
 
-            public async ValueTask<Group> GetStock() => await GetAndOrAdd(Stock);
+            public async ValueTask<Group> GetStock(CancellationToken canellationToken = default) => await GetAndOrAdd(Stock, canellationToken);
 
-            private async ValueTask<Group> GetAndOrAdd(string code)
+            private async ValueTask<Group> GetAndOrAdd(string code, CancellationToken canellationToken = default)
             {
                 if (_dictionary.TryGetValue(code, out var group))
                     return group;
 
-                group = await _groupRepository.GetByCode(code)
+                group = await _groupStore.GetAll()
+                    .Where(g => g.Code == code)
+                    .FirstOrDefaultAsync(canellationToken)
                     .ConfigureAwait(false);
 
                 _dictionary.TryAdd(code, group);

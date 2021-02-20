@@ -46,8 +46,15 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
         public async Task<Result<IEnumerable<GroupedTransactionsModel>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
         {
             var result = new List<GroupedTransactionsModel>();
-            var assets = await _assetRepository.GetAll()
-                .Include(a => a.Group)
+            IQueryable<Asset> query = _assetRepository.GetAll()
+                .Include(a => a.Group);
+
+            if (request.Order.HasValue)
+                query = request.Order.Value == General.Models.Order.Ascending
+                        ? query.OrderBy(a => a.Name)
+                        : query.OrderByDescending(a => a.Name);
+
+            var assets = await query
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
             var transactions = _transactionRepository.GetAll();

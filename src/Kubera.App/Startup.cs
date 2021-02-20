@@ -34,6 +34,7 @@ using Kubera.App.Infrastructure;
 using Kubera.App.Static;
 using Kubera.Business.Entities;
 using Kubera.Data.Data;
+using Kubera.General.Defaults;
 
 namespace Kubera.App
 {
@@ -157,9 +158,10 @@ namespace Kubera.App
 
             services.AddHttpClient<IForexService, AlphaVantageService>();
             
-            services.AddSingleton<DefaultEntities>();
             services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
             services.AddSingleton(_ => settings.CacheOptions ?? CacheOptions.Default);
+            services.AddScoped<IDefaultEntities, DefaultEntities>();
+            services.AddScoped<IDefaults, DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
             services.AddScoped<ICacheService, CacheService>();
 
