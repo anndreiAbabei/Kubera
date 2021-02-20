@@ -1,0 +1,28 @@
+.percent::before {
+  float: left;
+  padding-left: 1em;
+}
+
+.bad-100, .bad-50, .bad-10  {
+  color: red;
+}
+
+.good-10, .good-50, .good-100 {
+  color: green
+}
+
+.bad-100::before {
+  content: '\21CA';
+}
+
+.bad-50::before {
+  content: '\1F813';
+}
+
+.good-50::before {
+  content: '\1F815';
+}
+
+.good-100::before {
+  content: '\21C8';
+}

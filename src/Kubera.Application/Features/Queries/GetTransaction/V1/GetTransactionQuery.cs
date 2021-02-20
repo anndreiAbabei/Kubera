@@ -5,7 +5,7 @@ using System;
 
 namespace Kubera.Application.Features.Queries.GetTransaction.V1
 {
-    public class GetTransactionQuery : IRequest<Result<TransactionModel>>
+    public class GetTransactionQuery : IRequest<IResult<TransactionModel>>
     {
         public Guid Id { get; set; }
     }

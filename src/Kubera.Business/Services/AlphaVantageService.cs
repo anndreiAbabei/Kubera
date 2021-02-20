@@ -11,6 +11,7 @@ using Kubera.General.Extensions;
 using Kubera.General.Models;
 using Kubera.Business.Models.AlphaVantage;
 using System.Linq;
+using CSharpFunctionalExtensions;
 
 namespace Kubera.Business.Services
 {
@@ -20,8 +21,8 @@ namespace Kubera.Business.Services
         private readonly IAppSettings _appSettings;
         private readonly ICacheService _cacheService;
         private const string FunctionExchange = "CURRENCY_EXCHANGE_RATE";
-        private const string FunctionStock = "TIME_SERIES_INTRADAY"; 
-        private const string FunctionOverviewCompany = "OVERVIEW"; 
+        private const string FunctionStock = "TIME_SERIES_INTRADAY";
+        private const string FunctionOverviewCompany = "OVERVIEW";
 
         public AlphaVantageService(HttpClient httpClient,
             IAppSettings appSettings,
@@ -32,33 +33,66 @@ namespace Kubera.Business.Services
             _cacheService = cacheService;
         }
 
-        async ValueTask<IForexServiceResponse> IForexService.GetPriceOf(string fromCode, string toCode, CancellationToken cancellationToken = default)
+        async ValueTask<IResult<IForexServiceResponse>> IForexService.GetPriceOf(string fromCode, string toCode, CancellationToken cancellationToken = default)
         {
             var code = CalculateKey("forex", fromCode, toCode);
+            var existingValue = _cacheService.Get<IForexServiceResponse>(code);
 
-            return await _cacheService.GetOrAdd(code, () => GetPriceOfForexImpl(fromCode, toCode, cancellationToken))
+            if (existingValue != null)
+                return Result.Success(existingValue);
+
+            var result = await GetPriceOfForexImpl(fromCode, toCode, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (result.IsFailure)
+                return result;
+
+            _cacheService.Add(result.Value, code);
+
+            return result;
         }
 
-        async ValueTask<IStockServiceResponse> IStockService.GetPriceOf(string stock, string toCode, CancellationToken cancellationToken = default)
+        async ValueTask<IResult<IStockServiceResponse>> IStockService.GetPriceOf(string stock, string toCode, CancellationToken cancellationToken = default)
         {
             var code = CalculateKey("stock", stock, toCode);
+            var existingValue = _cacheService.Get<IStockServiceResponse>(code);
 
-            return await _cacheService.GetOrAdd(code, () => GetPriceOfStockImpl(stock, toCode, cancellationToken))
+            if (existingValue != null)
+                return Result.Success(existingValue);
+
+            var result = await GetPriceOfStockImpl(stock, toCode, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (result.IsFailure)
+                return result;
+
+            _cacheService.Add(result.Value, code);
+
+            return result;
         }
 
-        async ValueTask<IStockCompanyResponse> IStockService.GetCompany(string company, CancellationToken cancellationToken = default)
+        async ValueTask<IResult<IStockCompanyResponse>> IStockService.GetCompany(string company, CancellationToken cancellationToken = default)
         {
             var code = CalculateKey("company", company);
+            var existingValue = _cacheService.Get<IStockCompanyResponse>(code);
 
-            return await _cacheService.GetOrAdd(code, () => GetCompanyImpl(company, cancellationToken))
+            if (existingValue != null)
+                return Result.Success(existingValue);
+
+            var result = await GetCompanyImpl(company, cancellationToken)
                 .ConfigureAwait(false);
+
+            if (result.IsFailure)
+                return result;
+
+            _cacheService.Add(result.Value, code);
+
+            return result;
         }
 
         protected virtual object[] CalculateKey(params object[] type) => type;
 
-        private async ValueTask<IForexServiceResponse> GetPriceOfForexImpl(string fromCode, string toCode, CancellationToken cancellationToken = default)
+        private async ValueTask<IResult<IForexServiceResponse>> GetPriceOfForexImpl(string fromCode, string toCode, CancellationToken cancellationToken = default)
         {
             var qs = new
             {
@@ -70,17 +104,20 @@ namespace Kubera.Business.Services
             var result = await GetResult<AlphaVantageGetCurrencyExchangeRateResponse>(qs, cancellationToken)
                 .ConfigureAwait(false);
 
-            if(!decimal.TryParse(result.Result.Rate,
+            if (result.IsFailure)
+                return Result.Failure<IForexServiceResponse>(result.Error);
+
+            if (!decimal.TryParse(result.Value.Result.Rate,
                                     NumberStyles.Any,
                                     CultureInfo.InvariantCulture,
                                     out var rate))
-                throw new AlphaVantageException($"Invalid rate received {result.Result.Rate}");
+                return Result.Failure<IForexServiceResponse>($"Invalid rate received {result.Value.Result.Rate}");
 
-            return new AlphaVantageForexServiceResponse
+            var response = new AlphaVantageForexServiceResponse
             {
                 From = fromCode,
                 To = toCode,
-                Timestamp = DateTime.TryParse(result.Result.LastRefreshed,
+                Timestamp = DateTime.TryParse(result.Value.Result.LastRefreshed,
                                               CultureInfo.InvariantCulture,
                                               DateTimeStyles.AssumeUniversal,
                                               out var dt)
@@ -88,9 +125,11 @@ namespace Kubera.Business.Services
                                 : DateTime.UtcNow,
                 Rate = rate
             };
+
+            return Result.Success(response);
         }
 
-        private async ValueTask<IStockServiceResponse> GetPriceOfStockImpl(string stock, string toCode, CancellationToken cancellationToken = default)
+        private async ValueTask<IResult<IStockServiceResponse>> GetPriceOfStockImpl(string stock, string toCode, CancellationToken cancellationToken = default)
         {
             var qs = new
             {
@@ -101,30 +140,30 @@ namespace Kubera.Business.Services
             };
             var result = await GetResult<AlphaVantageGetStockRateResponse>(qs, cancellationToken)
                 .ConfigureAwait(false);
-            var openRate = result.Series.First().Value.Open;
+            var openRate = result.Value.Series.First().Value.Open;
 
             if (!decimal.TryParse(openRate,
                                     NumberStyles.Any,
                                     CultureInfo.InvariantCulture,
                                     out var rate))
-                throw new AlphaVantageException($"Invalid rate received {openRate}");
+                return Result.Failure<IStockServiceResponse>($"Invalid rate received {openRate}");
 
             var company = await ((IStockService)this).GetCompany(stock, cancellationToken)
                 .ConfigureAwait(false);
 
-            if(company.Currency.Equals(toCode, StringComparison.InvariantCultureIgnoreCase))
+            if (company.Value.Currency.Equals(toCode, StringComparison.InvariantCultureIgnoreCase))
             {
-                var forexResult = await ((IForexService)this).GetPriceOf(company.Currency, toCode, cancellationToken)
+                var forexResult = await ((IForexService)this).GetPriceOf(company.Value.Currency, toCode, cancellationToken)
                     .ConfigureAwait(false);
 
-                rate *= forexResult.Rate;
+                rate *= forexResult.Value.Rate;
             }
 
-            return new AlphaVantageStockServiceResponse
+            var response = new AlphaVantageStockServiceResponse
             {
                 Stock = stock,
                 To = toCode,
-                Timestamp = DateTime.TryParse(result.MetaData.LastRefreshed,
+                Timestamp = DateTime.TryParse(result.Value.MetaData.LastRefreshed,
                                               CultureInfo.InvariantCulture,
                                               DateTimeStyles.AssumeUniversal,
                                               out var dt)
@@ -132,9 +171,11 @@ namespace Kubera.Business.Services
                                 : DateTime.UtcNow,
                 Rate = rate
             };
+
+            return Result.Success(response);
         }
 
-        private async ValueTask<IStockCompanyResponse> GetCompanyImpl(string company, CancellationToken cancellationToken = default)
+        private async ValueTask<IResult<IStockCompanyResponse>> GetCompanyImpl(string company, CancellationToken cancellationToken = default)
         {
             var qs = new
             {
@@ -142,12 +183,11 @@ namespace Kubera.Business.Services
                 symbol = company,
                 apikey = _appSettings.AlphaVantageApiKey
             };
-
-           return await GetResult<AlphaVantageStockCompanyResponse>(qs, cancellationToken)
+            return await GetResult<AlphaVantageStockCompanyResponse>(qs, cancellationToken)
                 .ConfigureAwait(false);
         }
 
-        private async Task<T> GetResult<T>(object queryString, CancellationToken token = default)
+        private async Task<IResult<T>> GetResult<T>(object queryString, CancellationToken token = default)
         {
             var ub = new UriBuilder("https", "www.alphavantage.co")
             {
@@ -159,12 +199,14 @@ namespace Kubera.Business.Services
                 .ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
-                throw new AlphaVantageException($"Fail to get response from forex service {(int)response.StatusCode}");
+                Result.Failure<T>($"Fail to get response for forex/stock service {(int)response.StatusCode}");
 
             await using var content = await response.Content.ReadAsStreamAsync(token)
                 .ConfigureAwait(false);
-            return await JsonSerializer.DeserializeAsync<T>(content, cancellationToken: token)
+            var result = await JsonSerializer.DeserializeAsync<T>(content, cancellationToken: token)
                 .ConfigureAwait(false);
+
+            return Result.Success(result);
         }
     }
 }

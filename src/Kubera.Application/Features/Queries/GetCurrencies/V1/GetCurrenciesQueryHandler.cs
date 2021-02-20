@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetCurrencies.V1
 {
-    public class GetCurrenciesQueryHandler : IRequestHandler<GetCurrenciesQuery, Result<IEnumerable<CurrencyModel>>>
+    public class GetCurrenciesQueryHandler : IRequestHandler<GetCurrenciesQuery, IResult<IEnumerable<CurrencyModel>>>
     {
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Kubera.Application.Features.Queries.GetCurrencies.V1
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<CurrencyModel>>> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<CurrencyModel>>> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
         {
             var currencies = await _currencyRepository.GetAll()
                 .ToListAsync(cancellationToken)

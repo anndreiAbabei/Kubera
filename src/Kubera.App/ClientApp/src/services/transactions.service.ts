@@ -39,7 +39,11 @@ export class TransactionsService {
     return this.httpClient.post<Transaction>(this.settingsService.endpoints.post.transaction, transaction);
   }
 
+  public update(transaction: Transaction): Observable<void> {
+    return this.httpClient.put<void>(`${this.settingsService.endpoints.put.transaction}/${transaction.id}`, transaction);
+  }
+
   public delete(transactionId: string): Observable<Object> {
-    return this.httpClient.delete(this.settingsService.endpoints.delete.transaction + '/' + transactionId);
+    return this.httpClient.delete(`${this.settingsService.endpoints.delete.transaction}/${transactionId}`);
   }
 }

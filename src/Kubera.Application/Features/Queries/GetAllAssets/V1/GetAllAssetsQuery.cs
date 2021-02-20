@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Kubera.Application.Features.Queries.GetAllAssets.V1
 {
-    public class GetAllAssetsQuery : IRequest<Result<IEnumerable<AssetModel>>>
+    public class GetAllAssetsQuery : IRequest<IResult<IEnumerable<AssetModel>>>
     {
     }
 }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Kubera.Application.Features.Queries.GetUserInfo.V1
 {
-    public class GetUserInfoQuery : IRequest<Result<UserInfoModel>>
+    public class GetUserInfoQuery : IRequest<IResult<UserInfoModel>>
     {
     }
 }

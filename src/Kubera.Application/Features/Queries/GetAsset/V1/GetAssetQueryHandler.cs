@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetAsset.V1
 {
-    public class GetAssetQueryHandler : IRequestHandler<GetAssetQuery, Result<AssetModel>>
+    public class GetAssetQueryHandler : IRequestHandler<GetAssetQuery, IResult<AssetModel>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ namespace Kubera.Application.Features.Queries.GetAsset.V1
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<AssetModel>> Handle(GetAssetQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<AssetModel>> Handle(GetAssetQuery request, CancellationToken cancellationToken)
         {
             var asset = await _assetRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -36,7 +37,8 @@ namespace Kubera.Application.Features.Queries.GetAsset.V1
             if (asset.OwnerId != _userIdAccesor.Id)
                 return Result.Failure<AssetModel>(ErrorCodes.Forbid);
 
-            return _mapper.Map<Asset, AssetModel>(asset);
+            return _mapper.Map<Asset, AssetModel>(asset)
+                .AsResult();
 
         }
     }

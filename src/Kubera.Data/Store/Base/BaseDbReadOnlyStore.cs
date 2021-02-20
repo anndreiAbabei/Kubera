@@ -37,7 +37,7 @@ namespace Kubera.Data.Store.Base
         public virtual async ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken)
         {
             return await ApplicationDbContext.Set<TEntity>()
-                .FindAsync(keys, cancellationToken)
+                .FindAsync(keys.Cast<object>().ToArray(), cancellationToken)
                 .ConfigureAwait(false);
         }
     }

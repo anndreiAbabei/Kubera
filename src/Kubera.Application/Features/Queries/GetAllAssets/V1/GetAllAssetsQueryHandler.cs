@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetAllAssets.V1
 {
-    public class GetAllAssetsQueryHandler : IRequestHandler<GetAllAssetsQuery, Result<IEnumerable<AssetModel>>>
+    public class GetAllAssetsQueryHandler : IRequestHandler<GetAllAssetsQuery, IResult<IEnumerable<AssetModel>>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace Kubera.Application.Features.Queries.GetAllAssets.V1
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<AssetModel>>> Handle(GetAllAssetsQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<AssetModel>>> Handle(GetAllAssetsQuery request, CancellationToken cancellationToken)
         {
             var asstes = await _assetRepository.GetAll()
                 .ToListAsync(cancellationToken)

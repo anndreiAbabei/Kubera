@@ -20,12 +20,16 @@
 
         <ng-container matColumnDef="asset">
           <th mat-header-cell *matHeaderCellDef>Asset</th>
-          <td mat-cell *matCellDef="let row">{{row.asset?.name}}</td>
+          <td mat-cell *matCellDef="let row">
+            <app-asset [asset]="row.asset"></app-asset>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="wallet">
           <th mat-header-cell *matHeaderCellDef>Wallet</th>
-          <td mat-cell *matCellDef="let row">{{row.wallet}}</td>
+          <td mat-cell *matCellDef="let row">
+            <app-wallet [wallet]="row.wallet"></app-wallet>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="action">
@@ -45,12 +49,25 @@
 
         <ng-container matColumnDef="totalFormated">
           <th mat-header-cell *matHeaderCellDef class="right">Total</th>
-          <td mat-cell *matCellDef="let row" class="right">{{row.rate * row.amount | number:'1.2-2'}} {{row.currency?.symbol}}</td>
+          <td mat-cell *matCellDef="let row" class="right">
+            <app-currency [currency]="row.currency" [amount]="row.rate * row.amount"></app-currency>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="feeFormated">
           <th mat-header-cell *matHeaderCellDef class="right">Fee</th>
-          <td mat-cell *matCellDef="let row" class="right">{{row.fee || 0 | number:'1.2-2'}} {{row.feeCurrency?.symbol || row.currency?.symbol}}</td>
+          <td mat-cell *matCellDef="let row" class="right">
+            <app-currency [currency]="row.feeCurrency || row.currency" [amount]="row.fee || 0"></app-currency>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="menu">
+          <th mat-header-cell *matHeaderCellDef class="tight"></th>
+          <td mat-cell *matCellDef="let row" class="right">
+            <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{element: row}" [disabled]="isLoadingResults">
+              <i class="material-icons">more_vert</i>
+            </button>
+          </td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -73,5 +90,18 @@
 
       <mat-paginator [length]="resultsLength" [pageSize]="itemsPerPage" class="paginator"></mat-paginator>
     </div>
+
+    <mat-menu #menu="matMenu">
+      <ng-template matMenuContent let-transaction="element">
+        <button mat-menu-item (click)="showTransactionEdit(transaction)">
+          <mat-icon>mode_edit</mat-icon>
+          <span>Edit</span>
+        </button>
+        <button mat-menu-item class="red" (click)="removeTransaction(transaction)">
+          <mat-icon class="red">delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      </ng-template>
+    </mat-menu>
   </div>
 </div>

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Commands.CreateGroup
 {
-    public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, Result<GroupModel>>
+    public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, IResult<GroupModel>>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IMapper _mapper;
@@ -25,7 +26,7 @@ namespace Kubera.Application.Features.Commands.CreateGroup
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<GroupModel>> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
+        public async Task<IResult<GroupModel>> Handle(CreateGroupCommand request, CancellationToken cancellationToken)
         {
             var group = new Group
             {
@@ -41,7 +42,7 @@ namespace Kubera.Application.Features.Commands.CreateGroup
             group = await _groupRepository.Add(group, cancellationToken)
                 .ConfigureAwait(false);
 
-            return _mapper.Map<Group, GroupModel>(group);
+            return _mapper.Map<Group, GroupModel>(group).AsResult();
         }
     }
 }

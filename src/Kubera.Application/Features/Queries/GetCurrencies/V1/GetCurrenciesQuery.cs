@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Kubera.Application.Features.Queries.GetCurrencies.V1
 {
-    public class GetCurrenciesQuery : IRequest<Result<IEnumerable<CurrencyModel>>>
+    public class GetCurrenciesQuery : IRequest<IResult<IEnumerable<CurrencyModel>>>
     {
     }
 }

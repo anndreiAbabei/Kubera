@@ -8,6 +8,6 @@ namespace Kubera.Application.Common.Models
 
         public decimal TotalBought { get; set; }
 
-        public decimal ActualValue { get; set; }
+        public decimal? ActualValue { get; set; }
     }
 }

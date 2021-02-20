@@ -9,10 +9,11 @@ using Kubera.General.Extensions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 {
-    public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, Result<TransactionModel>>
+    public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, IResult<TransactionModel>>
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAssetRepository _assetRepository;
@@ -36,7 +37,7 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result<TransactionModel>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<IResult<TransactionModel>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
         {
             var transaction = new Transaction
             {
@@ -80,7 +81,7 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
             if (request.Input.FeeCurrencyId != null && currencies.Found(request.Input.FeeCurrencyId.Value, out var feeCurrency))
                 result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
 
-            return result;
+            return result.AsResult();
         }
     }
 }

@@ -5,7 +5,7 @@ using System;
 
 namespace Kubera.Application.Features.Queries.GetGroup.V1
 {
-    public class GetGroupQuery : IRequest<Result<GroupModel>>
+    public class GetGroupQuery : IRequest<IResult<GroupModel>>
     {
         public Guid Id { get; set; }
     }

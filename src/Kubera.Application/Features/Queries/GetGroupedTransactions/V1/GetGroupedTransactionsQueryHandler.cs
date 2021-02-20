@@ -13,10 +13,11 @@ using Kubera.General.Services;
 using Kubera.Data.Extensions;
 using Kubera.General.Extensions;
 using Kubera.General.Defaults;
+using Kubera.Application.Common.Extensions;
 
 namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
 {
-    public class GetGroupedTransactionsQueryHandler : IRequestHandler<GetGroupedTransactionsQuery, Result<IEnumerable<GroupedTransactionsModel>>>
+    public class GetGroupedTransactionsQueryHandler : IRequestHandler<GetGroupedTransactionsQuery, IResult<IEnumerable<GroupedTransactionsModel>>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -43,7 +44,7 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<GroupedTransactionsModel>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
+        public async Task<IResult<IEnumerable<GroupedTransactionsModel>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
         {
             var result = new List<GroupedTransactionsModel>();
             IQueryable<Asset> query = _assetRepository.GetAll()
@@ -68,7 +69,9 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
 
             foreach (var asset in assets)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                if (cancellationToken.IsCancellationRequested)
+                    return await Task.FromCanceled<IResult<IEnumerable<GroupedTransactionsModel>>>(cancellationToken);
+
                 var assetTransactions = transactions.Where(t => t.AssetId == asset.Id);
 
                 if (!await assetTransactions.AnyAsync(cancellationToken).ConfigureAwait(false))
@@ -84,13 +87,13 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
                         .ConfigureAwait(false),
                     TotalBought = await transactions.SumAsync(t => t.Amount * t.Rate, cancellationToken)
                         .ConfigureAwait(false),
-                    ActualValue = priceValue.Rate
+                    ActualValue = priceValue.IsSuccess ? priceValue.Value.Rate : null
                 };
 
                 result.Add(model);
             }
 
-            return result;
+            return result.AsResult();
         }
     }
 }
