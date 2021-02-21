@@ -12,13 +12,14 @@ using Kubera.Application.Features.Commands.CreateGroup;
 using Kubera.Application.Features.Commands.UpdateGroup.V1;
 using MediatR;
 using Kubera.Application.Features.Commands.DeleteGroup.V1;
+using Kubera.Application.Features.Queries.GetGroupTotals.V1;
 
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
-    public class GroupsController : BaseController
+    public class GroupController : BaseController
     {
-        public GroupsController(IMediator mediator)
+        public GroupController(IMediator mediator)
             : base(mediator)
         {
         }
@@ -128,6 +129,24 @@ namespace Kubera.App.Controllers.V1
                 Id = id
             };
             var result = await Mediator.Send(command, HttpContext.RequestAborted)
+                .ConfigureAwait(false);
+
+            return result.AsActionResult();
+        }
+
+        /// <summary>
+        /// Get all assets with their total of a user
+        /// </summary>
+        /// <returns>Collection of assets with their respective assets</returns>
+        [HttpGet("totals")]
+        [ProducesResponseType(typeof(IEnumerable<GroupTotalModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId)
+        {
+            var query = new GetGroupTotalQuery
+            {
+                CurrencyId = currencyId
+            };
+            var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
             return result.AsActionResult();
