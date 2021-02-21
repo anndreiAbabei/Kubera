@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Kubera.Application.Common.Models;
 using MediatR;
 using Kubera.Application.Features.Queries.GetUserInfo.V1;
-using Kubera.App.Infrastructure.Extensions;
 
 namespace Kubera.App.Controllers.V1
 {
