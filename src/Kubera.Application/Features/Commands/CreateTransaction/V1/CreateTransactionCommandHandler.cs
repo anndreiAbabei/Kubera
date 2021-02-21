@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Kubera.Application.Common.Extensions;
 using System.Collections.Generic;
 using Kubera.Application.Features.Queries.GetTransactions.V1;
+using Kubera.Application.Common.Caching;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 {
@@ -86,11 +87,7 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
             if (request.Input.FeeCurrencyId != null && currencies.Found(request.Input.FeeCurrencyId.Value, out var feeCurrency))
                 result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
 
-            _userCacheService.RemoveAll<TransactionModel>();
-            _userCacheService.RemoveAll<GroupedTransactionsModel>();
-            _userCacheService.RemoveAll<GetTransactionsQueryOutput>();
-            _userCacheService.RemoveAll<IEnumerable<TransactionModel>>();
-            _userCacheService.RemoveAll<IEnumerable<GroupedTransactionsModel>>();
+            _userCacheService.Remove(CacheRegion.Transactions);
 
             return result.AsResult();
         }

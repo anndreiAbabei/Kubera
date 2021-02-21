@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -48,10 +49,7 @@ namespace Kubera.Application.Features.Commands.CreateGroup
             group = await _groupRepository.Add(group, cancellationToken)
                 .ConfigureAwait(false);
 
-            _userCacheService.RemoveAll<GroupModel>();
-            _userCacheService.RemoveAll<GroupTotalModel>();
-            _userCacheService.RemoveAll<IEnumerable<GroupModel>>(); 
-            _userCacheService.RemoveAll<IEnumerable<GroupTotalModel>>();
+            _userCacheService.Remove(CacheRegion.Groups);
 
             return _mapper.Map<Group, GroupModel>(group).AsResult();
         }

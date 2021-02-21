@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Features.Queries.GetTransactions.V1;
@@ -49,11 +50,7 @@ namespace Kubera.Application.Features.Commands.UpdateTransaction.V1
             await _transactionRepository.Update(transaction, cancellationToken)
                     .ConfigureAwait(false);
 
-            _userCacheService.RemoveAll<TransactionModel>();
-            _userCacheService.RemoveAll<GroupedTransactionsModel>();
-            _userCacheService.RemoveAll<GetTransactionsQueryOutput>();
-            _userCacheService.RemoveAll<IEnumerable<TransactionModel>>();
-            _userCacheService.RemoveAll<IEnumerable<GroupedTransactionsModel>>();
+            _userCacheService.Remove(CacheRegion.Transactions);
 
             return Result.Success();
         }

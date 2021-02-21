@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
@@ -40,10 +41,7 @@ namespace Kubera.Application.Features.Commands.DeleteAsset.V1
             await _assetRepository.Delete(asset.Id, cancellationToken)
                 .ConfigureAwait(false);
 
-            _userCacheService.RemoveAll<GroupModel>();
-            _userCacheService.RemoveAll<GroupTotalModel>();
-            _userCacheService.RemoveAll<IEnumerable<GroupModel>>();
-            _userCacheService.RemoveAll<IEnumerable<GroupTotalModel>>();
+            _userCacheService.Remove(CacheRegion.Assets);
 
             return Result.Success();
         }

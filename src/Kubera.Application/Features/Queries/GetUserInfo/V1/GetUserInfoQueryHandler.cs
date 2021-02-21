@@ -9,7 +9,8 @@ using Kubera.Data.Entities;
 using Kubera.Data.Entities.Meta;
 using Kubera.Application.Common.Extensions;
 using Kubera.General.Services;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
+using System;
 
 namespace Kubera.Application.Features.Queries.GetUserInfo.V1
 {
@@ -25,6 +26,8 @@ namespace Kubera.Application.Features.Queries.GetUserInfo.V1
         {
             _userRepository = userRepository;
             _mapper = mapper;
+
+            cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(3));
         }
 
         protected override async ValueTask<IResult<UserInfoModel>> HandleImpl(GetUserInfoQuery request, CancellationToken cancellationToken)

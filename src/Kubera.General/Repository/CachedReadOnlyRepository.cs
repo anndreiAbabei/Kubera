@@ -38,7 +38,7 @@ namespace Kubera.General.Repository
             Options = options;
         }
 
-        public virtual void Remove(TKey[] keys) => CacheService.Remove<TEntity>(keys?.Cast<object>().ToArray());
+        public virtual void Remove(TKey[] keys) => CacheService.Remove<TEntity>(keys.ToKey());
 
         public virtual void Clear() => CacheService.Clear();
 
@@ -47,7 +47,7 @@ namespace Kubera.General.Repository
             if (!Options.UseCache)
                 return await base.GetById(keys, cancellationToken).ConfigureAwait(false);
 
-            return await CacheService.GetOrAdd(keys,
+            return await CacheService.GetOrAdd(keys.ToKey(),
                                                async () => await base.GetById(keys, cancellationToken)
                                                                      .ConfigureAwait(false))
                 .ConfigureAwait(false);

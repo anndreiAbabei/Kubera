@@ -1,5 +1,4 @@
 ﻿using Kubera.General.Services;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace Kubera.Business.Services
 {
@@ -9,12 +8,11 @@ namespace Kubera.Business.Services
 
         public string UserId => _userIdAccesor.Id;
 
-        public UserCacheService(IMemoryCache memoryCache, IUserIdAccesor userIdAccesor)
-            : base(memoryCache)
+        public UserCacheService(IUserIdAccesor userIdAccesor)
         {
             _userIdAccesor = userIdAccesor;
         }
 
-        protected override string CreateKey<T>(params object[] keys) => $"{base.CreateKey<T>(keys)}.<{_userIdAccesor.Id}>";
+        protected override string CreateKey<T>(string key) => $"{base.CreateKey<T>(key)}.<{_userIdAccesor.Id}>";
     }
 }

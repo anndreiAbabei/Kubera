@@ -1,11 +1,12 @@
 ﻿using CSharpFunctionalExtensions;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -31,6 +32,8 @@ namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
             _transactionRepository = transactionRepository;
             _currencyRepository = currencyRepository;
             _forexService = forexService;
+
+            cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
         protected override async ValueTask<IResult<IEnumerable<GroupTotalModel>>> HandleImpl(GetGroupTotalQuery request, CancellationToken cancellationToken)

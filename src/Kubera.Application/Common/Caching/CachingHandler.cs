@@ -2,14 +2,16 @@
 using Kubera.Application.Common.Infrastructure;
 using Kubera.General.Services;
 using MediatR;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Kubera.Application.Common
+namespace Kubera.Application.Common.Caching
 {
     public delegate void ReadFromCacheEventHandler<in T>(T item, string key);
 
-    public delegate void AddedInCacheEventHandler<in T>(T item, string key);
+    public delegate void AddedInCacheEventHandler<in T>(T item, string key, string region);
 
     public abstract class CachingHandler<TRequest, TResponse> : IRequestHandler<TRequest, IResult<TResponse>>
         where TRequest : CacheableQuery, IRequest<IResult<TResponse>>
@@ -50,8 +52,13 @@ namespace Kubera.Application.Common
             if (result.IsFailure)
                 return result;
 
-            OnAddedToCache(result.Value, code);
-            _cacheService.Add(result.Value, code);
+            var regions = Enum.GetValues<CacheRegion>()
+                    .Where(r => request.CacheRegion.HasFlag(r))
+                    .Select(r => r.ToString())
+                    .ToArray();
+            _cacheService.Add(result.Value, code, regions);
+
+            OnAddedToCache(result.Value, code, request.CacheRegion.ToString());
 
             return result;
         }
@@ -65,9 +72,9 @@ namespace Kubera.Application.Common
             GotFromCache?.Invoke(response, key);
         }
 
-        protected virtual void OnAddedToCache(TResponse response, string key)
+        protected virtual void OnAddedToCache(TResponse response, string key, string region)
         {
-            AddedFromCache?.Invoke(response, key);
+            AddedFromCache?.Invoke(response, key, region);
         }
     }
 }

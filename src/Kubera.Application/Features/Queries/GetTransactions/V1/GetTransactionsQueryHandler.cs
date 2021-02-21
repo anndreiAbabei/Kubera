@@ -11,7 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Kubera.Application.Common.Extensions;
 using Kubera.General.Services;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
+using System;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
@@ -36,6 +37,8 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
             _groupRepository = groupRepository;
             _currencyRepository = currencyRepository;
             _mapper = mapper;
+
+            cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(1));
         }
 
         protected override async ValueTask<IResult<GetTransactionsQueryOutput>> HandleImpl(GetTransactionsQuery request, CancellationToken cancellationToken)
@@ -45,13 +48,17 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
 
             var query = _transactionRepository.GetAll();
 
-            if(request.Date != null)
+            if (request.Date != null)
             {
                 if (request.Date.From.HasValue)
                     query = query.Where(t => t.CreatedAt >= request.Date.From.Value);
                 if (request.Date.To.HasValue)
                     query = query.Where(t => t.CreatedAt <= request.Date.To.Value);
             }
+
+            query = order == Order.Descending
+                        ? query.OrderByDescending(t => t.CreatedAt)
+                        : query.OrderBy(t => t.CreatedAt);
 
             if (request.Paging != null)
             {
@@ -63,10 +70,6 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
 
                 paging = new PagingResult(totalTrans);
             }
-
-            query = order == Order.Descending
-                        ? query.OrderByDescending(t => t.CreatedAt)
-                        : query.OrderBy(t => t.CreatedAt);
 
             var transactions = await query.ToListAsync(cancellationToken)
                 .ConfigureAwait(false);

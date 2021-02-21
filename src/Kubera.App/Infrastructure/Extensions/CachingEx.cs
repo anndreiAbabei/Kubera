@@ -1,4 +1,4 @@
-﻿using Kubera.Application.Common;
+﻿using Kubera.Application.Common.Caching;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System;

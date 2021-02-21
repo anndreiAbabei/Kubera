@@ -11,7 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Kubera.General.Services;
 using Kubera.Application.Common.Extensions;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
+using System;
 
 namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
@@ -36,6 +37,8 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             _currencyRepository = currencyRepository;
             _forexService = forexService;
             _mapper = mapper;
+
+            cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
         protected override async ValueTask<IResult<IEnumerable<AssetTotalModel>>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -8,6 +8,7 @@ using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +29,8 @@ namespace Kubera.Application.Features.Queries.GetAsset.V1
             _assetRepository = assetRepository;
             _mapper = mapper;
             _userIdAccesor = userIdAccesor;
+
+            cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(1));
         }
 
         protected override async ValueTask<IResult<AssetModel>> HandleImpl(GetAssetQuery request, CancellationToken cancellationToken)

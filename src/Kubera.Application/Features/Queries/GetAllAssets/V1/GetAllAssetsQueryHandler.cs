@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.General.Services;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -26,6 +27,8 @@ namespace Kubera.Application.Features.Queries.GetAllAssets.V1
         {
             _assetRepository = assetRepository;
             _mapper = mapper;
+
+            cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(1));
         }
 
         protected override async ValueTask<IResult<IEnumerable<AssetModel>>> HandleImpl(GetAllAssetsQuery request, CancellationToken cancellationToken)

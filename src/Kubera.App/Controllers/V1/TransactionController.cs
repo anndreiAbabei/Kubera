@@ -14,7 +14,7 @@ using Kubera.Application.Features.Queries.GetTransaction.V1;
 using Kubera.Application.Features.Commands.CreateTransaction.V1;
 using Kubera.Application.Features.Commands.UpdateTransaction.V1;
 using Kubera.Application.Features.Commands.DeleteTransaction.V1;
-using Kubera.Application.Features.Queries.GetGroupedTransactions.V1;
+using Kubera.Application.Features.Queries.GetAssetGroupedTransactions.V1;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -63,7 +63,7 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Order? order)
         {
-            var query = new GetGroupedTransactionsQuery
+            var query = new GetAssetGroupedTransactionsQuery
             {
                 Order = order
             };

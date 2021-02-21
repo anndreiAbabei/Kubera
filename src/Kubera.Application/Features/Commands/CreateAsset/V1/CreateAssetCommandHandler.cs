@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -52,10 +53,7 @@ namespace Kubera.Application.Features.Commands.CreateAsset.V1
             asset = await _assetRepository.Add(asset, cancellationToken)
                 .ConfigureAwait(false);
 
-            _userCacheService.RemoveAll<AssetModel>();
-            _userCacheService.RemoveAll<GroupTotalModel>();
-            _userCacheService.RemoveAll<IEnumerable<AssetModel>>(); 
-            _userCacheService.RemoveAll<IEnumerable<GroupTotalModel>>(); 
+            _userCacheService.Remove(CacheRegion.Assets);
 
             return _mapper.Map<Asset, AssetModel>(asset).AsResult();
         }

@@ -89,7 +89,7 @@ namespace Kubera.Business.Services
             return result;
         }
 
-        protected virtual object[] CalculateKey(params object[] type) => type;
+        protected virtual string CalculateKey(params object[] keys) => string.Join(".", keys);
 
         private async ValueTask<IResult<IForexServiceResponse>> GetPriceOfForexImpl(string fromCode, string toCode, CancellationToken cancellationToken = default)
         {

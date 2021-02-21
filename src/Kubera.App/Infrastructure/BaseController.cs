@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Kubera.App.Infrastructure.Extensions;
-using Kubera.Application.Common;
+using Kubera.Application.Common.Caching;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
