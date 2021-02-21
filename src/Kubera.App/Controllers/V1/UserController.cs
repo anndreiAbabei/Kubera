@@ -26,12 +26,8 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<UserInfoModel>> GetUserInfo()
         {
             var query = new GetUserInfoQuery();
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            HttpContext.AddFromCacheHeader(query);
-
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
     }
 }
