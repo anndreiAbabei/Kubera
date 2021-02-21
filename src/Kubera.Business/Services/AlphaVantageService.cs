@@ -107,11 +107,11 @@ namespace Kubera.Business.Services
             if (result.IsFailure)
                 return Result.Failure<IForexServiceResponse>(result.Error);
 
-            if (!decimal.TryParse(result.Value.Result.Rate,
+            if (!decimal.TryParse(result.Value.Result?.Rate,
                                     NumberStyles.Any,
                                     CultureInfo.InvariantCulture,
                                     out var rate))
-                return Result.Failure<IForexServiceResponse>($"Invalid rate received {result.Value.Result.Rate}");
+                return Result.Failure<IForexServiceResponse>($"Invalid rate received {result.Value.Result?.Rate}");
 
             var response = new AlphaVantageForexServiceResponse
             {

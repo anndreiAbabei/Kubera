@@ -3,6 +3,8 @@ export class EndpointsGet {
   assets = `${this.base}/asset`;
   assetsTotal = `${this.base}/asset/totals`;
   currencies = `${this.base}/currency`;
+  group = `${this.base}/group`;
+  groupTotal = `${this.base}/group/totals`;
 
   constructor(private base: string) { }
 }

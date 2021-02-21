@@ -43,7 +43,7 @@ namespace Kubera.Business.Repository
         {
             var user = _userIdAccesor.Id;
 
-            return base.GetAll().Where(a => a.OwnerId == user);
+            return base.GetAll().Where(a => string.IsNullOrEmpty(a.OwnerId) || a.OwnerId == user);
         }
     }
 }
