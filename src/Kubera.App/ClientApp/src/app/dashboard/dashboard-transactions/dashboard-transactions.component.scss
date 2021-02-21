@@ -8,10 +8,6 @@
   height: 100%;
 }
 
-.red {
-  color: red;
-}
-
 .root > div.content {
   height: 100%;
   display: flex;
@@ -25,11 +21,12 @@
 .add-button-container,
 .refresh-button-container {
   float: left;
-  margin-left: 1em;
+  margin-left: .5em;
+  margin-top: .5em;
 }
 
 .refresh-button-container{
-  margin-top: 1em;
+  margin-top: 1.5em;
 }
 
 .paginator {
@@ -53,6 +50,15 @@
 
     th.tight {
       width: 7em;
+    }
+  }
+}
+@import "./src/static/scss/shared";
+
+@mixin dashboard-transactions-theme($theme, $dark) {
+  .menu-action-transactions {
+    .red, button.red > .red {
+      @include shared-theme-red($dark)
     }
   }
 }

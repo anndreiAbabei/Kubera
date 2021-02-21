@@ -1,0 +1,9 @@
+// Hacks
+.cdk-overlay-container {
+  z-index:2000;
+}
+
+.btn.no-outline:focus,.btn.no-outline:active {
+  outline: none !important;
+  box-shadow: none;
+}

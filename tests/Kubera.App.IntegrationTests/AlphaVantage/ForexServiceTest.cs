@@ -23,9 +23,9 @@ namespace Kubera.App.IntegrationTests.AlphaVantage
 
             Assert.NotNull(result);
 
-            Assert.Equal(from, result.From);
-            Assert.Equal(to, result.To);
-            Assert.NotEqual(0m, result.Rate, 4);
+            Assert.Equal(from, result.Value.From);
+            Assert.Equal(to, result.Value.To);
+            Assert.NotEqual(0m, result.Value.Rate, 4);
         }
     }
 }

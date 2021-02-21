@@ -91,7 +91,7 @@
       <mat-paginator [length]="resultsLength" [pageSize]="itemsPerPage" class="paginator"></mat-paginator>
     </div>
 
-    <mat-menu #menu="matMenu">
+    <mat-menu #menu="matMenu" class="menu-action-transactions">
       <ng-template matMenuContent let-transaction="element">
         <button mat-menu-item (click)="showTransactionEdit(transaction)">
           <mat-icon>mode_edit</mat-icon>

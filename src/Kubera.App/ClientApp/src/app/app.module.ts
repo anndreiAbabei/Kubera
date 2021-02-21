@@ -50,6 +50,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { AppComponent } from './app.component';
 import { ApiAuthorizationModule } from 'src/api-authorization/api-authorization.module';
@@ -65,7 +66,6 @@ import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard
 import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
 import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
 import { DashboardEditTransactionComponent } from './dashboard/dashboard-edit-transaction/dashboard-edit-transaction.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { AssetComponent } from './shared/asset/asset.component';
 import { WalletComponent } from './shared/wallet/wallet.component';
 import { CurrencyComponent } from './shared/currency/currency.component';

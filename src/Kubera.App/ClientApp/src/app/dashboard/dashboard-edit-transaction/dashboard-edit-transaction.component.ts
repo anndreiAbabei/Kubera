@@ -68,7 +68,7 @@ export class DashboardEditTransactionComponent implements OnInit {
       this.currencies = await this.currencyService.getAll().toPromise();
     } catch (ex) {
       this.errorHandlerService.handle(ex);
-      this.activeModal.close();
+      this.close();
     }
 
     if (this.transaction) {
@@ -124,5 +124,9 @@ export class DashboardEditTransactionComponent implements OnInit {
     }
 
     this.activeModal.close(this.transaction);
+  }
+
+  public close() {
+    this.activeModal.close();
   }
 }
