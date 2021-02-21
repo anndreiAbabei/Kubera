@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Kubera.Business.Exceptions;
 using Kubera.General;
 using Kubera.General.Services;
 using Kubera.General.Extensions;

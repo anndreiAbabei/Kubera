@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -7,26 +8,29 @@ using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
-using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetAsset.V1
 {
-    public class GetAssetQueryHandler : IRequestHandler<GetAssetQuery, IResult<AssetModel>>
+    public class GetAssetQueryHandler : CachingHandler<GetAssetQuery, AssetModel>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly IMapper _mapper;
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public GetAssetQueryHandler(IAssetRepository assetRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
+        public GetAssetQueryHandler(IUserCacheService cacheService, 
+            IAssetRepository assetRepository, 
+            IMapper mapper, 
+            IUserIdAccesor userIdAccesor)
+            : base(cacheService)
         {
             _assetRepository = assetRepository;
             _mapper = mapper;
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<IResult<AssetModel>> Handle(GetAssetQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<AssetModel>> HandleImpl(GetAssetQuery request, CancellationToken cancellationToken)
         {
             var asset = await _assetRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -39,7 +43,8 @@ namespace Kubera.Application.Features.Queries.GetAsset.V1
 
             return _mapper.Map<Asset, AssetModel>(asset)
                 .AsResult();
-
         }
+
+        protected override string GenerateKey(GetAssetQuery request) => $"{base.GenerateKey(request)}.{request.Id}";
     }
 }

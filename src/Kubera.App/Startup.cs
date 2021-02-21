@@ -163,7 +163,8 @@ namespace Kubera.App
             services.AddScoped<IDefaultEntities, DefaultEntities>();
             services.AddScoped<IDefaults, DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
-            services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<ICacheService, CacheService>(); 
+            services.AddScoped<IUserCacheService, UserCacheService>();
 
             services.AddScoped<IAssetRepository, AssetRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();

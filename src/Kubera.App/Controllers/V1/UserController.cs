@@ -29,6 +29,8 @@ namespace Kubera.App.Controllers.V1
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
+            HttpContext.AddFromCacheHeader(query);
+
             return result.AsActionResult();
         }
     }

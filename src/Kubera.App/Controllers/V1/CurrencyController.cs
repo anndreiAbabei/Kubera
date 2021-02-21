@@ -1,5 +1,4 @@
 ﻿using Kubera.App.Infrastructure;
-using Kubera.App.Infrastructure.Extensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Features.Queries.GetCurrencies.V1;
 using MediatR;
@@ -27,10 +26,8 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<IEnumerable<CurrencyModel>>> GetCurrencies()
         {
             var query = new GetCurrenciesQuery();
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
     }
 }

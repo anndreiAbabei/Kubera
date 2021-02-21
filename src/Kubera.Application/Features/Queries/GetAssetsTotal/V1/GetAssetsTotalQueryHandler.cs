@@ -4,7 +4,6 @@ using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.General.Extensions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,10 +11,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Kubera.General.Services;
 using Kubera.Application.Common.Extensions;
+using Kubera.Application.Common;
 
 namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
-    public class GetAssetsTotalQueryHandler : IRequestHandler<GetAssetsTotalQuery, IResult<IEnumerable<AssetTotalModel>>>
+    public class GetAssetsTotalQueryHandler : CachingHandler<GetAssetsTotalQuery, IEnumerable<AssetTotalModel>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -23,11 +23,13 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
         private readonly IForexService _forexService;
         private readonly IMapper _mapper;
 
-        public GetAssetsTotalQueryHandler(IAssetRepository assetRepository, 
+        public GetAssetsTotalQueryHandler(IUserCacheService cacheService, 
+            IAssetRepository assetRepository, 
             ITransactionRepository transactionRepository,
             ICurrencyRepository currencyRepository,
             IForexService forexService,
             IMapper mapper)
+            : base(cacheService)
         {
             _assetRepository = assetRepository;
             _transactionRepository = transactionRepository;
@@ -36,7 +38,7 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             _mapper = mapper;
         }
 
-        public async Task<IResult<IEnumerable<AssetTotalModel>>> Handle(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<IEnumerable<AssetTotalModel>>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
         {
             var result = new List<AssetTotalModel>();
             var assets = await _assetRepository.GetAll()
@@ -97,6 +99,8 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 
             return result.AsResult();
         }
+
+        protected override string GenerateKey(GetAssetsTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}";
 
         private async ValueTask<decimal> Exchange(string from, string to, decimal amount, CancellationToken cancellationToken = default)
         {

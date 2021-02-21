@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using CSharpFunctionalExtensions;
-using MediatR;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using System.Threading;
@@ -14,10 +13,11 @@ using Kubera.Data.Extensions;
 using Kubera.General.Extensions;
 using Kubera.General.Defaults;
 using Kubera.Application.Common.Extensions;
+using Kubera.Application.Common;
 
-namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
+namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
 {
-    public class GetGroupedTransactionsQueryHandler : IRequestHandler<GetGroupedTransactionsQuery, IResult<IEnumerable<GroupedTransactionsModel>>>
+    public class GetGroupedTransactionsQueryHandler : CachingHandler<GetGroupedTransactionsQuery, IEnumerable<GroupedTransactionsModel>>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -27,13 +27,15 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
         private readonly IDefaults _defaults;
         private readonly IMapper _mapper;
 
-        public GetGroupedTransactionsQueryHandler(IAssetRepository assetRepository,
+        public GetGroupedTransactionsQueryHandler(IUserCacheService cacheService, 
+            IAssetRepository assetRepository,
             ITransactionRepository transactionRepository,
             IForexService forexService,
             IUserRepository userRepository,
             ICurrencyRepository currencyRepository,
             IDefaults defaults,
             IMapper mapper)
+            : base(cacheService)
         {
             _assetRepository = assetRepository;
             _transactionRepository = transactionRepository;
@@ -44,7 +46,7 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
             _mapper = mapper;
         }
 
-        public async Task<IResult<IEnumerable<GroupedTransactionsModel>>> Handle(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<IEnumerable<GroupedTransactionsModel>>> HandleImpl(GetGroupedTransactionsQuery request, CancellationToken cancellationToken)
         {
             var result = new List<GroupedTransactionsModel>();
             IQueryable<Asset> query = _assetRepository.GetAll()
@@ -95,5 +97,7 @@ namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
 
             return result.AsResult();
         }
+
+        protected override string GenerateKey(GetGroupedTransactionsQuery request) => $"{base.GenerateKey(request)}.{request.Order}";
     }
 }

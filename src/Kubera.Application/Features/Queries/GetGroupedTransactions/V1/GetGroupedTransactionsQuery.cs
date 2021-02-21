@@ -1,12 +1,11 @@
 using System.Collections.Generic;
-using CSharpFunctionalExtensions;
-using MediatR;
 using Kubera.Application.Common.Models;
 using Kubera.General.Models;
+using Kubera.Application.Common;
 
-namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1 
+namespace Kubera.Application.Features.Queries.GetGroupedTransactions.V1
 {
-    public class GetGroupedTransactionsQuery : IRequest<IResult<IEnumerable<GroupedTransactionsModel>>>
+    public class GetGroupedTransactionsQuery : CacheableRequest<IEnumerable<GroupedTransactionsModel>>
     {
         public Order? Order { get; set; }
     }

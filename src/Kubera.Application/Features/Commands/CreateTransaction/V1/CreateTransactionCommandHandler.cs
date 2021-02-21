@@ -10,31 +10,36 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Kubera.Application.Common.Extensions;
+using System.Collections.Generic;
+using Kubera.Application.Features.Queries.GetTransactions.V1;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 {
     public class CreateTransactionCommandHandler : IRequestHandler<CreateTransactionCommand, IResult<TransactionModel>>
     {
+        private readonly IUserCacheService _userCacheService;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAssetRepository _assetRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly ICurrencyRepository _currencyRepository;
-        private readonly IMapper _mapper;
         private readonly IUserIdAccesor _userIdAccesor;
+        private readonly IMapper _mapper;
 
-        public CreateTransactionCommandHandler(ITransactionRepository transactionRepository,
-                                     IAssetRepository assetRepository,
-                                     IGroupRepository groupRepository,
-                                     ICurrencyRepository currencyRepository,
-                                     IMapper mapper,
-                                     IUserIdAccesor userIdAccesor)
+        public CreateTransactionCommandHandler(IUserCacheService userCacheService, 
+            ITransactionRepository transactionRepository,
+            IAssetRepository assetRepository,
+            IGroupRepository groupRepository,
+            ICurrencyRepository currencyRepository,
+            IUserIdAccesor userIdAccesor,
+            IMapper mapper)
         {
+            _userCacheService = userCacheService;
             _transactionRepository = transactionRepository;
             _assetRepository = assetRepository;
             _groupRepository = groupRepository;
             _currencyRepository = currencyRepository;
-            _mapper = mapper;
             _userIdAccesor = userIdAccesor;
+            _mapper = mapper;
         }
 
         public async Task<IResult<TransactionModel>> Handle(CreateTransactionCommand request, CancellationToken cancellationToken)
@@ -80,6 +85,12 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 
             if (request.Input.FeeCurrencyId != null && currencies.Found(request.Input.FeeCurrencyId.Value, out var feeCurrency))
                 result.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
+
+            _userCacheService.RemoveAll<TransactionModel>();
+            _userCacheService.RemoveAll<GroupedTransactionsModel>();
+            _userCacheService.RemoveAll<GetTransactionsQueryOutput>();
+            _userCacheService.RemoveAll<IEnumerable<TransactionModel>>();
+            _userCacheService.RemoveAll<IEnumerable<GroupedTransactionsModel>>();
 
             return result.AsResult();
         }

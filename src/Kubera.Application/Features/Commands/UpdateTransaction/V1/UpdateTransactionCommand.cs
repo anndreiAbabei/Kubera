@@ -5,7 +5,7 @@ using System;
 
 namespace Kubera.Application.Features.Commands.UpdateTransaction.V1
 {
-    public class UpdateTransactionCommand : IRequest<Result>
+    public class UpdateTransactionCommand : IRequest<IResult>
     {
         public Guid Id { get; set; }
 

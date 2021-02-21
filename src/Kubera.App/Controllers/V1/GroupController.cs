@@ -33,10 +33,8 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<IEnumerable<GroupModel>>> GetGroups()
         {
             var query = new GetAllGroupsQuery();
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -54,10 +52,24 @@ namespace Kubera.App.Controllers.V1
             {
                 Id = id
             };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Get all assets with their total of a user
+        /// </summary>
+        /// <returns>Collection of assets with their respective assets</returns>
+        [HttpGet("totals")]
+        [ProducesResponseType(typeof(IEnumerable<GroupTotalModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId)
+        {
+            var query = new GetGroupTotalQuery
+            {
+                CurrencyId = currencyId
+            };
+
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -107,10 +119,8 @@ namespace Kubera.App.Controllers.V1
                 Id = id,
                 Input = model
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -128,28 +138,8 @@ namespace Kubera.App.Controllers.V1
             {
                 Id = id
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
-        }
-
-        /// <summary>
-        /// Get all assets with their total of a user
-        /// </summary>
-        /// <returns>Collection of assets with their respective assets</returns>
-        [HttpGet("totals")]
-        [ProducesResponseType(typeof(IEnumerable<GroupTotalModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId)
-        {
-            var query = new GetGroupTotalQuery
-            {
-                CurrencyId = currencyId
-            };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
-
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
     }
 }

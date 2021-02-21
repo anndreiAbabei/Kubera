@@ -1,27 +1,33 @@
 ﻿using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Infrastructure;
+using Kubera.Application.Common.Models;
+using Kubera.Application.Features.Queries.GetTransactions.V1;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
 using MediatR;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Commands.UpdateTransaction.V1
 {
-    public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransactionCommand, Result>
+    public class UpdateTransactionCommandHandler : IRequestHandler<UpdateTransactionCommand, IResult>
     {
+        private readonly IUserCacheService _userCacheService;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public UpdateTransactionCommandHandler(ITransactionRepository transactionRepository,
-                                     IUserIdAccesor userIdAccesor)
+        public UpdateTransactionCommandHandler(IUserCacheService userCacheService,
+            ITransactionRepository transactionRepository,
+            IUserIdAccesor userIdAccesor)
         {
+            _userCacheService = userCacheService;
             _transactionRepository = transactionRepository;
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result> Handle(UpdateTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(UpdateTransactionCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _transactionRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -42,6 +48,12 @@ namespace Kubera.Application.Features.Commands.UpdateTransaction.V1
 
             await _transactionRepository.Update(transaction, cancellationToken)
                     .ConfigureAwait(false);
+
+            _userCacheService.RemoveAll<TransactionModel>();
+            _userCacheService.RemoveAll<GroupedTransactionsModel>();
+            _userCacheService.RemoveAll<GetTransactionsQueryOutput>();
+            _userCacheService.RemoveAll<IEnumerable<TransactionModel>>();
+            _userCacheService.RemoveAll<IEnumerable<GroupedTransactionsModel>>();
 
             return Result.Success();
         }
