@@ -14,7 +14,6 @@ using Kubera.Application.Features.Commands.CreateAsset.V1;
 using Kubera.Application.Features.Commands.UpdateAsset.V1;
 using Kubera.Application.Features.Commands.DeleteAsset.V1;
 
-
 namespace Kubera.App.Controllers.V1
 {
     [ApiVersion("1.0")]
@@ -35,10 +34,8 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<IEnumerable<AssetModel>>> GetAssets()
         {
             var query = new GetAllAssetsQuery();
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -56,10 +53,8 @@ namespace Kubera.App.Controllers.V1
             {
                 Id = id
             };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -109,10 +104,8 @@ namespace Kubera.App.Controllers.V1
                 Id = id,
                 Input = model
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -133,10 +126,8 @@ namespace Kubera.App.Controllers.V1
             {
                 Id = id
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -151,10 +142,8 @@ namespace Kubera.App.Controllers.V1
             {
                 CurrencyId = currencyId
             };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
     }
 }

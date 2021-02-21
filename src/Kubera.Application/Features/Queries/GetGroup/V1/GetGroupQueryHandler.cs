@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -7,26 +8,32 @@ using Kubera.Application.Services;
 using Kubera.Data.Entities;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
-using MediatR;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetGroup.V1
 {
-    public class GetGroupQueryHandler : IRequestHandler<GetGroupQuery, IResult<GroupModel>>
+    public class GetGroupQueryHandler : CachingHandler<GetGroupQuery, GroupModel>
     {
         private readonly IGroupRepository _groupRepository;
-        private readonly IMapper _mapper;
         private readonly IUserIdAccesor _userIdAccesor;
+        private readonly IMapper _mapper;
 
-        public GetGroupQueryHandler(IGroupRepository groupRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
+        public GetGroupQueryHandler(IUserCacheService cacheService, 
+            IGroupRepository groupRepository, 
+            IUserIdAccesor userIdAccesor, 
+            IMapper mapper)
+            : base(cacheService)
         {
             _groupRepository = groupRepository;
-            _mapper = mapper;
             _userIdAccesor = userIdAccesor;
+            _mapper = mapper;
+
+            cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(1));
         }
 
-        public async Task<IResult<GroupModel>> Handle(GetGroupQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<GroupModel>> HandleImpl(GetGroupQuery request, CancellationToken cancellationToken)
         {
             var group = await _groupRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -40,5 +47,7 @@ namespace Kubera.Application.Features.Queries.GetGroup.V1
             return _mapper.Map<Group, GroupModel>(group)
                 .AsResult();
         }
+
+        protected override string GenerateKey(GetGroupQuery request) => $"{base.GenerateKey(request)}.{request.Id}";
     }
 }

@@ -5,7 +5,7 @@ using System;
 
 namespace Kubera.Application.Features.Commands.UpdateAsset.V1
 {
-    public class UpdateAssetCommand : IRequest<Result>
+    public class UpdateAssetCommand : IRequest<IResult>
     {
         public Guid Id { get; set; }
 

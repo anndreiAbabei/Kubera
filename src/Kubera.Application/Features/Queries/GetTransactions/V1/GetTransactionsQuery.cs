@@ -1,13 +1,12 @@
-﻿using CSharpFunctionalExtensions;
-using Kubera.Application.Common.Models;
+﻿using Kubera.Application.Common.Caching;
 using Kubera.General.Models;
-using MediatR;
-using System.Collections.Generic;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
-    public class GetTransactionsQuery : IRequest<IResult<IEnumerable<TransactionModel>>>
+    public class GetTransactionsQuery : CacheableRequest<GetTransactionsQueryOutput>
     {
+        internal override CacheRegion CacheRegion => CacheRegion.Transactions;
+
         public IPaging Paging { get; set; }
 
         public IDateFilter Date { get; set; }

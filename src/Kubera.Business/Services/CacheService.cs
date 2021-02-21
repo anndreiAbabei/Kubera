@@ -1,68 +1,125 @@
 ﻿using Kubera.General.Services;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Primitives;
+using System;
+using System.Linq;
+using System.Runtime.Caching;
 
 namespace Kubera.Business.Services
 {
     public class CacheService : ICacheService
     {
-        private readonly IMemoryCache _memoryCache;
-        private readonly CacheChangeToken _baseExpirationToken;
+        private static readonly MemoryCache _memoryCache = MemoryCache.Default;
 
-        public CacheService(IMemoryCache memoryCache)
+        private readonly CacheItemPolicy _defaultCachePolicy = new CacheItemPolicy
         {
-            _memoryCache = memoryCache;
-            _baseExpirationToken = new CacheChangeToken();
+            AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
+        };
+
+        public DateTimeOffset? AbsoluteExpiration
+        {
+            get => _defaultCachePolicy.AbsoluteExpiration != ObjectCache.InfiniteAbsoluteExpiration
+                        ? _defaultCachePolicy.AbsoluteExpiration
+                        : null;
+            set => _defaultCachePolicy.AbsoluteExpiration = value == null
+                                                                ? ObjectCache.InfiniteAbsoluteExpiration
+                                                                : value.Value;
         }
 
-        public virtual void Add<T>(T entity, params object[] keys)
+        public TimeSpan? SlidingExpiration
         {
-            var key = CreateKey<T>(keys);
+            get => _defaultCachePolicy.SlidingExpiration != ObjectCache.NoSlidingExpiration
+                        ? _defaultCachePolicy.SlidingExpiration
+                        : null;
+            set => _defaultCachePolicy.SlidingExpiration = value == null
+                                                                ? ObjectCache.NoSlidingExpiration
+                                                                : value.Value;
+        }
+
+        public virtual void Add<T>(T entity, string key)
+        {
             var cacheTokenKey = CreateCacheTokenKey<T>();
-            var token = _memoryCache.TryGetValue<IChangeToken>(cacheTokenKey, out var tk)
-                        ? tk
-                        : new CacheChangeToken(_baseExpirationToken);
-
-            _memoryCache.Set(key, entity, token);
+            AddImpl(entity, key, cacheTokenKey);
         }
 
-        public virtual T Get<T>(params object[] keys)
+        public void Add<T>(T entity, string key, string[] regions)
         {
-            var key = CreateKey<T>(keys);
-
-            return _memoryCache.TryGetValue<T>(key, out var entity)
-                    ? entity
-                    : default;
+            AddImpl(entity, key, regions);
         }
 
-        public virtual void Remove<T>(params object[] keys)
+        public virtual T Get<T>(string key)
         {
-            var key = CreateKey<T>(keys);
+            key = CreateKey<T>(key);
 
-            _memoryCache.Remove(key);
+            if (_memoryCache.Get(key) is not CachedEntity<T> entity)
+                return default;
+
+            return entity.Entity;
+        }
+
+        public virtual void Remove<T>(string key)
+        {
+            key = CreateKey<T>(key);
+
+            RemoveExpiredEntity(key);
         }
 
         public virtual void RemoveAll<T>()
         {
-            var cacheTokenKey = CreateCacheTokenKey<T>();
+            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity<T>)
+                                          .Select(kvp => kvp.Key)
+                                          .ToList();
 
-            if (_memoryCache.TryGetValue<CacheChangeToken>(cacheTokenKey, out var tk))
-                tk.HasChanged = true;
+            foreach (var key in keysToRemve)
+                RemoveExpiredEntity(key);
+        }
+
+        public void RemoveRegion(string region)
+        {
+            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity ce && ce.Regions.Contains(region))
+                                          .Select(kvp => kvp.Key)
+                                          .ToList();
+
+            foreach (var key in keysToRemve)
+                RemoveExpiredEntity(key);
+
         }
 
         public virtual void Clear()
         {
-            _baseExpirationToken.HasChanged = true;
+            _memoryCache.Trim(100);
         }
 
-        protected virtual string CreateKey<T>(params object[] keys)
+        protected virtual string CreateKey<T>(string key) => $"{typeof(T).FullName}[{key}]";
+
+        private void AddImpl<T>(T entity, string key, params string[] regions)
         {
-            return $"{typeof(T).FullName}[{string.Join(".", keys)}]";
+            key = CreateKey<T>(key);
+
+            _memoryCache.Add(key, new CachedEntity<T>(entity, regions), _defaultCachePolicy);
         }
 
-        private static string CreateCacheTokenKey<T>()
+        private static string CreateCacheTokenKey<T>() => typeof(T).FullName;
+
+        private static void RemoveExpiredEntity(string key) => _memoryCache.Remove(key, CacheEntryRemovedReason.Removed);
+
+        private class CachedEntity
         {
-            return $"CACHE_TOKEN.{typeof(T).FullName}";
+            public string[] Regions { get; }
+
+            public CachedEntity(string[] regions)
+            {
+                Regions = regions;
+            }
+        }
+
+        private class CachedEntity<T> : CachedEntity
+        {
+            public T Entity { get; }
+
+            public CachedEntity(T entity, string[] regions)
+                : base(regions)
+            {
+                Entity = entity;
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -8,6 +9,7 @@ using Kubera.Data.Entities;
 using Kubera.General.Services;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,15 +17,20 @@ namespace Kubera.Application.Features.Commands.CreateAsset.V1
 {
     public class CreateAssetCommandHandler : IRequestHandler<CreateAssetCommand, IResult<AssetModel>>
     {
+        private readonly IUserCacheService _userCacheService;
         private readonly IAssetRepository _assetRepository;
-        private readonly IMapper _mapper;
         private readonly IUserIdAccesor _userIdAccesor;
+        private readonly IMapper _mapper;
 
-        public CreateAssetCommandHandler(IAssetRepository assetRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
+        public CreateAssetCommandHandler(IUserCacheService userCacheService, 
+            IAssetRepository assetRepository, 
+            IUserIdAccesor userIdAccesor, 
+            IMapper mapper)
         {
+            _userCacheService = userCacheService;
             _assetRepository = assetRepository;
-            _mapper = mapper;
             _userIdAccesor = userIdAccesor;
+            _mapper = mapper;
         }
 
         public async Task<IResult<AssetModel>> Handle(CreateAssetCommand request, CancellationToken cancellationToken)
@@ -45,6 +52,8 @@ namespace Kubera.Application.Features.Commands.CreateAsset.V1
 
             asset = await _assetRepository.Add(asset, cancellationToken)
                 .ConfigureAwait(false);
+
+            _userCacheService.Remove(CacheRegion.Assets);
 
             return _mapper.Map<Asset, AssetModel>(asset).AsResult();
         }

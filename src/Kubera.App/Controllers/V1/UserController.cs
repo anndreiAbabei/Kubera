@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Kubera.Application.Common.Models;
 using MediatR;
 using Kubera.Application.Features.Queries.GetUserInfo.V1;
-using Kubera.App.Infrastructure.Extensions;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -26,10 +25,8 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<UserInfoModel>> GetUserInfo()
         {
             var query = new GetUserInfoQuery();
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
     }
 }

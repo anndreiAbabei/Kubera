@@ -52,6 +52,8 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnDestroy {
       if (!this.noResult) {
         this.selectedCurrency = this.currencies[0];
         this.groups = await this.groupService.getTotals(this.selectedCurrency.id).toPromise();
+
+        this.noResult = this.groups.length <= 1;
       }
     } catch (ex) {
       this.errorHandlering.handle(ex);

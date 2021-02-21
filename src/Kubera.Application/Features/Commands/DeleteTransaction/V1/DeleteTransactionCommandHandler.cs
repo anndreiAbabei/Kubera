@@ -1,27 +1,32 @@
 ﻿using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
 using MediatR;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Commands.DeleteTransaction.V1
 {
-    public class DeleteTransactionCommandHandler : IRequestHandler<DeleteTransactionCommand, Result>
+    public class DeleteTransactionCommandHandler : IRequestHandler<DeleteTransactionCommand, IResult>
     {
+        private readonly IUserCacheService _userCacheService;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserIdAccesor _userIdAccesor;
 
-        public DeleteTransactionCommandHandler(ITransactionRepository transactionRepository,
-                                     IUserIdAccesor userIdAccesor)
+        public DeleteTransactionCommandHandler(IUserCacheService userCacheService,
+            ITransactionRepository transactionRepository,
+            IUserIdAccesor userIdAccesor)
         {
+            _userCacheService = userCacheService;
             _transactionRepository = transactionRepository;
             _userIdAccesor = userIdAccesor;
         }
 
-        public async Task<Result> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
+        public async Task<IResult> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
         {
             var transaction = await _transactionRepository.GetById(request.Id, cancellationToken)
                 .ConfigureAwait(false);
@@ -34,6 +39,8 @@ namespace Kubera.Application.Features.Commands.DeleteTransaction.V1
 
             await _transactionRepository.Delete(transaction.Id, cancellationToken)
                 .ConfigureAwait(false);
+
+            _userCacheService.Remove(CacheRegion.Transactions);
 
             return Result.Success();
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Infrastructure;
 using Kubera.Application.Common.Models;
@@ -8,6 +9,7 @@ using Kubera.Data.Entities;
 using Kubera.General.Services;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,14 +17,19 @@ namespace Kubera.Application.Features.Commands.CreateGroup
 {
     public class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, IResult<GroupModel>>
     {
+        private readonly IUserCacheService _userCacheService;
         private readonly IGroupRepository _groupRepository;
-        private readonly IMapper _mapper;
         private readonly IUserIdAccesor _userIdAccesor;
+        private readonly IMapper _mapper;
 
-        public CreateGroupCommandHandler(IGroupRepository groupRepository, IMapper mapper, IUserIdAccesor userIdAccesor)
+        public CreateGroupCommandHandler(IUserCacheService userCacheService, 
+            IGroupRepository groupRepository, 
+            IUserIdAccesor userIdAccesor, 
+            IMapper mapper)
         {
-            _groupRepository = groupRepository;
             _mapper = mapper;
+            _userCacheService = userCacheService;
+            _groupRepository = groupRepository;
             _userIdAccesor = userIdAccesor;
         }
 
@@ -41,6 +48,8 @@ namespace Kubera.Application.Features.Commands.CreateGroup
 
             group = await _groupRepository.Add(group, cancellationToken)
                 .ConfigureAwait(false);
+
+            _userCacheService.Remove(CacheRegion.Groups);
 
             return _mapper.Map<Group, GroupModel>(group).AsResult();
         }

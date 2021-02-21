@@ -1,11 +1,10 @@
-﻿using AutoMapper;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
+using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Models;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,25 +14,29 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
 {
-    public class GetGroupTotalQueryHandler : IRequestHandler<GetGroupTotalQuery, IResult<IEnumerable<GroupTotalModel>>>
+    public class GetGroupTotalQueryHandler : CachingHandler<GetGroupTotalQuery, IEnumerable<GroupTotalModel>>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly ITransactionRepository _transactionRepository;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IForexService _forexService;
 
-        public GetGroupTotalQueryHandler(IGroupRepository groupRepository,
+        public GetGroupTotalQueryHandler(IUserCacheService cacheService, 
+            IGroupRepository groupRepository,
             ITransactionRepository transactionRepository,
             ICurrencyRepository currencyRepository,
             IForexService forexService)
+            : base(cacheService)
         {
             _groupRepository = groupRepository;
             _transactionRepository = transactionRepository;
             _currencyRepository = currencyRepository;
             _forexService = forexService;
+
+            cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
-        public async Task<IResult<IEnumerable<GroupTotalModel>>> Handle(GetGroupTotalQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<IEnumerable<GroupTotalModel>>> HandleImpl(GetGroupTotalQuery request, CancellationToken cancellationToken)
         {
             var result = new List<GroupTotalModel>();
             var groups = await _groupRepository.GetAll()
@@ -92,6 +95,8 @@ namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
 
             return result.AsResult();
         }
+
+        protected override string GenerateKey(GetGroupTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}";
 
         private async ValueTask<decimal> Exchange(string from, string to, decimal amount, CancellationToken cancellationToken = default)
         {

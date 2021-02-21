@@ -52,6 +52,8 @@ export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
         if (!this.noResult) {
           this.selectedCurrency = this.currencies[0];
           this.assets = await this.assetService.getTotals(this.selectedCurrency.id).toPromise();
+
+          this.noResult = this.assets.length <= 0;
         }
       } catch (ex) {
         this.errorHandlering.handle(ex);

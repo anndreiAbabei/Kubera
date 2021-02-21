@@ -14,7 +14,7 @@ using Kubera.Application.Features.Queries.GetTransaction.V1;
 using Kubera.Application.Features.Commands.CreateTransaction.V1;
 using Kubera.Application.Features.Commands.UpdateTransaction.V1;
 using Kubera.Application.Features.Commands.DeleteTransaction.V1;
-using Kubera.Application.Features.Queries.GetGroupedTransactions.V1;
+using Kubera.Application.Features.Queries.GetAssetGroupedTransactions.V1;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -40,10 +40,19 @@ namespace Kubera.App.Controllers.V1
                 Date = filter,
                 Order = order
             };
+
+            HttpContext.AddCachePrefernces(query);
+
             var result = await Mediator.Send(query, HttpContext.RequestAborted)
                 .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            if (result.IsFailure)
+                return result.Error.AsErrorActionResult();
+
+            HttpContext.AddPaging(result.Value.Paging);
+            HttpContext.AddFromCacheHeader(query);
+
+            return Ok(result.Value.Transactions);
         }
         
         /// <summary>
@@ -54,14 +63,12 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Order? order)
         {
-            var query = new GetGroupedTransactionsQuery
+            var query = new GetAssetGroupedTransactionsQuery
             {
                 Order = order
             };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -79,10 +86,8 @@ namespace Kubera.App.Controllers.V1
             {
                 Id = id
             };
-            var result = await Mediator.Send(query, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(query).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -130,10 +135,8 @@ namespace Kubera.App.Controllers.V1
                 Id = id,
                 Input = model
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -147,17 +150,12 @@ namespace Kubera.App.Controllers.V1
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> DeleteTransaction(Guid id)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var command = new DeleteTransactionCommand
             {
                 Id = id
             };
-            var result = await Mediator.Send(command, HttpContext.RequestAborted)
-                .ConfigureAwait(false);
 
-            return result.AsActionResult();
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
     }
 }

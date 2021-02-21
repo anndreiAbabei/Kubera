@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Kubera.Business.Exceptions;
 using Kubera.General;
 using Kubera.General.Services;
 using Kubera.General.Extensions;
@@ -90,7 +89,7 @@ namespace Kubera.Business.Services
             return result;
         }
 
-        protected virtual object[] CalculateKey(params object[] type) => type;
+        protected virtual string CalculateKey(params object[] keys) => string.Join(".", keys);
 
         private async ValueTask<IResult<IForexServiceResponse>> GetPriceOfForexImpl(string fromCode, string toCode, CancellationToken cancellationToken = default)
         {

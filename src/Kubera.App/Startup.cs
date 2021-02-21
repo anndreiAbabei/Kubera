@@ -145,7 +145,8 @@ namespace Kubera.App
 
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb]);
+            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb], 
+                options => options.EnableRetryOnFailure());
         }
 
         private void ConfigureDi(IServiceCollection services)
@@ -154,7 +155,6 @@ namespace Kubera.App
             settings.AlphaVantageApiKey = Configuration[SettingKeys.AlphaVantageApiKey];
 
             services.AddHttpContextAccessor();
-            services.AddMemoryCache();
 
             services.AddHttpClient<IForexService, AlphaVantageService>();
             
@@ -163,7 +163,8 @@ namespace Kubera.App
             services.AddScoped<IDefaultEntities, DefaultEntities>();
             services.AddScoped<IDefaults, DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
-            services.AddScoped<ICacheService, CacheService>();
+            services.AddTransient<ICacheService, CacheService>(); 
+            services.AddTransient<IUserCacheService, UserCacheService>();
 
             services.AddScoped<IAssetRepository, AssetRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
