@@ -1,0 +1,60 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+
+$theme-light-primary: mat-palette($mat-indigo);
+$theme-light-accent:  mat-palette($mat-orange, A200, A100, A600);
+$theme-light:   mat-light-theme($theme-light-primary, $theme-light-accent);
+
+$theme-dark-primary: mat-palette($mat-blue-grey);
+$theme-dark-accent:  mat-palette($mat-amber, A200, A100, A400);
+$theme-dark-warn:    mat-palette($mat-deep-orange);
+$theme-dark:   mat-dark-theme($theme-dark-primary, $theme-dark-accent, $theme-dark-warn);
+@include angular-material-theme($theme-dark);
+
+@import "./src/app/nav-menu/nav-menu.component";
+@import "./src/app/shared/currency/currency.component";
+@import "./src/app/shared/percent/percent.component";
+@import "./src/app/dashboard/dashboard-transactions/dashboard-transactions.component";
+@mixin custom-components-theme($theme, $dark) {
+  @include nav-bar-theme($theme);
+  @include currency-theme($theme, $dark);
+  @include percent-theme($theme, $dark);
+  @include dashboard-transactions-theme($theme, $dark);
+}
+
+.color-scheme-dark {
+  @include angular-material-theme($theme-dark);
+  @include custom-components-theme($theme-dark, true);
+
+  $bgColor: mat-color($mat-gray, 900);
+
+  background-color: $bgColor;
+  color: white;
+
+  .navbar-brand {
+      color: #d0d0d0;
+  }
+
+  .modal-content {
+    background-color: $bgColor;
+  }
+}
+
+.color-scheme-light {
+  @include angular-material-theme($theme-light);
+  @include custom-components-theme($theme-light, false);
+
+  $bgColor: white;
+
+  background-color: $bgColor;
+  color: rgba(0, 0, 0, 0.87);
+
+  .navbar-brand {
+      color: #2d2d2d;
+  }
+
+  .modal-content {
+    background-color: $bgColor;
+  }
+}

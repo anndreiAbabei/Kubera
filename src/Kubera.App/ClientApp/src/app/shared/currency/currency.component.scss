@@ -1,14 +1,17 @@
-span.currency-name {
-  display: none;
-}
+@mixin currency-theme($theme, $dark) {
+  $primary: map-get($theme, primary);
+  $foreground: map-get($theme, foreground);
 
-span.currency-icon {
-  background-color: lightgreen;
-  border-radius: 90px;
-  width: 1.5em;
-  height: 1.5em;
-  display: inline-block;
-  text-align: center;
-  vertical-align: middle;
-  margin-left: .5em;
+  span.currency-name {
+    display: none;
+  }
+  span.bubble.currency-icon {
+    background-color: lightgreen;
+    margin-left: .5em;
+    @if $dark {
+      color: mat-color($primary, '100-contrast');
+    } @else {
+      color: mat-color($foreground, text);
+    }
+  }
 }

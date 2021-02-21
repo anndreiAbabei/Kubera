@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h4 class="modal-title" id="modal-basic-title">Create transaction</h4>
-  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+  <button type="button" class="close" aria-label="Close" (click)="close()">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
@@ -29,7 +29,7 @@
       <mat-label>Asset</mat-label>
       <mat-select formControlName="asset">
         <mat-option *ngFor="let asset of assets" [value]="asset.id">
-          {{asset.name}}
+          <app-asset [asset]="asset"></app-asset>
         </mat-option>
       </mat-select>
       <mat-error *ngIf="addTransactionForm.get('asset').hasError('required')">

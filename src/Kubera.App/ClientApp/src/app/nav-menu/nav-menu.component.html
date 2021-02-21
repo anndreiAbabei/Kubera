@@ -1,5 +1,5 @@
 <header>
-  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3" >
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" >
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">{{appName}}</a>
       <button class="navbar-toggler"
@@ -15,20 +15,20 @@
         [ngClass]="{ show: isExpanded }">
         <app-login-menu></app-login-menu>
         <ul class="navbar-nav flex-grow">
-          <li>
-            <button mat-menu-item (click)="toggleDarkMode()">
+          <li class="nav-item">
+            <button class="btn no-outline dark-mode-toggle" (click)="toggleDarkMode()">
               <mat-icon>dark_mode</mat-icon>
             </button>
           </li>
           <li class="nav-item"
               [routerLinkActive]="['link-active']"
               [routerLinkActiveOptions]="{ exact: true }">
-            <a class="nav-link text-dark" [routerLink]="['/']">Home</a>
+            <a class="nav-link" [routerLink]="['/']">Home</a>
           </li>
           <li class="nav-item"
               [routerLinkActive]="['link-active']"
               [routerLinkActiveOptions]="{ exact: true }">
-            <a class="nav-link text-dark" [routerLink]="['/dashboard']">Dashboard</a>
+            <a class="nav-link" [routerLink]="['/dashboard']">Dashboard</a>
           </li>
         </ul>
       </div>

@@ -52,17 +52,16 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
 
     const result = await this.modalService.open(DashboardEditTransactionComponent).result;
 
-    this.isLoadingResults = true;
-
     if (!result) {
       return;
     }
 
     try {
+      this.isLoadingResults = true;
       const t = await this.transactionService.create(result).toPromise();
       this.transactions.push(t);
       this.eventService.updateTransaction.emit(t);
-    } catch(ex) {
+    } catch (ex) {
       this.errorHandlerService.handle(ex);
     } finally {
       this.isLoadingResults = false;
@@ -80,9 +79,10 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
     }
 
     try {
+      this.isLoadingResults = true;
       await this.transactionService.update(result).toPromise();
       this.eventService.updateTransaction.emit(result);
-    } catch(ex) {
+    } catch (ex) {
       this.errorHandlerService.handle(ex);
     } finally {
       this.isLoadingResults = false;

@@ -1,0 +1,24 @@
+.bubble {
+  display: inline-flex;
+  border-radius: 90px;
+  width: 1.5em;
+  height: 1.5em;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin shared-theme-red($dark) {
+  @if $dark {
+    color: #E57373;
+  } @else {
+    color: #C62828;
+  }
+}
+
+@mixin shared-theme-green($dark) {
+  @if $dark {
+    color: #9CCC65;
+  } @else {
+    color: #43A047;
+  }
+}
