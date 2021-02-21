@@ -1,8 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Kubera.Application.Common.Caching;
 using Kubera.Application.Common.Infrastructure;
-using Kubera.Application.Common.Models;
-using Kubera.Application.Features.Queries.GetTransactions.V1;
 using Kubera.Application.Services;
 using Kubera.General.Extensions;
 using Kubera.General.Services;

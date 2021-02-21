@@ -13,7 +13,6 @@ using Kubera.Application.Features.Commands.UpdateGroup.V1;
 using MediatR;
 using Kubera.Application.Features.Commands.DeleteGroup.V1;
 using Kubera.Application.Features.Queries.GetGroupTotals.V1;
-using System.Linq;
 
 namespace Kubera.App.Controllers.V1
 {
