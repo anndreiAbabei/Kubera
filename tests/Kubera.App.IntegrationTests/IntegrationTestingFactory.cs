@@ -2,6 +2,7 @@
 using Bogus;
 using Kubera.General;
 using Kubera.General.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Kubera.App.IntegrationTests
@@ -34,6 +35,13 @@ namespace Kubera.App.IntegrationTests
         }
 
 
+
+        protected virtual ILogger<T> Logger<T>()
+        {
+            var logMock = new Mock<ILogger<T>>();
+
+            return logMock.Object;
+        }
 
         public virtual T CreateFake<T>(Action<Faker<T>> options = null)
             where T : class

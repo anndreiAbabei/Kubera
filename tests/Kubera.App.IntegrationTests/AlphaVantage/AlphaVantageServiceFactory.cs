@@ -15,7 +15,10 @@ namespace Kubera.App.IntegrationTests.AlphaVantage
         public AlphaVantageServiceFactory()
         {
             _httpClient = new HttpClient();
-            var service = new AlphaVantageService(_httpClient, AppSettings, CacheService);
+            var service = new AlphaVantageService(_httpClient, 
+                                                  AppSettings, 
+                                                  CacheService,
+                                                  Logger<AlphaVantageService>());
             Forex = service;
         }
 
@@ -37,7 +40,7 @@ namespace Kubera.App.IntegrationTests.AlphaVantage
 
         public void Dispose()
         {
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
     }
