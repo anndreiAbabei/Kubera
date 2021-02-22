@@ -12,24 +12,28 @@ namespace Kubera.App.IntegrationTests
 
         public virtual ICacheService CacheService { get; }
 
-        public IntegrationTestingFactory()
+
+
+        protected IntegrationTestingFactory()
         {
             var appMock = new Mock<IAppSettings>();
             var cacheMock = new Mock<ICacheService>();
 
             appMock.SetupGet(a => a.AlphaVantageApiKey)
-                .Returns(Environment.GetEnvironmentVariable("ALPHA_VANTAGE_API"));
+                   .Returns(Environment.GetEnvironmentVariable("ALPHA_VANTAGE_API"));
 
             cacheMock.Setup(c => c.Get<It.IsAnyType>(It.IsAny<string>()))
-                .Returns(() => default);
-            cacheMock.Setup(c => c.Add(It.IsAny<It.IsAnyType>(), It.IsAny<object[]>()));
-            cacheMock.Setup(c => c.Remove<It.IsAnyType>(It.IsAny<object[]>()));
+                     .Returns(() => default);
+            cacheMock.Setup(c => c.Add(It.IsAny<It.IsAnyType>(), It.IsAny<string>()));
+            cacheMock.Setup(c => c.Remove<It.IsAnyType>(It.IsAny<string>()));
             cacheMock.Setup(c => c.RemoveAll<It.IsAnyType>());
             cacheMock.Setup(c => c.Clear());
 
             AppSettings = appMock.Object;
             CacheService = cacheMock.Object;
         }
+
+
 
         public virtual T CreateFake<T>(Action<Faker<T>> options = null)
             where T : class
