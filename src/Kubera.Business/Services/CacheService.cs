@@ -2,26 +2,34 @@
 using System;
 using System.Linq;
 using System.Runtime.Caching;
+using Microsoft.Extensions.Logging;
+using Kubera.General.Extensions;
 
 namespace Kubera.Business.Services
 {
     public class CacheService : ICacheService
     {
-        private static readonly MemoryCache _memoryCache = MemoryCache.Default;
+        private readonly ILogger<CacheService> _logger;
+        private static readonly MemoryCache MemoryCache = MemoryCache.Default;
 
         private readonly CacheItemPolicy _defaultCachePolicy = new CacheItemPolicy
         {
             AbsoluteExpiration = DateTimeOffset.Now.AddDays(1)
         };
 
+
+
+        public CacheService(ILogger<CacheService> logger)
+        {
+            _logger = logger;
+        }
+
         public DateTimeOffset? AbsoluteExpiration
         {
             get => _defaultCachePolicy.AbsoluteExpiration != ObjectCache.InfiniteAbsoluteExpiration
                         ? _defaultCachePolicy.AbsoluteExpiration
                         : null;
-            set => _defaultCachePolicy.AbsoluteExpiration = value == null
-                                                                ? ObjectCache.InfiniteAbsoluteExpiration
-                                                                : value.Value;
+            set => _defaultCachePolicy.AbsoluteExpiration = value ?? ObjectCache.InfiniteAbsoluteExpiration;
         }
 
         public TimeSpan? SlidingExpiration
@@ -29,9 +37,7 @@ namespace Kubera.Business.Services
             get => _defaultCachePolicy.SlidingExpiration != ObjectCache.NoSlidingExpiration
                         ? _defaultCachePolicy.SlidingExpiration
                         : null;
-            set => _defaultCachePolicy.SlidingExpiration = value == null
-                                                                ? ObjectCache.NoSlidingExpiration
-                                                                : value.Value;
+            set => _defaultCachePolicy.SlidingExpiration = value ?? ObjectCache.NoSlidingExpiration;
         }
 
         public virtual void Add<T>(T entity, string key)
@@ -47,24 +53,33 @@ namespace Kubera.Business.Services
 
         public virtual T Get<T>(string key)
         {
+            var evId = new EventId(Guid.NewGuid().GetHashCode(), nameof(Get));
             key = CreateKey<T>(key);
 
-            if (_memoryCache.Get(key) is not CachedEntity<T> entity)
-                return default;
+            _logger.LogTrace(evId, $"Try get [{key}] from cache of type [{typeof(T).FullName}]");
 
+            if (MemoryCache.Get(key) is not CachedEntity<T> entity)
+            {
+                _logger.LogTrace(evId, $"Key [{key}] not found in cache, returns default");
+                return default;
+            }
+            
+            _logger.LogTrace(evId, $"Key [{key}] had been found in cache having regions [{entity.Regions.Join()}]");
             return entity.Entity;
         }
 
         public virtual void Remove<T>(string key)
         {
             key = CreateKey<T>(key);
+            _logger.LogTrace($"Removing [{key}] from cache of type [{typeof(T).FullName}]");
 
             RemoveExpiredEntity(key);
         }
 
         public virtual void RemoveAll<T>()
         {
-            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity<T>)
+            _logger.LogTrace($"Removing all [{typeof(T).FullName}] from cache");
+            var keysToRemve = MemoryCache.Where(kvp => kvp.Value is CachedEntity<T>)
                                           .Select(kvp => kvp.Key)
                                           .ToList();
 
@@ -74,7 +89,8 @@ namespace Kubera.Business.Services
 
         public void RemoveRegion(string region)
         {
-            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity ce && ce.Regions.Contains(region))
+            _logger.LogTrace($"Removing region [{region}] from cache");
+            var keysToRemve = MemoryCache.Where(kvp => kvp.Value is CachedEntity ce && ce.Regions.Contains(region))
                                           .Select(kvp => kvp.Key)
                                           .ToList();
 
@@ -85,7 +101,8 @@ namespace Kubera.Business.Services
 
         public virtual void Clear()
         {
-            _memoryCache.Trim(100);
+            _logger.LogTrace("Clear cache");
+            MemoryCache.Trim(100);
         }
 
         protected virtual string CreateKey<T>(string key) => $"{typeof(T).FullName}[{key}]";
@@ -93,19 +110,22 @@ namespace Kubera.Business.Services
         private void AddImpl<T>(T entity, string key, params string[] regions)
         {
             key = CreateKey<T>(key);
-
-            _memoryCache.Add(key, new CachedEntity<T>(entity, regions), _defaultCachePolicy);
+            
+            _logger.LogTrace($"Adding [{key}] to cache, at regions [{regions.Join()}], of type [{typeof(T).FullName}]");
+            MemoryCache.Add(key, new CachedEntity<T>(entity, regions), _defaultCachePolicy);
         }
 
         private static string CreateCacheTokenKey<T>() => typeof(T).FullName;
 
-        private static void RemoveExpiredEntity(string key) => _memoryCache.Remove(key, CacheEntryRemovedReason.Removed);
+        private static void RemoveExpiredEntity(string key) => MemoryCache.Remove(key, CacheEntryRemovedReason.Removed);
 
         private class CachedEntity
         {
             public string[] Regions { get; }
 
-            public CachedEntity(string[] regions)
+
+
+            protected CachedEntity(string[] regions)
             {
                 Regions = regions;
             }

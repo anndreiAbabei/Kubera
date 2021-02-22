@@ -38,9 +38,21 @@ namespace Kubera.General.Repository
             Options = options;
         }
 
-        public virtual void Remove(TKey[] keys) => CacheService.Remove<TEntity>(keys.ToKey());
+        public virtual void Remove(TKey[] keys)
+        {
+            if (!Options.UseCache)
+                CacheService.Remove<TEntity>(keys.ToKey());
+        }
 
-        public virtual void Clear() => CacheService.Clear();
+
+
+        public virtual void Clear()
+        {
+            if (Options.UseCache)
+                CacheService.Clear();
+        }
+
+
 
         public override async ValueTask<TEntity> GetById(TKey[] keys, CancellationToken cancellationToken = default)
         {

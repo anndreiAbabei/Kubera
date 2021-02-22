@@ -45,65 +45,72 @@ namespace Kubera.App
             Configuration = configuration;
         }
 
+
+
         private IConfiguration Configuration { get; }
 
+
+
         public void ConfigureServices(IServiceCollection services)
-        { 
+        {
 #if DEBUG
             services.AddDatabaseDeveloperPageExceptionFilter();
 #endif
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(ConfigureDb);
 
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+                    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
             services.AddAuthentication()
-                .AddIdentityServerJwt();
+                    .AddIdentityServerJwt();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddApiVersioning(x =>
-            {
-                x.DefaultApiVersion = new ApiVersion(1, 0);
-                x.AssumeDefaultVersionWhenUnspecified = true;
-                x.ReportApiVersions = true;
-            })
-            .AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "VVV";
-                options.SubstituteApiVersionInUrl = true;
-            })
-            .AddSingleton<FluentValidationSchemaProcessor>()
-            .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
+                     {
+                         x.DefaultApiVersion = new ApiVersion(1, 0);
+                         x.AssumeDefaultVersionWhenUnspecified = true;
+                         x.ReportApiVersions = true;
+                     })
+                    .AddVersionedApiExplorer(options =>
+                     {
+                         options.GroupNameFormat = "VVV";
+                         options.SubstituteApiVersionInUrl = true;
+                     })
+                    .AddSingleton<FluentValidationSchemaProcessor>()
+                    .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true)
-               .AddControllers(options =>
-               {
-                   options.EnableEndpointRouting = false;
+                    .AddControllers(options =>
+                     {
+                         options.EnableEndpointRouting = false;
 
-                   options.ReturnHttpNotAcceptable = true;
+                         options.ReturnHttpNotAcceptable = true;
 
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); 
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); 
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
-               })
-               .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
-               .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
+                         options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
+                         options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized));
+                         options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
+                         options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable));
+                         options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
+                         options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
+                     })
+                    .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
+                    .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
 
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
 
             services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
-                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+                    .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>))
+                    .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestLoggingBehavior<,>));;
 
             services.AddHostedService<StartupSeedService>();
 
             ConfigureDi(services);
         }
+
+
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -122,7 +129,7 @@ namespace Kubera.App
             app.UseStaticFiles();
             if (!env.IsDevelopment())
                 app.UseSpaStaticFiles();
-            
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -138,16 +145,20 @@ namespace Kubera.App
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment()) 
+                if (env.IsDevelopment())
                     spa.UseAngularCliServer("start");
             });
         }
 
+
+
         private void ConfigureDb(DbContextOptionsBuilder builder)
         {
-            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb], 
-                options => options.EnableRetryOnFailure());
+            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb],
+                                 options => options.EnableRetryOnFailure());
         }
+
+
 
         private void ConfigureDi(IServiceCollection services)
         {
@@ -157,13 +168,13 @@ namespace Kubera.App
             services.AddHttpContextAccessor();
 
             services.AddHttpClient<IForexService, AlphaVantageService>();
-            
+
             services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
             services.AddSingleton(_ => settings.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IDefaultEntities, DefaultEntities>();
             services.AddScoped<IDefaults, DefaultEntities>();
             services.AddScoped<IUserIdAccesor, HttpUserIdAccesor>();
-            services.AddTransient<ICacheService, CacheService>(); 
+            services.AddTransient<ICacheService, CacheService>();
             services.AddTransient<IUserCacheService, UserCacheService>();
 
             services.AddScoped<IAssetRepository, AssetRepository>();
@@ -183,29 +194,31 @@ namespace Kubera.App
             services.AddAutoMapper(typeof(AppMapper).Assembly);
         }
 
+
+
         private static void GenerateSwaggerDocument(AspNetCoreOpenApiDocumentGeneratorSettings settings, IServiceProvider sp, string name, string group)
         {
             var fluentValidationSchemaProcessor = sp.GetRequiredService<FluentValidationSchemaProcessor>();
             settings.SchemaProcessors.Add(fluentValidationSchemaProcessor);
 
             settings.DocumentName = name;
-            settings.ApiGroupNames = new[] { group };
+            settings.ApiGroupNames = new[] {group};
 
             settings.FlattenInheritanceHierarchy = true;
             settings.GenerateEnumMappingDescription = true;
 
             settings.PostProcess = doc =>
             {
-                doc.Schemes = new[] { OpenApiSchema.Https };
+                doc.Schemes = new[] {OpenApiSchema.Https};
                 doc.Info.Version = name;
                 doc.Info.Title = $"{Resources.ApiName} API";
                 doc.Info.Description = $"The {Resources.ApiName} API used for {Resources.AppName} UI App";
                 doc.Info.TermsOfService = "MIT";
                 doc.Info.Contact = new OpenApiContact
-                {
-                    Name = Resources.AppName,
-                    Email = ""
-                };
+                                   {
+                                       Name = Resources.AppName,
+                                       Email = ""
+                                   };
             };
         }
     }

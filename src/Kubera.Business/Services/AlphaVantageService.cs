@@ -11,6 +11,7 @@ using Kubera.General.Models;
 using Kubera.Business.Models.AlphaVantage;
 using System.Linq;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 
 namespace Kubera.Business.Services
 {
@@ -19,17 +20,20 @@ namespace Kubera.Business.Services
         private readonly HttpClient _httpClient;
         private readonly IAppSettings _appSettings;
         private readonly ICacheService _cacheService;
+        private readonly ILogger<AlphaVantageService> _logger;
         private const string FunctionExchange = "CURRENCY_EXCHANGE_RATE";
         private const string FunctionStock = "TIME_SERIES_INTRADAY";
         private const string FunctionOverviewCompany = "OVERVIEW";
 
         public AlphaVantageService(HttpClient httpClient,
             IAppSettings appSettings,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ILogger<AlphaVantageService> logger)
         {
             _httpClient = httpClient;
             _appSettings = appSettings;
             _cacheService = cacheService;
+            _logger = logger;
         }
 
         async ValueTask<IResult<IForexServiceResponse>> IForexService.GetPriceOf(string fromCode, string toCode, CancellationToken cancellationToken = default)
@@ -44,7 +48,10 @@ namespace Kubera.Business.Services
                 .ConfigureAwait(false);
 
             if (result.IsFailure)
+            {
+                _logger.LogError($"GET {nameof(IForexService)}.{nameof(IForexService.GetPriceOf)}: {result.Error}");
                 return result;
+            }
 
             _cacheService.Add(result.Value, code);
 
@@ -63,7 +70,10 @@ namespace Kubera.Business.Services
                 .ConfigureAwait(false);
 
             if (result.IsFailure)
+            {
+                _logger.LogError($"GET {nameof(IStockService)}.{nameof(IStockService.GetPriceOf)}: {result.Error}");
                 return result;
+            }
 
             _cacheService.Add(result.Value, code);
 
@@ -82,7 +92,10 @@ namespace Kubera.Business.Services
                 .ConfigureAwait(false);
 
             if (result.IsFailure)
+            {
+                _logger.LogError($"GET {nameof(IStockService)}.{nameof(IStockService.GetCompany)}: {result.Error}");
                 return result;
+            }
 
             _cacheService.Add(result.Value, code);
 
