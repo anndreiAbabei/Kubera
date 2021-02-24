@@ -1,0 +1,64 @@
+﻿.no-item {
+    text-align: center;
+    color: gray;
+    margin-top: 1em;
+}
+
+.root {
+  height: 100%;
+}
+
+.root > div.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-results {
+  position: relative;
+}
+
+.add-button-container,
+.refresh-button-container {
+  float: left;
+  margin-left: .5em;
+  margin-top: .5em;
+}
+
+.refresh-button-container{
+  margin-top: 1.5em;
+}
+
+.paginator {
+  padding-top: 1em;
+}
+
+.table {
+  flex: 1;
+
+  table {
+    width: 100%;
+
+    td {
+      vertical-align: middle;
+    }
+
+    td.right,
+    th.right {
+      text-align: end;
+    }
+
+    th.tight {
+      width: 7em;
+    }
+  }
+}
+@import "./src/static/scss/shared";
+
+@mixin dashboard-transactions-theme($theme, $dark) {
+  .menu-action-transactions {
+    .red, button.red > .red {
+      @include shared-theme-red($dark)
+    }
+  }
+}

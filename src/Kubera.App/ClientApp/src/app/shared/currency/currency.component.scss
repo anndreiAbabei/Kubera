@@ -1,0 +1,22 @@
+@mixin currency-theme($theme, $dark) {
+  $primary: map-get($theme, primary);
+  $foreground: map-get($theme, foreground);
+  $warn: map-get($theme, warn);
+
+  span.currency-name {
+    display: none;
+  }
+  span.no-amount {
+    color: mat-color($warn, text);
+    margin-right: .3em;
+  }
+  span.bubble.currency-icon {
+    background-color: lightgreen;
+    margin-left: .5em;
+    @if $dark {
+      color: mat-color($primary, '100-contrast');
+    } @else {
+      color: mat-color($foreground, text);
+    }
+  }
+}

@@ -1,0 +1,32 @@
+.percent::before {
+  float: left;
+  padding-left: 1em;
+}
+
+.bad-100::before {
+  content: '\21CA';
+}
+
+.bad-50::before {
+  content: '\1F813';
+}
+
+.good-50::before {
+  content: '\1F815';
+}
+
+.good-100::before {
+  content: '\21C8';
+}
+
+@import "./src/static/scss/shared";
+
+@mixin percent-theme($theme, $dark) {
+  .bad-100, .bad-50, .bad-10  {
+    @include shared-theme-red($dark)
+  }
+
+  .good-10, .good-50, .good-100 {
+    @include shared-theme-green($dark)
+  }
+}

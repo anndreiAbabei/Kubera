@@ -1,0 +1,37 @@
+<header>
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" >
+    <div class="container">
+      <a class="navbar-brand" [routerLink]="['/']">{{appName}}</a>
+      <button class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target=".navbar-collapse"
+          aria-label="Toggle navigation"
+          [attr.aria-expanded]="isExpanded"
+          (click)="toggle()">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse"
+        [ngClass]="{ show: isExpanded }">
+        <app-login-menu></app-login-menu>
+        <ul class="navbar-nav flex-grow">
+          <li class="nav-item">
+            <button class="btn no-outline dark-mode-toggle" (click)="toggleDarkMode()">
+              <mat-icon>dark_mode</mat-icon>
+            </button>
+          </li>
+          <li class="nav-item"
+              [routerLinkActive]="['link-active']"
+              [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" [routerLink]="['/']">Home</a>
+          </li>
+          <li class="nav-item"
+              [routerLinkActive]="['link-active']"
+              [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link" [routerLink]="['/dashboard']">Dashboard</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

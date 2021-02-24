@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS1066: The default value specified will have no effect because it applies to a member that is used in contexts that do not allow optional arguments
+dotnet_diagnostic.CS1066.severity = none

@@ -1,0 +1,55 @@
+﻿<div class="root">
+  <div class="mat-elevation-z8 content">
+    <div class="table">
+      <mat-progress-bar mode="query" *ngIf="isLoadingResults" aria-label="Loading groups"></mat-progress-bar>
+      <table mat-table [dataSource]="groups" matSort matSortActive="name" matSortDisableClear matSortDirection="desc">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>
+              Group
+            </th>
+            <td mat-cell *matCellDef="let row">
+              {{row.name || 'Ungrouped'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell class="right" *matHeaderCellDef>Amount</th>
+            <td mat-cell class="right" *matCellDef="let row">{{row.sumAmount | number:'1.2-8'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <th mat-header-cell class="right" *matHeaderCellDef>Total</th>
+            <td mat-cell class="right" *matCellDef="let row">
+              <app-currency [currency]="selectedCurrency" [amount]="row.total"></app-currency>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actual">
+            <th mat-header-cell class="right" *matHeaderCellDef>Now</th>
+            <td mat-cell class="right" *matCellDef="let row">
+              <app-currency [currency]="selectedCurrency" [amount]="row.totalNow"></app-currency>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="increase">
+            <th mat-header-cell class="right" *matHeaderCellDef>Procent</th>
+            <td mat-cell class="right increase-indicator" *matCellDef="let row">
+              <app-percent [percent]="row.increase"></app-percent>
+            </td>
+          </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <p class="no-item" *ngIf="noResult">No available group</p>
+    </div>
+
+    <div>
+      <div class="refresh-button-container">
+        <button mat-mini-fab color="accent" aria-label="Refresh groups" [disabled]="isLoadingResults" (click)="refreshGroups()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
