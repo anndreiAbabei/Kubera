@@ -13,6 +13,7 @@ using Kubera.Application.Features.Queries.GetAssetsTotal.V1;
 using Kubera.Application.Features.Commands.CreateAsset.V1;
 using Kubera.Application.Features.Commands.UpdateAsset.V1;
 using Kubera.Application.Features.Commands.DeleteAsset.V1;
+using Kubera.App.Models;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -34,6 +35,23 @@ namespace Kubera.App.Controllers.V1
         public async Task<ActionResult<IEnumerable<AssetModel>>> GetAssets()
         {
             var query = new GetAllAssetsQuery();
+
+            return await ExecuteRequest(query).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Get all assets with their total of a user
+        /// </summary>
+        /// <returns>Collection of assets with their respective assets</returns>
+        [HttpGet("totals")]
+        [ProducesResponseType(typeof(IEnumerable<AssetTotalModel>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<AssetTotalModel>>> GetAssetsTotals([FromQuery] Guid currencyId, [FromQuery] Filter filter)
+        {
+            var query = new GetAssetsTotalQuery
+            {
+                CurrencyId = currencyId,
+                Filter = filter
+            };
 
             return await ExecuteRequest(query).ConfigureAwait(false);
         }
@@ -128,22 +146,6 @@ namespace Kubera.App.Controllers.V1
             };
 
             return await ExecuteRequest(command).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Get all assets with their total of a user
-        /// </summary>
-        /// <returns>Collection of assets with their respective assets</returns>
-        [HttpGet("totals")]
-        [ProducesResponseType(typeof(IEnumerable<AssetTotalModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<AssetTotalModel>>> GetAssetsTotals([FromQuery]Guid currencyId)
-        {
-            var query = new GetAssetsTotalQuery
-            {
-                CurrencyId = currencyId
-            };
-
-            return await ExecuteRequest(query).ConfigureAwait(false);
         }
     }
 }

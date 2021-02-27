@@ -48,12 +48,16 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
 
             var query = _transactionRepository.GetAll();
 
-            if (request.Date != null)
+            if (request.Filter != null)
             {
-                if (request.Date.From.HasValue)
-                    query = query.Where(t => t.CreatedAt >= request.Date.From.Value);
-                if (request.Date.To.HasValue)
-                    query = query.Where(t => t.CreatedAt <= request.Date.To.Value);
+                if (request.Filter.From.HasValue)
+                    query = query.Where(t => t.CreatedAt >= request.Filter.From.Value);
+                if (request.Filter.To.HasValue)
+                    query = query.Where(t => t.CreatedAt <= request.Filter.To.Value);
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.AssetId == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.Asset.GroupId == request.Filter.GroupId.Value);
             }
 
             query = order == Order.Descending
@@ -117,7 +121,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
         protected override string GenerateKey(GetTransactionsQuery request)
         {
             return base.GenerateKey(request) + "." +
-                request.Date + "." +
+                request.Filter + "." +
                 request.Paging + "." +
                 request.Order;
         }

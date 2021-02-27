@@ -36,7 +36,7 @@ namespace Kubera.Business.Seed
 
             foreach ((string code, string name) in Codes.Group.Collection)
                 if (cancellationToken.IsCancellationRequested)
-                    return groups;
+                    return await Task.FromCanceled<IEnumerable<Group>>(cancellationToken);
                 else
                     groups.Add(await CreateGroupIfNotExists(code, name, cancellationToken));
 

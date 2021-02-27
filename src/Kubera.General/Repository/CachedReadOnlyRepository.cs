@@ -63,7 +63,7 @@ namespace Kubera.General.Repository
             return CacheService.GetOrAdd(keys, () => base.GetAll());
         }
 
-        protected virtual object[] CalculateGetAllKey(IPaging paging, IDateFilter dateFilter)
+        protected virtual object[] CalculateGetAllKey(IPaging paging, IFilter dateFilter)
         {
             return new object[] { $"{paging?.Items}_{paging?.Page}|{dateFilter?.From?.ToString("o")}_{dateFilter?.To?.ToString("o")}" };
         }

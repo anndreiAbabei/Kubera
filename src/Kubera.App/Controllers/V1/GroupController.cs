@@ -13,6 +13,7 @@ using Kubera.Application.Features.Commands.UpdateGroup.V1;
 using MediatR;
 using Kubera.Application.Features.Commands.DeleteGroup.V1;
 using Kubera.Application.Features.Queries.GetGroupTotals.V1;
+using Kubera.App.Models;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -62,11 +63,12 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of assets with their respective assets</returns>
         [HttpGet("totals")]
         [ProducesResponseType(typeof(IEnumerable<GroupTotalModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId)
+        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId, [FromQuery] Filter filter)
         {
             var query = new GetGroupTotalQuery
             {
-                CurrencyId = currencyId
+                CurrencyId = currencyId,
+                Filter = filter
             };
 
             return await ExecuteRequest(query).ConfigureAwait(false);

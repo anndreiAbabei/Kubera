@@ -44,22 +44,18 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
         protected override async ValueTask<IResult<IEnumerable<AssetTotalModel>>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
         {
             var result = new List<AssetTotalModel>();
-            var assets = await _assetRepository.GetAll()
-                .Include(a => a.Group)
-                .ToListAsync(cancellationToken)
+
+            var assets = await GetAsseets(request, cancellationToken)
+                .ConfigureAwait(false);
+            var transactions = await GetTransactions(request, assets.Select(a => a.Id).ToArray(), cancellationToken)
                 .ConfigureAwait(false);
             var currency = await _currencyRepository.GetById(request.CurrencyId, cancellationToken)
                 .ConfigureAwait(false);
-            var transactions = await _transactionRepository
-                .GetAll()
-                .Include(t => t.Currency)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
 
-            foreach(var group in transactions.GroupBy(t => t.AssetId))
+            foreach (var group in transactions.GroupBy(t => t.AssetId))
             {
                 if (cancellationToken.IsCancellationRequested)
-                    return await Task.FromCanceled<IResult<IEnumerable<AssetTotalModel>>>(cancellationToken);
+                    return await FromCancellationToken(cancellationToken);
 
                 var asset = assets.FirstOrDefault(a => a.Id == group.Key);
                 if (asset == null)
@@ -103,7 +99,48 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             return result.AsResult();
         }
 
-        protected override string GenerateKey(GetAssetsTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}";
+        protected override string GenerateKey(GetAssetsTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}.{request.Filter}";
+
+        private async Task<IEnumerable<Asset>> GetAsseets(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        {
+            var query = _assetRepository.GetAll();
+
+            if (request.Filter != null)
+            {
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.Id == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.GroupId == request.Filter.GroupId.Value);
+            }
+
+            return await query.Include(a => a.Group)
+                            .ToListAsync(cancellationToken)
+                            .ConfigureAwait(false);
+        }
+
+        private async Task<List<Transaction>> GetTransactions(GetAssetsTotalQuery request, Guid[] assetIds, CancellationToken cancellationToken)
+        {
+            var query = _transactionRepository.GetAll();
+
+            if (request.Filter != null)
+            {
+                if (request.Filter.From.HasValue)
+                    query = query.Where(t => t.CreatedAt >= request.Filter.From.Value);
+                if (request.Filter.To.HasValue)
+                    query = query.Where(t => t.CreatedAt <= request.Filter.To.Value);
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.AssetId == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.Asset.GroupId == request.Filter.GroupId.Value);
+                else
+                    query = query.Where(t => assetIds.Contains(t.AssetId));
+            }
+
+            return await query
+                            .Include(t => t.Currency)
+                            .ToListAsync(cancellationToken)
+                            .ConfigureAwait(false);
+        }   
 
         private async ValueTask<decimal> Exchange(string from, string to, decimal amount, CancellationToken cancellationToken = default)
         {
