@@ -36,9 +36,17 @@ namespace Kubera.App.Controllers.V1
         /// <returns>User information object</returns>
         [HttpPatch("currency")]
         [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateUserCurrency([FromBody] UpdateUserCurrencyModel model)
         {
-            var command = new UpdateUserCurrencyCommand();
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var command = new UpdateUserCurrencyCommand
+            {
+                Input = model
+            };
 
             return await ExecuteRequest(command).ConfigureAwait(false);
         }

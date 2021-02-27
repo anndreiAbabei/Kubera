@@ -42,6 +42,6 @@ export class CurrencySelectorComponent implements OnInit {
   public async currencyChanged(arg: any): Promise<void> {
     await this.userService.updateUserPrefferedCurrency(arg.value).toPromise();
 
-    this.eventService.selectedCurrencyChanged.emit(this.currencies.find(arg.value));
+    this.eventService.selectedCurrencyChanged.emit(this.currencies.find(c => c.id === arg.value));
   }
 }

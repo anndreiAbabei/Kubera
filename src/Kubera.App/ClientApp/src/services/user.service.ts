@@ -17,7 +17,7 @@ export class UserService extends CachedService {
   public getUserInfo(): Observable<UserInfo> {
     const url = this.settingsService.endpoints.get.user;
 
-    return super.getOrAddInCache(url, () => this.httpClient.get<UserInfo>(url));
+    return super.getOrAddInCache(url, () => this.httpClient.get<UserInfo>(url), super.persistentCache);
   }
 
   public updateUserPrefferedCurrency(currencyId: any): Observable<Object> {
@@ -27,7 +27,7 @@ export class UserService extends CachedService {
     };
     const res = this.httpClient.patch(url, body);
 
-    res.subscribe(() => super.remove(this.settingsService.endpoints.get.user));
+    res.subscribe(() => super.remove(this.settingsService.endpoints.get.user, super.persistentCache));
 
     return res;
   }
