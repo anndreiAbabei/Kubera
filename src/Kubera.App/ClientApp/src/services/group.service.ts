@@ -4,23 +4,24 @@ import { Observable } from 'rxjs';
 import { Filter, Order } from 'src/models/filtering.model';
 import { Group } from 'src/models/group.model';
 import { GroupTotal } from 'src/models/groupTotal.model';
+import { CachedService } from './cached.service';
 import { HttpUtilsService } from './http-utils.service';
 import { SettingsService } from './settings.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class GroupService {
+export class GroupService extends CachedService {
   constructor(private readonly httpClient: HttpClient,
               private readonly settingsService: SettingsService,
               private readonly httpUtilsService: HttpUtilsService) {
-
+    super();
   }
 
   public getAll(): Observable<Group[]> {
     const url = this.settingsService.endpoints.get.group;
 
-    return this.httpClient.get<Group[]>(url);
+    return super.getOrAddInCache(url, () => this.httpClient.get<Group[]>(url));
   }
 
   public getTotals(currencyId: string, order?: Order, filter?: Filter): Observable<GroupTotal[]> {

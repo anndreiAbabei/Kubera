@@ -100,40 +100,42 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
 
   public refreshTransactions(): void {
     merge(this.sort?.sortChange, this.paginator?.page)
-    .pipe(startWith({}), switchMap(() => {
-      this.setIsLoading(true);
+    .pipe(startWith({}),
+      switchMap(() => {
+        this.setIsLoading(true);
 
-      const order = this.sort.active && this.sort.direction === 'asc'
-                      ? Order.ascending
-                      : Order.descending;
+        const order = this.sort.active && this.sort.direction === 'asc'
+                        ? Order.ascending
+                        : Order.descending;
 
-      const page = new Paging();
-      page.page = this.paginator.pageIndex;
-      page.items = this.itemsPerPage;
+        const page = new Paging();
+        page.page = this.paginator.pageIndex;
+        page.items = this.itemsPerPage;
 
-      return this.transactionService.getAll(page, order, this.filter);
-    }),
-    map(data => {
-      this.noResult = data.transactions.length === 0;
-      this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
+        return this.transactionService.getAll(page, order, this.filter);
+      }),
+      map(data => {
+        this.noResult = data.transactions.length === 0;
+        this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
 
-      data.transactions.forEach(t => {
-        t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
-        t.feeFormated = t.fee
-                          ? `${t.fee} ${t.feeCurrency?.symbol}`
-                          : `${0.00} ${t.currency?.symbol}`;
-        t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
-      });
-      this.setIsLoading(false);
+        data.transactions.forEach(t => {
+          t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
+          t.feeFormated = t.fee
+                            ? `${t.fee} ${t.feeCurrency?.symbol}`
+                            : `${0.00} ${t.currency?.symbol}`;
+          t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+        });
+        this.setIsLoading(false);
 
-      return data.transactions;
-    }),
-    catchError(() => {
-      this.setIsLoading(false);
-      this.noResult = true;
+        return data.transactions;
+      }),
+      catchError(() => {
+        this.setIsLoading(false);
+        this.noResult = true;
 
-      return observableOf([]);
-    })).subscribe(data => this.transactions = data);
+        return observableOf([]);
+      }))
+    .subscribe(data => this.transactions = data);
   }
 
   public async removeTransaction(transaction: Transaction): Promise<void> {
