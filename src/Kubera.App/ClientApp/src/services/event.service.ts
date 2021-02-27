@@ -1,4 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
+import { Currency } from 'src/models/currency.model';
 
 @Injectable({
   providedIn: 'root'
@@ -6,4 +7,5 @@ import { EventEmitter, Injectable } from '@angular/core';
 export class EventService {
   public transactions = new EventEmitter();
   public updateTransaction = new EventEmitter();
+  public selectedCurrencyChanged = new EventEmitter<Currency>();
 }

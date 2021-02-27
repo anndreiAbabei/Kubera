@@ -4,7 +4,7 @@ using Kubera.General.Store;
 
 namespace Kubera.Data.Store
 {
-    public class UserStore : BaseDbReadOnlyStore<ApplicationUser, string>, IUserStore
+    public class UserStore : BaseDbCrudStore<ApplicationUser, string>, IUserStore
     {
         public UserStore(IApplicationDbContext applicationDbContext)
             : base(applicationDbContext)
@@ -12,7 +12,7 @@ namespace Kubera.Data.Store
         }
     }
 
-    public interface IUserStore : IStore<ApplicationUser, string>
+    public interface IUserStore : ICrudStore<ApplicationUser, string>
     {
     }
 }

@@ -4,6 +4,8 @@ export interface ICacheHandler {
   store(key: string, value: any): void;
 
   get(key: string): any;
+
+  remove(key: string): void;
 }
 
 export class MemoryCacheHandler implements ICacheHandler {
@@ -20,6 +22,10 @@ export class MemoryCacheHandler implements ICacheHandler {
   public store(key: string, value: any): void {
     MemoryCacheHandler.storage.set(key, value);
   }
+
+  public remove(key: string): void {
+    MemoryCacheHandler.storage.delete(key);
+  }
 }
 
 export class PersistentCacheHandler implements ICacheHandler {
@@ -34,5 +40,9 @@ export class PersistentCacheHandler implements ICacheHandler {
 
   public store(key: string, value: any): void {
     localStorage.setItem(key, value);
+  }
+
+  public remove(key: string): void {
+    localStorage.removeItem(key);
   }
 }

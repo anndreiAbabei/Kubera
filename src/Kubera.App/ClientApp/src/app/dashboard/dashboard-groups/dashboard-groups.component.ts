@@ -7,6 +7,7 @@ import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
 import { GroupService } from 'src/services/group.service';
+import { UserService } from 'src/services/user.service';
 
 @Component({
     selector: 'app-dashboard-groups',
@@ -33,13 +34,15 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
   constructor(private readonly groupService: GroupService,
       private readonly currencyService: CurrencyService,
       private readonly errorHandlering: ErrorHandlerService,
-      private readonly eventService: EventService) {  }
+      private readonly eventService: EventService,
+      private readonly userService: UserService) {  }
 
   public async ngAfterViewInit(): Promise<void> {
     this.sort.sortChange.subscribe(() => this.groups = this.sortGroups(this.groups));
 
     await this.refreshGroups();
     this.eventService.updateTransaction.subscribe(async () => await this.refreshGroups());
+    this.eventService.selectedCurrencyChanged.subscribe(async c => await this.refreshGroups(c.id));
   }
 
   public async ngOnChanges(changes: SimpleChanges): Promise<void> {
@@ -50,25 +53,42 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
 
   public ngOnDestroy(): void {
     this.eventService.updateTransaction.unsubscribe();
+    this.eventService.selectedCurrencyChanged.unsubscribe();
   }
 
-  public async refreshGroups(): Promise<void> {
+  public async refreshGroups(currencyId?: string): Promise<void> {
     try {
       this.setIsLoading(true);
 
-      this.currencies = await this.currencyService.getAll().toPromise();
-      this.noResult = this.currencies.length <= 0;
+      let selectedCurrencyId = currencyId;
+      const user = await this.userService.getUserInfo().toPromise();
+      this.noResult = !user?.settings?.prefferedCurrency;
 
+      if (!selectedCurrencyId) {
+        if (this.noResult) {
+          this.currencies = await this.currencyService.getAll().toPromise();
+          this.noResult = this.currencies.length <= 0;
+          selectedCurrencyId = this.currencies[0].id;
+        } else {
+          selectedCurrencyId = user.settings.prefferedCurrency;
+        }
+      } else {
+        this.noResult = false;
+      }
       if (!this.noResult) {
         const order = this.sort.active && this.sort.direction === 'asc'
                         ? Order.ascending
                         : Order.descending;
 
-        this.selectedCurrency = this.currencies[0];
-        this.groups = await this.groupService.getTotals(this.selectedCurrency.id, order, this.filter).toPromise();
+        this.groups = await this.groupService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
 
         this.noResult = this.groups.length <= 0;
       }
+
+      if (!this.currencies) {
+        this.currencies = await this.currencyService.getAll().toPromise();
+      }
+      this.selectedCurrency = this.currencies.find(c => c.id === selectedCurrencyId);
     } catch (ex) {
       this.errorHandlering.handle(ex);
       this.noResult = true;

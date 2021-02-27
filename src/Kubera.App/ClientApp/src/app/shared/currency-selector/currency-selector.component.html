@@ -1,0 +1,9 @@
+<div>
+  <mat-form-field class="small no-underline">
+    <mat-select [(ngModel)]="selectedCurrency" (selectionChange)="currencyChanged($event)">
+      <mat-option *ngFor="let currency of currencies" [value]="currency.id">
+        {{currency.symbol}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

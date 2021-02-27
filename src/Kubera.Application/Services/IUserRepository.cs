@@ -7,5 +7,7 @@ namespace Kubera.Application.Services
     public interface IUserRepository
     {
         ValueTask<ApplicationUser> GetMe(CancellationToken cancellationToken = default);
+
+        ValueTask Update(ApplicationUser user, CancellationToken cancellationToken = default);
     }
 }

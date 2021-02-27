@@ -8,7 +8,7 @@ namespace Kubera.Data.Extensions
     {
         public static UserSettings GetSettings(this ApplicationUser user)
         {
-            if (user.Settings == null)
+            if (string.IsNullOrEmpty(user.Settings))
                 return null;
 
             return JsonSerializer.Deserialize<UserSettings>(user.Settings);
