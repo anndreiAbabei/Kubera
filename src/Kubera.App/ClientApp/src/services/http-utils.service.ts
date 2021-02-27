@@ -24,10 +24,10 @@ export class HttpUtilsService {
 
     if (filter) {
       if (filter.from) {
-        queryStrings.push(`from=${filter.from}`);
+        queryStrings.push(`from=${filter.from.toISOString()}`);
       }
       if (filter.to) {
-        queryStrings.push(`to=${filter.to}`);
+        queryStrings.push(`to=${filter.to.toISOString()}`);
       }
       if (filter.assetId) {
         queryStrings.push(`assetId=${filter.assetId}`);

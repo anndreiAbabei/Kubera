@@ -23,6 +23,6 @@ namespace Kubera.App.Models
         public override string ToString() => $"{From?.ToString("o") ?? string.Empty}-" +
                                              $"{To?.ToString("o") ?? string.Empty}-" +
                                              $"{AssetId?.ToString() ?? string.Empty}-" +
-                                             $"{AssetId?.ToString() ?? string.Empty}";
+                                             $"{GroupId?.ToString() ?? string.Empty}";
     }
 }

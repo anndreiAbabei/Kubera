@@ -43,9 +43,9 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
   }
 
   public async ngOnChanges(changes: SimpleChanges): Promise<void> {
-    console.log('Groups');
-    console.log(changes);
-    await this.refreshGroups();
+    if (!changes['filter'].firstChange) {
+      await this.refreshGroups();
+    }
   }
 
   public ngOnDestroy(): void {
@@ -67,7 +67,7 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
         this.selectedCurrency = this.currencies[0];
         this.groups = await this.groupService.getTotals(this.selectedCurrency.id, order, this.filter).toPromise();
 
-        this.noResult = this.groups.length <= 1;
+        this.noResult = this.groups.length <= 0;
       }
     } catch (ex) {
       this.errorHandlering.handle(ex);

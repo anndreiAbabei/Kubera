@@ -45,9 +45,9 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    console.log('Transactions');
-    console.log(changes);
-    this.refreshTransactions();
+    if (!changes['filter'].firstChange) {
+      this.refreshTransactions();
+    }
   }
 
   public ngOnDestroy(): void {
@@ -99,7 +99,7 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   }
 
   public refreshTransactions(): void {
-    merge(this.sort.sortChange, this.paginator.page)
+    merge(this.sort?.sortChange, this.paginator?.page)
     .pipe(startWith({}), switchMap(() => {
       this.setIsLoading(true);
 
@@ -123,8 +123,8 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
                           ? `${t.fee} ${t.feeCurrency?.symbol}`
                           : `${0.00} ${t.currency?.symbol}`;
         t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
-        this.setIsLoading(false);
       });
+      this.setIsLoading(false);
 
       return data.transactions;
     }),

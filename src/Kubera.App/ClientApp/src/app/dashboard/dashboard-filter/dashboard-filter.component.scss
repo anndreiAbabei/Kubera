@@ -1,7 +1,24 @@
-﻿.content {
-  display: inline;
+﻿.content > form {
+  padding: 0 2em;
+
+  .actions > .clear {
+    margin-right: .5em;
+
+    .clear-text {
+      padding-top: .1em;
+    }
+  }
+
+  .filter {
+    margin-right: .5em;
+  }
+
+  .filter ~ .filter  {
+    margin-left: 1em;
+  }
 
   .actions {
     float: right;
+    padding-top: 1.5em;
   }
 }

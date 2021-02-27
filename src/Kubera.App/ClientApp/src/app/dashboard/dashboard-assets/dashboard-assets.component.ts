@@ -47,9 +47,9 @@ export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDes
     }
 
     public async ngOnChanges(changes: SimpleChanges): Promise<void> {
-      console.log('Assets');
-      console.log(changes);
-      await this.refreshAssets();
+      if (!changes['filter'].firstChange) {
+        await this.refreshAssets();
+      }
     }
 
     public async refreshAssets(): Promise<void> {

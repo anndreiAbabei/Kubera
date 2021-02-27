@@ -13,9 +13,6 @@
     "typeRoots": [
       "node_modules/@types"
     ],
-    "angularCompilerOptions": {
-      "strictTemplates": true
-    },
     "lib": [
       "es2017",
       "es2015",
