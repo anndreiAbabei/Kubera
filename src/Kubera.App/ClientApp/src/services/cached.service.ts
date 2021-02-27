@@ -18,4 +18,10 @@ export class CachedService {
 
     return obs;
   }
+
+  protected remove(key: string, cache?: ICacheHandler): void {
+    cache = cache ?? this.memoryCache;
+
+    cache.remove(key);
+  }
 }

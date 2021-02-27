@@ -66,10 +66,12 @@ import { DashboardFilterComponent } from './dashboard/dashboard-filter/dashboard
 import { DashboardGroupsComponent } from './dashboard/dashboard-groups/dashboard-groups.component';
 import { DashboardTransactionsComponent } from './dashboard/dashboard-transactions/dashboard-transactions.component';
 import { DashboardEditTransactionComponent } from './dashboard/dashboard-edit-transaction/dashboard-edit-transaction.component';
+
 import { AssetComponent } from './shared/asset/asset.component';
 import { WalletComponent } from './shared/wallet/wallet.component';
 import { CurrencyComponent } from './shared/currency/currency.component';
 import { PercentComponent } from './shared/percent/percent.component';
+import { CurrencySelectorComponent } from './shared/currency-selector/currency-selector.component';
 
 @NgModule({
   declarations: [
@@ -85,7 +87,8 @@ import { PercentComponent } from './shared/percent/percent.component';
     AssetComponent,
     WalletComponent,
     PercentComponent,
-    CurrencyComponent
+    CurrencyComponent,
+    CurrencySelectorComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
