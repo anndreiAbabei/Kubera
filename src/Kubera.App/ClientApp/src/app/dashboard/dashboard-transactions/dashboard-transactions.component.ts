@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,9 +6,9 @@ import { merge, of as observableOf } from 'rxjs';
 import { map, startWith, switchMap, catchError } from 'rxjs/operators';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
-import { Order, Paging } from '../../../models/filtering.model';
-import { Transaction } from '../../../models/transactions.model';
-import { TransactionsService } from '../../../services/transactions.service';
+import { Filter, Order, Paging } from 'src/models/filtering.model';
+import { Transaction } from 'src/models/transactions.model';
+import { TransactionsService } from 'src/services/transactions.service';
 import { DashboardEditTransactionComponent } from '../dashboard-edit-transaction/dashboard-edit-transaction.component';
 
 @Component({
@@ -16,7 +16,7 @@ import { DashboardEditTransactionComponent } from '../dashboard-edit-transaction
     templateUrl: './dashboard-transactions.component.html',
     styleUrls: ['./dashboard-transactions.component.scss']
 })
-export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy {
+export class DashboardTransactionsComponent implements AfterViewInit, OnChanges, OnDestroy {
   public resultsLength = 0;
   public isLoadingResults = false;
   public noResult = false;
@@ -25,6 +25,9 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
   public transactions: Transaction[];
   public page: Paging;
   public readonly itemsPerPage = 30;
+
+  @Input()
+  public filter: Filter;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -38,6 +41,12 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
     this.eventService.transactions.subscribe(() => this.refreshTransactions());
 
+    this.refreshTransactions();
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    console.log('Transactions');
+    console.log(changes);
     this.refreshTransactions();
   }
 
@@ -102,7 +111,7 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
       page.page = this.paginator.pageIndex;
       page.items = this.itemsPerPage;
 
-      return this.transactionService.getAll(page, order);
+      return this.transactionService.getAll(page, order, this.filter);
     }),
     map(data => {
       this.noResult = data.transactions.length === 0;

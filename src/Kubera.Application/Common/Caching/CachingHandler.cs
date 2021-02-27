@@ -13,7 +13,7 @@ namespace Kubera.Application.Common.Caching
 
     public delegate void AddedInCacheEventHandler<in T>(T item, string key, string region);
 
-    public abstract class CachingHandler<TRequest, TResponse> : IRequestHandler<TRequest, IResult<TResponse>>
+    public abstract class CachingHandler<TRequest, TResponse> : BaseRequest<TRequest, TResponse>
         where TRequest : CacheableQuery, IRequest<IResult<TResponse>>
     {
         private readonly IUserCacheService _cacheService;
@@ -26,7 +26,7 @@ namespace Kubera.Application.Common.Caching
             _cacheService = cacheService;
         }
 
-        public async Task<IResult<TResponse>> Handle(TRequest request, CancellationToken cancellationToken)
+        public override async Task<IResult<TResponse>> Handle(TRequest request, CancellationToken cancellationToken)
         {
             var code = GenerateKey(request);
             TResponse existing;

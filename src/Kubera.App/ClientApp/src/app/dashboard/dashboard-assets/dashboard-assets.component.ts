@@ -1,7 +1,8 @@
-﻿import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+﻿import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { AssetTotal } from 'src/models/assetTotal.model';
 import { Currency } from 'src/models/currency.model';
+import { Filter, Order } from 'src/models/filtering.model';
 import { AssetService } from 'src/services/asset.service';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
@@ -13,7 +14,7 @@ import { EventService } from 'src/services/event.service';
     styleUrls: ['./dashboard-assets.component.scss']
 })
 /** dashboard-assets component*/
-export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
+export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDestroy {
     public resultsLength = 0;
     public isLoadingResults = false;
     public noResult = false;
@@ -23,6 +24,9 @@ export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
     public selectedCurrency: Currency;
     private currencies: Currency[];
     public readonly itemsPerPage = 30;
+
+    @Input()
+    public filter: Filter;
 
     @ViewChild(MatSort) sort: MatSort;
 
@@ -42,6 +46,12 @@ export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
       this.eventService.updateTransaction.unsubscribe();
     }
 
+    public async ngOnChanges(changes: SimpleChanges): Promise<void> {
+      console.log('Assets');
+      console.log(changes);
+      await this.refreshAssets();
+    }
+
     public async refreshAssets(): Promise<void> {
       try {
         this.setIsLoading(true);
@@ -50,8 +60,12 @@ export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
         this.noResult = this.currencies.length <= 0;
 
         if (!this.noResult) {
+          const order = this.sort.active && this.sort.direction === 'asc'
+                          ? Order.ascending
+                          : Order.descending;
+
           this.selectedCurrency = this.currencies[0];
-          this.assets = await this.assetService.getTotals(this.selectedCurrency.id).toPromise();
+          this.assets = await this.assetService.getTotals(this.selectedCurrency.id, order, this.filter).toPromise();
 
           this.noResult = this.assets.length <= 0;
         }

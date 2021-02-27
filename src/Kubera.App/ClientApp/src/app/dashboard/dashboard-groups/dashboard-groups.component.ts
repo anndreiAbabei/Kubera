@@ -1,6 +1,7 @@
-﻿import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+﻿import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { Currency } from 'src/models/currency.model';
+import { Filter, Order } from 'src/models/filtering.model';
 import { GroupTotal } from 'src/models/groupTotal.model';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
@@ -13,7 +14,7 @@ import { GroupService } from 'src/services/group.service';
     styleUrls: ['./dashboard-groups.component.scss']
 })
 /** dashboard-groups component*/
-export class DashboardGroupsComponent  implements AfterViewInit, OnDestroy {
+export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDestroy {
   public resultsLength = 0;
   public isLoadingResults = false;
   public noResult = false;
@@ -23,6 +24,9 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnDestroy {
   public selectedCurrency: Currency;
   private currencies: Currency[];
   public readonly itemsPerPage = 30;
+
+  @Input()
+  public filter: Filter;
 
   @ViewChild(MatSort) sort: MatSort;
 
@@ -38,6 +42,12 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnDestroy {
     this.eventService.updateTransaction.subscribe(async () => await this.refreshGroups());
   }
 
+  public async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    console.log('Groups');
+    console.log(changes);
+    await this.refreshGroups();
+  }
+
   public ngOnDestroy(): void {
     this.eventService.updateTransaction.unsubscribe();
   }
@@ -50,8 +60,12 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnDestroy {
       this.noResult = this.currencies.length <= 0;
 
       if (!this.noResult) {
+        const order = this.sort.active && this.sort.direction === 'asc'
+                        ? Order.ascending
+                        : Order.descending;
+
         this.selectedCurrency = this.currencies[0];
-        this.groups = await this.groupService.getTotals(this.selectedCurrency.id).toPromise();
+        this.groups = await this.groupService.getTotals(this.selectedCurrency.id, order, this.filter).toPromise();
 
         this.noResult = this.groups.length <= 1;
       }

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Paging, DateFilter, Order } from '../models/filtering.model';
+import { Paging, Order, Filter } from '../models/filtering.model';
 import { Transaction, TransactionsResponse } from '../models/transactions.model';
 import { HttpUtilsService } from './http-utils.service';
 import { SettingsService } from './settings.service';
@@ -17,7 +17,7 @@ export class TransactionsService {
 
   }
 
-  public getAll(paging?: Paging, ascending?: Order, filter?: DateFilter): Observable<TransactionsResponse> {
+  public getAll(paging?: Paging, ascending?: Order, filter?: Filter): Observable<TransactionsResponse> {
     const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.get.transactions, paging, ascending, filter);
 
     const page: number = paging ? paging.page : undefined;

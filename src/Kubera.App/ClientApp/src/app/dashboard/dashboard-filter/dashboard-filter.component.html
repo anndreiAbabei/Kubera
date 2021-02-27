@@ -1,1 +1,42 @@
-<div style="border: 1px solid red">dashboard-filter Component</div>
+<div class="mat-elevation-z8 content">
+  <mat-checkbox class="range" (change)="setStatus($event.checked, filterForm.controls.from, filterForm.controls.to)" [(ngModel)]="range"></mat-checkbox>
+  <mat-form-field class="control" appearance="fill">
+    <mat-label>Select a date range for dashboard</mat-label>
+    <mat-date-range-input [formGroup]="filterForm" [rangePicker]="picker">
+      <input matStartDate formControlName="from" placeholder="From date">
+      <input matEndDate formControlName="to" placeholder="To date">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+
+    <mat-error *ngIf="filterForm.controls.from.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+    <mat-error *ngIf="filterForm.controls.to.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+  </mat-form-field>
+
+  <mat-checkbox class="asset" (change)="setStatus($event.checked, filterForm.controls.asset)" [(ngModel)]="asset"></mat-checkbox>
+  <mat-form-field appearance="fill">
+    <mat-label>Asset</mat-label>
+    <mat-select formControlName="asset">
+      <mat-option *ngFor="let asset of assets" [value]="asset.id">
+        <app-asset [asset]="asset"></app-asset>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-checkbox class="group" (change)="setStatus($event.checked, filterForm.controls.group)" [(ngModel)]="group"></mat-checkbox>
+  <mat-form-field appearance="fill">
+    <mat-label>Group</mat-label>
+    <mat-select formControlName="group">
+      <mat-option *ngFor="let group of groups" [value]="group.id">
+        {{group.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="actions">
+    <button mat-icon-button aria-label="Clear filter" (click)="clearFilter()">
+      <mat-icon>clear</mat-icon>
+    </button>
+    <button mat-flat-button color="primary" (click)="performFiltering()" aria-label="Apply filter">Apply</button>
+  </div>
+</div>
