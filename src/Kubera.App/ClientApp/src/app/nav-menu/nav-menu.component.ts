@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AuthorizeService } from 'src/api-authorization/authorize.service';
 import { ThemeService } from 'src/services/theme.service';
 import { SettingsService } from '../../services/settings.service';
 
@@ -11,15 +13,18 @@ export class NavMenuComponent implements OnInit {
   public isExpanded = false;
   public appName: string;
   public dark: boolean;
+  public isAuthenticated: Observable<boolean>;
 
   constructor(private readonly settingService: SettingsService,
-    private readonly themeService: ThemeService) {
+    private readonly themeService: ThemeService,
+    private readonly authorizeService: AuthorizeService) {
 
   }
 
   public ngOnInit(): void {
     this.appName = this.settingService.fullAppName;
     this.dark = this.themeService.currentActive() === this.themeService.dark;
+    this.isAuthenticated = this.authorizeService.isAuthenticated();
   }
 
   public collapse(): void {

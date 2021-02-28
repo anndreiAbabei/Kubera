@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Kubera.Application.Common.Models;
 using MediatR;
 using Kubera.Application.Features.Queries.GetUserInfo.V1;
+using Kubera.Application.Features.Commands.UpdateUserCurrency.V1;
 
 namespace Kubera.App.Controllers.V1
 {
@@ -27,6 +28,27 @@ namespace Kubera.App.Controllers.V1
             var query = new GetUserInfoQuery();
 
             return await ExecuteRequest(query).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Update user prefferd currency
+        /// </summary>
+        /// <returns>User information object</returns>
+        [HttpPatch("currency")]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(UserInfoModel), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateUserCurrency([FromBody] UpdateUserCurrencyModel model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            var command = new UpdateUserCurrencyCommand
+            {
+                Input = model
+            };
+
+            return await ExecuteRequest(command).ConfigureAwait(false);
         }
     }
 }

@@ -1,11 +1,13 @@
-﻿import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+﻿import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { AssetTotal } from 'src/models/assetTotal.model';
 import { Currency } from 'src/models/currency.model';
+import { Filter, Order } from 'src/models/filtering.model';
 import { AssetService } from 'src/services/asset.service';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
+import { UserService } from 'src/services/user.service';
 
 @Component({
     selector: 'app-dashboard-assets',
@@ -13,7 +15,7 @@ import { EventService } from 'src/services/event.service';
     styleUrls: ['./dashboard-assets.component.scss']
 })
 /** dashboard-assets component*/
-export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
+export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDestroy {
     public resultsLength = 0;
     public isLoadingResults = false;
     public noResult = false;
@@ -24,37 +26,71 @@ export class DashboardAssetsComponent implements AfterViewInit, OnDestroy {
     private currencies: Currency[];
     public readonly itemsPerPage = 30;
 
+    @Input()
+    public filter: Filter;
+
     @ViewChild(MatSort) sort: MatSort;
 
     constructor(private readonly assetService: AssetService,
         private readonly currencyService: CurrencyService,
         private readonly errorHandlering: ErrorHandlerService,
-        private readonly eventService: EventService) {  }
+        private readonly eventService: EventService,
+        private readonly userService: UserService) {  }
 
     public async ngAfterViewInit(): Promise<void> {
       this.sort.sortChange.subscribe(() => this.assets = this.sortAssets(this.assets));
 
       await this.refreshAssets();
       this.eventService.updateTransaction.subscribe(async () => await this.refreshAssets());
+      this.eventService.selectedCurrencyChanged.subscribe(async c => await this.refreshAssets(c.id));
     }
 
     public ngOnDestroy(): void {
       this.eventService.updateTransaction.unsubscribe();
+      this.eventService.selectedCurrencyChanged.unsubscribe();
     }
 
-    public async refreshAssets(): Promise<void> {
+    public async ngOnChanges(changes: SimpleChanges): Promise<void> {
+      if (!changes['filter'].firstChange) {
+        await this.refreshAssets();
+      }
+    }
+
+    public async refreshAssets(currencyId?: string): Promise<void> {
       try {
         this.setIsLoading(true);
 
-        this.currencies = await this.currencyService.getAll().toPromise();
-        this.noResult = this.currencies.length <= 0;
+        let selectedCurrencyId = currencyId;
+
+        if (!selectedCurrencyId) {
+          const user = await this.userService.getUserInfo().toPromise();
+          this.noResult = !user?.settings?.prefferedCurrency;
+
+          if (this.noResult) {
+            this.currencies = await this.currencyService.getAll().toPromise();
+            this.noResult = this.currencies.length <= 0;
+            selectedCurrencyId = this.currencies[0].id;
+          } else {
+            selectedCurrencyId = user.settings.prefferedCurrency;
+          }
+        } else {
+          this.noResult = false;
+        }
 
         if (!this.noResult) {
-          this.selectedCurrency = this.currencies[0];
-          this.assets = await this.assetService.getTotals(this.selectedCurrency.id).toPromise();
+          const order = this.sort.active && this.sort.direction === 'asc'
+                          ? Order.ascending
+                          : Order.descending;
+
+          this.assets = await this.assetService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
 
           this.noResult = this.assets.length <= 0;
         }
+
+        if (!this.currencies) {
+          this.currencies = await this.currencyService.getAll().toPromise();
+        }
+        this.selectedCurrency = this.currencies.find(c => c.id === selectedCurrencyId);
       } catch (ex) {
         this.errorHandlering.handle(ex);
         this.noResult = true;

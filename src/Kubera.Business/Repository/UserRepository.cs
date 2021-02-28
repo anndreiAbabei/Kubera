@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Business.Repository
 {
-    public class UserRepository : CachedReadOnlyRepository<ApplicationUser, string>, IUserRepository
+    public class UserRepository : CachedCrudRepository<ApplicationUser, string>, IUserRepository
     {
         private readonly IUserIdAccesor _userIdAccesor;
 

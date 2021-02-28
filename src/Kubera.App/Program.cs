@@ -28,23 +28,44 @@ namespace Kubera.App
         {
             if (ctx.HostingEnvironment.IsDevelopment())
                 builder.AddUserSecrets<Program>();
-            else if (ctx.HostingEnvironment.IsProduction())
+            else
             {
-                var builtConfig = builder.Build();
+                var root = builder.Build();
+                var vaultName = root["KeyVault:Name"];
+                var appId = root["KeyVault:ADApplicationId"];
+                var directoryId = root["KeyVault:ADDirectoryId"];
+                var cert = GetApplicationCertificate(root);
 
-                using var store = new X509Store(StoreLocation.CurrentUser);
-                
+                var uri = new Uri($"https://{vaultName}.vault.azure.net/");
+                var credential = new ClientCertificateCredential(directoryId, appId, cert);
+                var manager = new KeyVaultSecretManager();
+
+                builder.AddAzureKeyVault(uri, credential, manager);
+            }
+        }
+
+        internal static X509Certificate2 GetApplicationCertificate(IConfiguration configuration)
+        {
+            return GetCertificate(configuration, "Application:Certificate");
+        }
+
+        internal static X509Certificate2 GetCertificate(IConfiguration configuration, string path)
+        {
+            var thumbprint = configuration[path];
+
+            if (string.IsNullOrEmpty(thumbprint))
+                return null;
+
+            using var store = new X509Store(StoreLocation.CurrentUser);
+            try
+            {
                 store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, 
-                    builtConfig["AzureADCertThumbprint"], false);
-
-                builder.AddAzureKeyVault(new Uri($"https://{builtConfig["KeyVaultName"]}.vault.azure.net/"),
-                    new ClientCertificateCredential(builtConfig["AzureADDirectoryId"], 
-                        builtConfig["AzureADApplicationId"],
-                        certs.OfType<X509Certificate2>().Single()),
-                    new KeyVaultSecretManager());
-
-
+                return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)
+                                .OfType<X509Certificate2>()
+                                .Single();
+            }
+            finally
+            {
                 store.Close();
             }
         }

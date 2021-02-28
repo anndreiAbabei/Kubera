@@ -55,6 +55,14 @@ namespace Kubera.Application.Features.Queries.GetAssetGroupedTransactions.V1
             IQueryable<Asset> query = _assetRepository.GetAll()
                 .Include(a => a.Group);
 
+            if (request.Filter != null)
+            {
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.Id == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.GroupId == request.Filter.GroupId.Value);
+            }
+
             if (request.Order.HasValue)
                 query = request.Order.Value == General.Models.Order.Ascending
                         ? query.OrderBy(a => a.Name)
@@ -75,9 +83,17 @@ namespace Kubera.Application.Features.Queries.GetAssetGroupedTransactions.V1
             foreach (var asset in assets)
             {
                 if (cancellationToken.IsCancellationRequested)
-                    return await Task.FromCanceled<IResult<IEnumerable<GroupedTransactionsModel>>>(cancellationToken);
+                    return await FromCancellationToken(cancellationToken);
 
                 var assetTransactions = transactions.Where(t => t.AssetId == asset.Id);
+
+                if (request.Filter != null)
+                {
+                    if (request.Filter.From.HasValue)
+                        assetTransactions = assetTransactions.Where(t => t.CreatedAt >= request.Filter.From.Value);
+                    if (request.Filter.To.HasValue)
+                        assetTransactions = assetTransactions.Where(t => t.CreatedAt <= request.Filter.To.Value);
+                }
 
                 if (!await assetTransactions.AnyAsync(cancellationToken).ConfigureAwait(false))
                     continue;
@@ -101,6 +117,6 @@ namespace Kubera.Application.Features.Queries.GetAssetGroupedTransactions.V1
             return result.AsResult();
         }
 
-        protected override string GenerateKey(GetAssetGroupedTransactionsQuery request) => $"{base.GenerateKey(request)}.{request.Order}";
+        protected override string GenerateKey(GetAssetGroupedTransactionsQuery request) => $"{base.GenerateKey(request)}.{request.Order}.{request.Filter}";
     }
 }

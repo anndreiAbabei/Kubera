@@ -3,9 +3,11 @@ export class Paging {
   items: number;
 }
 
-export class DateFilter {
+export class Filter {
   from?: Date;
   to?: Date;
+  assetId?: string;
+  groupId?: string;
 }
 
 export enum Order {
