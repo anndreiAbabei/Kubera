@@ -20,10 +20,10 @@ namespace Kubera.App.IntegrationTests
             appMock.SetupGet(a => a.AlphaVantageApiKey)
                 .Returns(Environment.GetEnvironmentVariable("ALPHA_VANTAGE_API"));
 
-            cacheMock.Setup(c => c.Get<It.IsAnyType>(It.IsAny<object[]>()))
+            cacheMock.Setup(c => c.Get<It.IsAnyType>(It.IsAny<string>()))
                 .Returns(() => default);
-            cacheMock.Setup(c => c.Add(It.IsAny<It.IsAnyType>(), It.IsAny<object[]>()));
-            cacheMock.Setup(c => c.Remove<It.IsAnyType>(It.IsAny<object[]>()));
+            cacheMock.Setup(c => c.Add(It.IsAny<It.IsAnyType>(), It.IsAny<string>()));
+            cacheMock.Setup(c => c.Remove<It.IsAnyType>(It.IsAny<string>()));
             cacheMock.Setup(c => c.RemoveAll<It.IsAnyType>());
             cacheMock.Setup(c => c.Clear());
 
