@@ -48,61 +48,17 @@ namespace Kubera.App
         private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
-        { 
-#if DEBUG
-            services.AddDatabaseDeveloperPageExceptionFilter();
-#endif
-            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(ConfigureDb);
+        {
+            var settings = GetSettings();
+            services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(b => ConfigureDb(b, settings));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            ConfigureAuthorisation(services);
+            ConfigureApi(services);
+            ConfigureClient(services);
 
-            services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-
-            services.AddAuthentication()
-                .AddIdentityServerJwt();
-            services.AddControllersWithViews();
-            services.AddRazorPages();
-            services.AddApiVersioning(x =>
-            {
-                x.DefaultApiVersion = new ApiVersion(1, 0);
-                x.AssumeDefaultVersionWhenUnspecified = true;
-                x.ReportApiVersions = true;
-            })
-            .AddVersionedApiExplorer(options =>
-            {
-                options.GroupNameFormat = "VVV";
-                options.SubstituteApiVersionInUrl = true;
-            })
-            .AddSingleton<FluentValidationSchemaProcessor>()
-            .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
-
-            services.Configure<RouteOptions>(options => options.LowercaseUrls = true)
-               .AddControllers(options =>
-               {
-                   options.EnableEndpointRouting = false;
-
-                   options.ReturnHttpNotAcceptable = true;
-
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized)); 
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable)); 
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
-                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
-               })
-               .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
-               .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
-
-            services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
-
-            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
-                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            ConfigureDi(services, settings);
 
             services.AddHostedService<StartupSeedService>();
-
-            ConfigureDi(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -111,7 +67,7 @@ namespace Kubera.App
                 app.UseDeveloperExceptionPage();
             else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseDeveloperExceptionPage();
                 app.UseHsts();
             }
 
@@ -143,22 +99,87 @@ namespace Kubera.App
             });
         }
 
-        private void ConfigureDb(DbContextOptionsBuilder builder)
-        {
-            builder.UseSqlServer(Configuration[SettingKeys.ConnectionStrKuberaDb], 
-                options => options.EnableRetryOnFailure());
-        }
-
-        private void ConfigureDi(IServiceCollection services)
+        private IAppSettings GetSettings()
         {
             var settings = Configuration.GetSection(SettingKeys.AppSettings).Get<AppSettings>();
+
             settings.AlphaVantageApiKey = Configuration[SettingKeys.AlphaVantageApiKey];
+            settings.DatabaseConnectionString = Configuration[SettingKeys.ConnectionStrKuberaDb];
+
+            return settings;
+        }
+
+        private static void ConfigureDb(DbContextOptionsBuilder builder, IAppSettings settings)
+        {
+            builder.UseSqlServer(settings.DatabaseConnectionString, options => options.EnableRetryOnFailure(settings.DatabaseRetries));
+        }
+
+        private void ConfigureAuthorisation(IServiceCollection services)
+        {
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            var identityBuilder = services.AddIdentityServer()
+                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+            var appCert = Program.GetApplicationCertificate(Configuration);
+            if (appCert != null)
+                identityBuilder.AddSigningCredential(appCert);
+
+            services.AddAuthentication()
+                .AddIdentityServerJwt();
+        }
+
+        private static void ConfigureApi(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+            services.AddApiVersioning(x =>
+            {
+                x.DefaultApiVersion = new ApiVersion(1, 0);
+                x.AssumeDefaultVersionWhenUnspecified = true;
+                x.ReportApiVersions = true;
+            })
+            .AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "VVV";
+                options.SubstituteApiVersionInUrl = true;
+            })
+            .AddSingleton<FluentValidationSchemaProcessor>()
+            .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
+
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true)
+               .AddControllers(options =>
+               {
+                   options.EnableEndpointRouting = false;
+
+                   options.ReturnHttpNotAcceptable = true;
+
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status401Unauthorized));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status403Forbidden));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(StatusCodes.Status406NotAcceptable));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity));
+                   options.Filters.Add(new ProducesResponseTypeAttribute(typeof(ProblemDetails), StatusCodes.Status500InternalServerError));
+               })
+               .AddFluentValidation(config => config.RegisterValidatorsFromAssemblyContaining<ApplicationDom>())
+               .AddJsonOptions(options => options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase);
+        }
+
+        private static void ConfigureClient(IServiceCollection services)
+        {
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
+        }
+
+        private static void ConfigureDi(IServiceCollection services, IAppSettings settings)
+        {
+            services.AddMediatR(typeof(ApplicationDom).GetTypeInfo().Assembly)
+                .AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
             services.AddHttpContextAccessor();
 
             services.AddHttpClient<IForexService, AlphaVantageService>();
             
-            services.AddSingleton<IAppSettings, AppSettings>(_ => settings);
+            services.AddSingleton(_ => settings);
             services.AddSingleton(_ => settings.CacheOptions ?? CacheOptions.Default);
             services.AddScoped<IDefaultEntities, DefaultEntities>();
             services.AddScoped<IDefaults, DefaultEntities>();

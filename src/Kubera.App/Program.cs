@@ -34,26 +34,34 @@ namespace Kubera.App
                 var vaultName = root["KeyVault:Name"];
                 var appId = root["KeyVault:ADApplicationId"];
                 var directoryId = root["KeyVault:ADDirectoryId"];
-                var thumbprint = root["KeyVault:ADCertThumbprint"];
+                var cert = GetApplicationCertificate(root);
 
-                using var store = new X509Store(StoreLocation.CurrentUser);
+                var uri = new Uri($"https://{vaultName}.vault.azure.net/");
+                var credential = new ClientCertificateCredential(directoryId, appId, cert);
+                var manager = new KeyVaultSecretManager();
 
-                try
-                {
-                    store.Open(OpenFlags.ReadOnly);
-                    var uri = new Uri($"https://{vaultName}.vault.azure.net/");
-                    var cert = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)
-                                    .OfType<X509Certificate2>()
-                                    .Single();
-                    var credential = new ClientCertificateCredential(directoryId, appId, cert);
-                    var manager = new KeyVaultSecretManager();
+                builder.AddAzureKeyVault(uri, credential, manager);
+            }
+        }
 
-                    builder.AddAzureKeyVault(uri, credential, manager);
-                }
-                finally
-                {
-                    store.Close();
-                }
+        internal static X509Certificate2 GetApplicationCertificate(IConfiguration configuration)
+        {
+            var thumbprint = configuration["Application:Certificate"];
+
+            if (string.IsNullOrEmpty(thumbprint))
+                return null;
+
+            using var store = new X509Store(StoreLocation.CurrentUser);
+            try
+            {
+                store.Open(OpenFlags.ReadOnly);
+                return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)
+                                .OfType<X509Certificate2>()
+                                .Single();
+            }
+            finally
+            {
+                store.Close();
             }
         }
     }
