@@ -132,7 +132,7 @@ namespace Kubera.App
             {
                 var appCert = Program.GetCertificate(Configuration, "Application:Identity");
 
-                if (appCert == null)
+                if (appCert != null)
                     identityBuilder.AddSigningCredential(appCert);
             }
 
