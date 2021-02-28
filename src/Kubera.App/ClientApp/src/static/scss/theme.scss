@@ -10,7 +10,7 @@ $theme-dark-primary: mat-palette($mat-blue-grey);
 $theme-dark-accent:  mat-palette($mat-amber, A200, A100, A400);
 $theme-dark-warn:    mat-palette($mat-deep-orange);
 $theme-dark:   mat-dark-theme($theme-dark-primary, $theme-dark-accent, $theme-dark-warn);
-@include angular-material-theme($theme-dark);
+// @include angular-material-theme($theme-dark);
 
 @import "./src/app/nav-menu/nav-menu.component";
 @import "./src/app/shared/currency/currency.component";

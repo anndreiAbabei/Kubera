@@ -28,24 +28,32 @@ namespace Kubera.App
         {
             if (ctx.HostingEnvironment.IsDevelopment())
                 builder.AddUserSecrets<Program>();
-            else if (ctx.HostingEnvironment.IsProduction())
+            else
             {
-                var builtConfig = builder.Build();
+                var root = builder.Build();
+                var vaultName = root["KeyVault:Name"];
+                var appId = root["KeyVault:ADApplicationId"];
+                var directoryId = root["KeyVault:ADDirectoryId"];
+                var thumbprint = root["KeyVault:ADCertThumbprint"];
 
                 using var store = new X509Store(StoreLocation.CurrentUser);
-                
-                store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint, 
-                    builtConfig["AzureADCertThumbprint"], false);
 
-                builder.AddAzureKeyVault(new Uri($"https://{builtConfig["KeyVaultName"]}.vault.azure.net/"),
-                    new ClientCertificateCredential(builtConfig["AzureADDirectoryId"], 
-                        builtConfig["AzureADApplicationId"],
-                        certs.OfType<X509Certificate2>().Single()),
-                    new KeyVaultSecretManager());
+                try
+                {
+                    store.Open(OpenFlags.ReadOnly);
+                    var uri = new Uri($"https://{vaultName}.vault.azure.net/");
+                    var cert = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)
+                                    .OfType<X509Certificate2>()
+                                    .Single();
+                    var credential = new ClientCertificateCredential(directoryId, appId, cert);
+                    var manager = new KeyVaultSecretManager();
 
-
-                store.Close();
+                    builder.AddAzureKeyVault(uri, credential, manager);
+                }
+                finally
+                {
+                    store.Close();
+                }
             }
         }
     }
