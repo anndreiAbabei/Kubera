@@ -6,5 +6,7 @@ namespace Kubera.General
     {
         ICacheOptions CacheOptions { get; }
         string AlphaVantageApiKey { get; }
+        string DatabaseConnectionString { get; }
+        int DatabaseRetries { get; }
     }
 }
