@@ -46,7 +46,12 @@ namespace Kubera.App
 
         internal static X509Certificate2 GetApplicationCertificate(IConfiguration configuration)
         {
-            var thumbprint = configuration["Application:Certificate"];
+            return GetCertificate(configuration, "Application:Certificate");
+        }
+
+        internal static X509Certificate2 GetCertificate(IConfiguration configuration, string path)
+        {
+            var thumbprint = configuration[path];
 
             if (string.IsNullOrEmpty(thumbprint))
                 return null;

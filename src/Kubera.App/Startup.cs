@@ -35,6 +35,7 @@ using Kubera.App.Static;
 using Kubera.Business.Entities;
 using Kubera.Data.Data;
 using Kubera.General.Defaults;
+using Kubera.App.Infrastructure.Environment;
 
 namespace Kubera.App
 {
@@ -120,10 +121,20 @@ namespace Kubera.App
                             .AddEntityFrameworkStores<ApplicationDbContext>();
 
             var identityBuilder = services.AddIdentityServer()
-                .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
-            var appCert = Program.GetApplicationCertificate(Configuration);
-            if (appCert != null)
-                identityBuilder.AddSigningCredential(appCert);
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddOperationalStore<ApplicationDbContext>()
+                .AddIdentityResources()
+                .AddApiResources()
+                .AddClients();
+            if (Configuration.GetAppEnvironment() == AppEnvironment.Developement)
+                identityBuilder.AddDeveloperSigningCredential();
+            else
+            {
+                var appCert = Program.GetCertificate(Configuration, "Application:Identity");
+
+                if (appCert == null)
+                    identityBuilder.AddSigningCredential(appCert);
+            }
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
