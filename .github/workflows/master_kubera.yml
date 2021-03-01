@@ -20,12 +20,15 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x'
+        
+    - name: Restore with dotnet
+      run: dotnet restore --no-cache
 
     - name: Build with dotnet
-      run: dotnet build --configuration UAT
+      run: dotnet build --configuration UAT --no-restore
 
     - name: dotnet publish
-      run: dotnet publish -c UAT -o ${{env.DOTNET_ROOT}}/myapp
+      run: dotnet publish -c UAT -o ${{env.DOTNET_ROOT}}/myapp --no-restore
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
