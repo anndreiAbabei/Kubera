@@ -16,7 +16,7 @@ using System;
 
 namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
-    public class GetAssetsTotalQueryHandler : CachingHandler<GetAssetsTotalQuery, IEnumerable<AssetTotalModel>>
+    public class GetAssetsTotalQueryHandler : CachingHandler<GetAssetsTotalQuery, GetAssetsTotalOutput>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -41,9 +41,9 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
-        protected override async ValueTask<IResult<IEnumerable<AssetTotalModel>>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<GetAssetsTotalOutput>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
         {
-            var result = new List<AssetTotalModel>();
+            var assestsResult = new List<AssetTotalModel>();
 
             var assets = await GetAsseets(request, cancellationToken)
                 .ConfigureAwait(false);
@@ -87,14 +87,26 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     SumAmount = amount,
                     Total = total,
                     TotalNow = totalNow,
-                    Increase = totalNow.HasValue ? CalculateProcent(total, totalNow.Value) : 0
+                    Increase = totalNow.HasValue ? total.ProcentFrom(totalNow.Value) : 0
                 };
 
                 if (asset.Group != null)
                     model.Group = _mapper.Map<Group, GroupModel>(asset.Group);
 
-                result.Add(model);
+                assestsResult.Add(model);
             }
+
+            var resultTotal = assestsResult.Select(a => a.Total).DefaultIfEmpty(0).Sum();
+            var resultTotalNow = assestsResult.Select(a => a.TotalNow ?? 0).DefaultIfEmpty(0).Sum();
+
+            var result = new GetAssetsTotalOutput
+            {
+                Assets = assestsResult,
+                Count = assestsResult.Count,
+                Total = resultTotal,
+                TotalNow = resultTotalNow,
+                Increase = resultTotal.ProcentFrom(resultTotalNow)
+            };
 
             return result.AsResult();
         }
@@ -151,17 +163,6 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     .ConfigureAwait(false);
 
             return rate.IsSuccess ? amount * rate.Value.Rate : amount;
-        }
-
-        private static float CalculateProcent(decimal previous, decimal current)
-        {
-            if (previous == 0)
-                return 0f;
-
-            if (current == 0)
-                return -100f;
-
-            return (float)((current - previous) / previous * 100m);
         }
     }
 }

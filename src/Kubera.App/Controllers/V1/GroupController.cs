@@ -62,8 +62,8 @@ namespace Kubera.App.Controllers.V1
         /// </summary>
         /// <returns>Collection of assets with their respective assets</returns>
         [HttpGet("totals")]
-        [ProducesResponseType(typeof(IEnumerable<GroupTotalModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupTotalModel>>> GetGroupTotals([FromQuery] Guid currencyId, [FromQuery] Filter filter)
+        [ProducesResponseType(typeof(GetGroupTotalOutput), StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetGroupTotalOutput>> GetGroupTotals([FromQuery] Guid currencyId, [FromQuery] Filter filter)
         {
             var query = new GetGroupTotalQuery
             {

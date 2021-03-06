@@ -2,7 +2,7 @@
 import { MatSort } from '@angular/material/sort';
 import { Currency } from 'src/models/currency.model';
 import { Filter, Order } from 'src/models/filtering.model';
-import { GroupTotal } from 'src/models/groupTotal.model';
+import { GroupTotal, GroupTotals } from 'src/models/groupTotal.model';
 import { CurrencyService } from 'src/services/currency.service';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
@@ -21,7 +21,7 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
   public noResult = false;
   public displayedColumns: string[] = ['name', 'amount', 'total', 'actual', 'increase'];
   public canLoadMore = true;
-  public groups: GroupTotal[];
+  public total = GroupTotals.Empty;
   public selectedCurrency: Currency;
   private currencies: Currency[];
   public readonly itemsPerPage = 30;
@@ -38,7 +38,7 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
       private readonly userService: UserService) {  }
 
   public async ngAfterViewInit(): Promise<void> {
-    this.sort.sortChange.subscribe(() => this.groups = this.sortGroups(this.groups));
+    this.sort.sortChange.subscribe(() => this.total.groups = this.sortGroups(this.total.groups));
 
     await this.refreshGroups();
     this.eventService.updateTransaction.subscribe(async () => await this.refreshGroups());
@@ -80,9 +80,9 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
                         ? Order.ascending
                         : Order.descending;
 
-        this.groups = await this.groupService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
+        this.total = await this.groupService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
 
-        this.noResult = this.groups.length <= 0;
+        this.noResult = this.total.groups.length <= 0;
       }
 
       if (!this.currencies) {
