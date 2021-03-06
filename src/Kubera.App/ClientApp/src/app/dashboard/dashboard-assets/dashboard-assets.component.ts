@@ -1,6 +1,6 @@
 ﻿import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
-import { AssetTotal } from 'src/models/assetTotal.model';
+import { AssetTotal, AssetTotals } from 'src/models/assetTotal.model';
 import { Currency } from 'src/models/currency.model';
 import { Filter, Order } from 'src/models/filtering.model';
 import { AssetService } from 'src/services/asset.service';
@@ -21,7 +21,7 @@ export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDes
     public noResult = false;
     public displayedColumns: string[] = ['name', 'amount', 'total', 'actual', 'increase'];
     public canLoadMore = true;
-    public assets: AssetTotal[];
+    public total = AssetTotals.Empty;
     public selectedCurrency: Currency;
     private currencies: Currency[];
     public readonly itemsPerPage = 30;
@@ -38,7 +38,7 @@ export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDes
         private readonly userService: UserService) {  }
 
     public async ngAfterViewInit(): Promise<void> {
-      this.sort.sortChange.subscribe(() => this.assets = this.sortAssets(this.assets));
+      this.sort.sortChange.subscribe(() => this.total.assets = this.sortAssets(this.total.assets));
 
       await this.refreshAssets();
       this.eventService.updateTransaction.subscribe(async () => await this.refreshAssets());
@@ -82,9 +82,9 @@ export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDes
                           ? Order.ascending
                           : Order.descending;
 
-          this.assets = await this.assetService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
+          this.total = await this.assetService.getTotals(selectedCurrencyId, order, this.filter).toPromise();
 
-          this.noResult = this.assets.length <= 0;
+          this.noResult = this.total.assets.length <= 0;
         }
 
         if (!this.currencies) {

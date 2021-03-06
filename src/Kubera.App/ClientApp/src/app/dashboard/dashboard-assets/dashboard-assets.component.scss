@@ -42,5 +42,13 @@
     th.right {
       text-align: end;
     }
+
+    tr.footer {
+      filter: contrast(75%);
+
+      td {
+        font-weight: bold;
+      }
+    }
   }
 }

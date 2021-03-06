@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Filter, Order } from 'src/models/filtering.model';
 import { Group } from 'src/models/group.model';
-import { GroupTotal } from 'src/models/groupTotal.model';
+import { GroupTotals } from 'src/models/groupTotal.model';
 import { CachedService } from './cached.service';
 import { HttpUtilsService } from './http-utils.service';
 import { SettingsService } from './settings.service';
@@ -24,9 +24,9 @@ export class GroupService extends CachedService {
     return super.getOrAddInCache(url, () => this.httpClient.get<Group[]>(url));
   }
 
-  public getTotals(currencyId: string, order?: Order, filter?: Filter): Observable<GroupTotal[]> {
+  public getTotals(currencyId: string, order?: Order, filter?: Filter): Observable<GroupTotals> {
     const url = this.httpUtilsService.createUrl(this.settingsService.endpoints.get.groupTotal, null, order, filter, `currencyId=${currencyId}`);
 
-    return this.httpClient.get<GroupTotal[]>(url);
+    return this.httpClient.get<GroupTotals>(url);
   }
 }

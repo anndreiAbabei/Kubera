@@ -28,18 +28,26 @@ margin-bottom: .5em;
 }
 
 .table {
-flex: 1;
+  flex: 1;
 
-table {
-  width: 100%;
+  table {
+    width: 100%;
 
-  td {
-    vertical-align: middle;
+    td {
+      vertical-align: middle;
+    }
+
+    td.right,
+    th.right {
+      text-align: end;
+    }
+
+    tr.footer {
+      filter: contrast(75%);
+
+      td {
+        font-weight: bold;
+      }
+    }
   }
-
-  td.right,
-  th.right {
-    text-align: end;
-  }
-}
 }

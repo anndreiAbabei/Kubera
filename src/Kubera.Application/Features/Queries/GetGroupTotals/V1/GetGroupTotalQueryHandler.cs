@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
 {
-    public class GetGroupTotalQueryHandler : CachingHandler<GetGroupTotalQuery, IEnumerable<GroupTotalModel>>
+    public class GetGroupTotalQueryHandler : CachingHandler<GetGroupTotalQuery, GetGroupTotalOutput>
     {
         private readonly IGroupRepository _groupRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -37,9 +37,9 @@ namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
             cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
-        protected override async ValueTask<IResult<IEnumerable<GroupTotalModel>>> HandleImpl(GetGroupTotalQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<GetGroupTotalOutput>> HandleImpl(GetGroupTotalQuery request, CancellationToken cancellationToken)
         {
-            var result = new List<GroupTotalModel>();
+            var groupResults = new List<GroupTotalModel>();
 
             var currency = await _currencyRepository.GetById(request.CurrencyId, cancellationToken)
                 .ConfigureAwait(false);
@@ -84,11 +84,24 @@ namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
                     SumAmount = amount,
                     Total = total,
                     TotalNow = totalNow != 0 ? totalNow : null,
-                    Increase = CalculateProcent(total, totalNow)
+                    Increase = total.ProcentFrom(totalNow)
                 };
 
-                result.Add(model);
+                groupResults.Add(model);
             }
+
+            var resultTotal = groupResults.Select(a => a.Total).DefaultIfEmpty(0).Sum();
+            var resultTotalNow = groupResults.Select(a => a.TotalNow ?? 0).DefaultIfEmpty(0).Sum();
+
+
+            var result = new GetGroupTotalOutput
+            {
+                Groups = groupResults,
+                Count = groupResults.Count,
+                Total = resultTotal,
+                TotalNow = resultTotalNow,
+                Increase = resultTotal.ProcentFrom(resultTotalNow)
+            };
 
             return result.AsResult();
         }
@@ -145,17 +158,6 @@ namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
                     .ConfigureAwait(false);
 
             return rate.IsSuccess ? amount * rate.Value.Rate : amount;
-        }
-
-        private static float CalculateProcent(decimal previous, decimal current)
-        {
-            if (previous == 0)
-                return 0f;
-
-            if (current == 0)
-                return -100f;
-
-            return (float)((current - previous) / previous * 100m);
         }
     }
 }

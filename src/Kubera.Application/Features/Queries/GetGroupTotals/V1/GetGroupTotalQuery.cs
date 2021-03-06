@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Kubera.Application.Features.Queries.GetGroupTotals.V1
 {
-    public class GetGroupTotalQuery : CacheableRequest<IEnumerable<GroupTotalModel>>
+    public class GetGroupTotalQuery : CacheableRequest<GetGroupTotalOutput>
     {
         internal override CacheRegion CacheRegion => CacheRegion.Groups | CacheRegion.Transactions;
 

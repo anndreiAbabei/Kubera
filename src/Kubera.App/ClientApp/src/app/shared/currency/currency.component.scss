@@ -13,6 +13,7 @@
   span.bubble.currency-icon {
     background-color: lightgreen;
     margin-left: .5em;
+    font-weight: normal;
     @if $dark {
       color: mat-color($primary, '100-contrast');
     } @else {
