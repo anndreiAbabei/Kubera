@@ -5,26 +5,24 @@
 }
 
 .root {
-height: 100%;
+  height: 100%;
 }
 
 .root > div.content {
-height: 100%;
-display: flex;
-flex-direction: column;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .no-results {
-position: relative;
+  position: relative;
 }
 
 .refresh-button-container {
-float: left;
-margin-left: 1em;
-}
-
-.refresh-button-container{
-margin-bottom: .5em;
+  float: left;
+  margin-left: 1em;
+  margin-bottom: .5em;
+  display: none;
 }
 
 .table {

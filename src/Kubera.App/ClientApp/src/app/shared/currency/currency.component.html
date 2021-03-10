@@ -1,6 +1,7 @@
-<div>
-  <span class="amount" *ngIf="amount || amount === 0">{{amount | number:'1.2-2'}}</span>
-  <span class="no-amount" *ngIf="!amount && amount !== 0">-</span>
+<div class="currency-component" [ngClass]="{'responsive': !forceBuble}">
+  <span class="amount" *ngIf="!hideAmount && (amount || amount === 0)">{{amount | number:'1.2-2'}}</span>
+  <span class="no-amount" *ngIf="!hideAmount && (!amount && amount !== 0)">-</span>
+  <span class="currency-symbol">{{currency?.symbol}}</span>
   <span class="currency-name">{{currency?.name}}</span>
   <span class="bubble currency-icon">{{currency?.symbol}}</span>
 </div>

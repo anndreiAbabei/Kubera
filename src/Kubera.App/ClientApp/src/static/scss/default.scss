@@ -14,3 +14,19 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+
+table.tight-md {
+  td, th {
+    &:first-of-type{
+      @media only screen and (max-width: 768px) {
+        padding-left: 12px
+      }
+    }
+
+    &:last-of-type{
+      @media only screen and (max-width: 768px) {
+        padding-right: 12px
+      }
+    }
+  }
+}

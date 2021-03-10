@@ -16,6 +16,7 @@ export class DashboardFilterComponent implements OnInit {
   public filterForm: FormGroup;
   public assets: Asset[];
   public groups: Group[];
+  public collapsed = true;
 
   @Output()
   public filterChanged = new EventEmitter<Filter>();

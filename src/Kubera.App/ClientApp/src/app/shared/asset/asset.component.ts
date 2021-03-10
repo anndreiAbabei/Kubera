@@ -10,4 +10,6 @@ import { Asset } from 'src/models/asset.model';
 export class AssetComponent {
   @Input()
   public asset: Asset;
+  @Input()
+  public forceShowName: boolean;
 }

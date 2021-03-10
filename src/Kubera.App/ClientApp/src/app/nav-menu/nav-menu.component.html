@@ -1,5 +1,5 @@
 <header>
-  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" >
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" [ngClass]="dark ? 'navbar-dark' : 'navbar-light'">
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">{{appName}}</a>
       <button class="navbar-toggler"
@@ -14,13 +14,14 @@
       <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse"
         [ngClass]="{ show: isExpanded }">
         <app-login-menu></app-login-menu>
-        <app-currency-selector *ngIf="isAuthenticated | async"></app-currency-selector>
+        <div class="user-preferrences">
+          <button class="btn no-outline dark-mode-toggle user-preference-item" (click)="toggleDarkMode()">
+            <mat-icon>dark_mode</mat-icon>
+          </button>
+          <div class="separator user-preference-item"></div>
+          <app-currency-selector *ngIf="isAuthenticated | async" class="currency-selector user-preference-item"></app-currency-selector>
+        </div>
         <ul class="navbar-nav flex-grow">
-          <li class="nav-item">
-            <button class="btn no-outline dark-mode-toggle" (click)="toggleDarkMode()">
-              <mat-icon>dark_mode</mat-icon>
-            </button>
-          </li>
           <li class="nav-item"
               [routerLinkActive]="['link-active']"
               [routerLinkActiveOptions]="{ exact: true }">

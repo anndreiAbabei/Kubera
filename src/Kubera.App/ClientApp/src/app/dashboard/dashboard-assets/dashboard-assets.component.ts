@@ -42,11 +42,13 @@ export class DashboardAssetsComponent implements AfterViewInit, OnChanges, OnDes
 
       await this.refreshAssets();
       this.eventService.updateTransaction.subscribe(async () => await this.refreshAssets());
+      this.eventService.refreshRequested.subscribe(async () => await this.refreshAssets());
       this.eventService.selectedCurrencyChanged.subscribe(async c => await this.refreshAssets(c.id));
     }
 
     public ngOnDestroy(): void {
       this.eventService.updateTransaction.unsubscribe();
+      this.eventService.refreshRequested.unsubscribe();
       this.eventService.selectedCurrencyChanged.unsubscribe();
     }
 
