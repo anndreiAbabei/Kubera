@@ -1,5 +1,5 @@
 <header>
-  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" [ngClass]="{'navbar-dark': dark}">
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" [ngClass]="dark ? 'navbar-dark' : 'navbar-light'">
     <div class="container">
       <a class="navbar-brand" [routerLink]="['/']">{{appName}}</a>
       <button class="navbar-toggler"
