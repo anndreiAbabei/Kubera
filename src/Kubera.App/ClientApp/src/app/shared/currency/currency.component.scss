@@ -3,7 +3,7 @@
   $foreground: map-get($theme, foreground);
   $warn: map-get($theme, warn);
 
-  span.currency-name {
+  span.currency-name, span.currency-symbol {
     display: none;
   }
   span.no-amount {
@@ -18,6 +18,18 @@
       color: mat-color($primary, '100-contrast');
     } @else {
       color: mat-color($foreground, text);
+    }
+  }
+
+
+  @media only screen and (max-width: 768px) {
+    div.responsive {
+      span.currency-symbol{
+        display: initial;
+      }
+      span.bubble.currency-icon {
+        display: none;
+      }
     }
   }
 }

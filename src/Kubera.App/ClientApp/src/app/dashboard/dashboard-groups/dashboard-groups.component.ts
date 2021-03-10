@@ -42,6 +42,7 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
 
     await this.refreshGroups();
     this.eventService.updateTransaction.subscribe(async () => await this.refreshGroups());
+    this.eventService.refreshRequested.subscribe(async () => await this.refreshGroups());
     this.eventService.selectedCurrencyChanged.subscribe(async c => await this.refreshGroups(c.id));
   }
 
@@ -53,6 +54,7 @@ export class DashboardGroupsComponent  implements AfterViewInit, OnChanges, OnDe
 
   public ngOnDestroy(): void {
     this.eventService.updateTransaction.unsubscribe();
+    this.eventService.refreshRequested.unsubscribe();
     this.eventService.selectedCurrencyChanged.unsubscribe();
   }
 

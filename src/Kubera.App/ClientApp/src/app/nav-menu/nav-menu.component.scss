@@ -29,6 +29,21 @@
   }
 }
 
+.user-preferrences {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+
+  .user-preference-item {
+    margin: 0 .5em;
+  }
+
+  .separator {
+    flex-grow: 1;
+    margin: 0 .1em;
+  }
+}
+
 
 html {
   font-size: 14px;

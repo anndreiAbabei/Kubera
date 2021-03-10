@@ -1,45 +1,56 @@
 <div class="mat-elevation-z8 content">
-  <form [formGroup]="filterForm">
-    <mat-checkbox class="filter range" (change)="setStatus()" formControlName="rangeCheck"></mat-checkbox>
-    <mat-form-field class="control" appearance="fill">
-      <mat-label>Date range for dashboard</mat-label>
-      <mat-date-range-input [rangePicker]="dateRangePicker">
-        <input matStartDate formControlName="from" placeholder="From date">
-        <input matEndDate formControlName="to" placeholder="To date">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
-      <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
+  <form [formGroup]="filterForm" [ngClass]="{'collapsed': collapsed}">
+    <div class="filter-group">
+      <mat-checkbox class="filter range" (change)="setStatus()" formControlName="rangeCheck"></mat-checkbox>
+      <mat-form-field class="control filter-field" appearance="fill">
+        <mat-label>Date range for dashboard</mat-label>
+        <mat-date-range-input [rangePicker]="dateRangePicker">
+          <input matStartDate formControlName="from" placeholder="From date">
+          <input matEndDate formControlName="to" placeholder="To date">
+        </mat-date-range-input>
+        <mat-datepicker-toggle matSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
 
-      <mat-error *ngIf="filterForm.controls.from.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-      <mat-error *ngIf="filterForm.controls.to.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-    </mat-form-field>
+        <mat-error *ngIf="filterForm.controls.from.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+        <mat-error *ngIf="filterForm.controls.to.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+      </mat-form-field>
+    </div>
 
-    <mat-checkbox class="filter asset" (change)="setStatus()" formControlName="assetCheck"></mat-checkbox>
-    <mat-form-field appearance="fill">
-      <mat-label>Asset</mat-label>
-      <mat-select formControlName="asset" #selectAsset>
-        <mat-option *ngFor="let asset of assets" [value]="asset.id">
-          <app-asset [asset]="asset"></app-asset>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div class="filter-group">
+      <mat-checkbox class="filter asset" (change)="setStatus()" formControlName="assetCheck"></mat-checkbox>
+      <mat-form-field class="filter-field" appearance="fill">
+        <mat-label>Asset</mat-label>
+        <mat-select formControlName="asset" #selectAsset>
+          <mat-option *ngFor="let asset of assets" [value]="asset.id">
+            <app-asset [asset]="asset"></app-asset>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-    <mat-checkbox class="filter group" (change)="setStatus()" formControlName="groupCheck"></mat-checkbox>
-    <mat-form-field appearance="fill">
-      <mat-label>Group</mat-label>
-      <mat-select formControlName="group" #selectGroup>
-        <mat-option *ngFor="let group of groups" [value]="group.id">
-          {{group.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div class="filter-group">
+      <mat-checkbox class="filter group" (change)="setStatus()" formControlName="groupCheck"></mat-checkbox>
+      <mat-form-field class="filter-field" appearance="fill">
+        <mat-label>Group</mat-label>
+        <mat-select formControlName="group" #selectGroup>
+          <mat-option *ngFor="let group of groups" [value]="group.id">
+            {{group.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
     <div class="actions">
-      <button mat-button class="clear" aria-label="Clear filter" (click)="clearFilter()">
-        <mat-icon>clear</mat-icon>
-        <span class="clear-text">Clear</span>
+      <button mat-flat-button class="left hide-filter icon-button" (click)="collapsed = !collapsed" aria-label="Hide filter">
+        <mat-icon class="collapse-icon">expand_less</mat-icon>
+        <mat-icon class="expand-icon">expand_more</mat-icon>
+        <span class="icon-button-text">Filter</span>
       </button>
-      <button mat-flat-button color="primary" (click)="performFiltering()" aria-label="Apply filter">Apply</button>
+      <button mat-button class="right icon-button" aria-label="Clear filter" (click)="clearFilter()">
+        <mat-icon>clear</mat-icon>
+        <span class="icon-button-text">Clear</span>
+      </button>
+      <button mat-flat-button class="right" color="primary" (click)="performFiltering()" aria-label="Apply filter">Apply</button>
     </div>
   </form>
 </div>

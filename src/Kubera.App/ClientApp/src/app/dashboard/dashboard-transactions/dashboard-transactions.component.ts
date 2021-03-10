@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -164,6 +164,11 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
 
   public formatTotal(transaction: Transaction): string {
     return transaction.totalFormated;
+  }
+
+  public async performRefresh(): Promise<void> {
+    this.eventService.refreshRequested.emit();
+    await this.refreshTransactions();
   }
 
   private setIsLoading(isLoading: boolean): void {

@@ -1,4 +1,10 @@
 span.bubble.asset-icon {
   background-color: coral;
   margin-right: .5em;
+
+}
+@media only screen and (max-width: 768px) {
+  .asset-name{
+    display: none;
+  }
 }

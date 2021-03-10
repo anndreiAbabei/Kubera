@@ -6,6 +6,7 @@ import { Currency } from 'src/models/currency.model';
 })
 export class EventService {
   public transactions = new EventEmitter();
+  public refreshRequested = new EventEmitter();
   public updateTransaction = new EventEmitter();
   public selectedCurrencyChanged = new EventEmitter<Currency>();
 }

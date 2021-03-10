@@ -1,24 +1,106 @@
 ﻿.content > form {
   padding: 0 2em;
 
-  .actions > .clear {
-    margin-right: .5em;
+  @media only screen and (max-width: 768px) {
+    padding: .5em 1em;
 
-    .clear-text {
-      padding-top: .1em;
+    .collapse-icon {
+      display: initial;
+    }
+
+    .expand-icon {
+      display: none;
+    }
+
+    &.collapsed {
+      .filter-group {
+        display: none;
+      }
+
+      .actions > button {
+        padding-bottom: 0;
+
+        .collapse-icon {
+          display: none;
+        }
+
+        .expand-icon {
+          display: initial;
+        }
+
+        &:not(.hide-filter) {
+          display: none;
+        }
+      }
     }
   }
 
-  .filter {
-    margin-right: .5em;
+  &::after {
+    content: " ";
+    clear: both;
+    display: table;
   }
+
+  .filter-group {
+    display: inline;
+
+    @media only screen and (max-width: 768px) {
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+
+      .filter-field {
+        flex-grow: 1;
+        margin-right: 0;
+      }
+    }
+
+    .filter {
+      margin-right: .5em;
+    }
+
+    .filter-field {
+      margin-right: .5em;
+    }
+  }
+
 
   .filter ~ .filter  {
     margin-left: 1em;
   }
 
-  .actions {
+  .actions  {
+    padding-top: 1em;
     float: right;
-    padding-top: 1.5em;
+
+    .hide-filter {
+      display: none;
+    }
+
+    @media only screen and (max-width: 768px) {
+      padding-top: 0;
+      padding-bottom: .5em;
+      width: 100%;
+
+      .hide-filter {
+        display: initial;
+      }
+    }
+
+    .right {
+      float: right;
+    }
+
+    .left {
+      float: left;
+    }
+
+    & > .icon-button {
+      margin-right: .5em;
+
+      .icon-button-text {
+        padding-top: .1em;
+      }
+    }
   }
 }

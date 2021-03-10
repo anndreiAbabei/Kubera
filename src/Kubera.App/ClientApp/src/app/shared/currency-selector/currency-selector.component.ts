@@ -11,7 +11,8 @@ import { UserService } from 'src/services/user.service';
 })
 export class CurrencySelectorComponent implements OnInit {
   public currencies: Currency[];
-  public selectedCurrency: string;
+  public selectedCurrencyId: string;
+  public selectedCurrency: Currency;
 
   constructor(private readonly currencyService: CurrencyService,
     private readonly userService: UserService,
@@ -28,20 +29,23 @@ export class CurrencySelectorComponent implements OnInit {
     if (userInfo?.settings?.prefferedCurrency) {
       for (const currency of this.currencies) {
         if (currency.id === userInfo.settings.prefferedCurrency) {
-          this.selectedCurrency = currency.id;
+          this.selectedCurrencyId = currency.id;
           break;
         }
       }
     }
 
-    if (!this.selectedCurrency) {
-      this.selectedCurrency = this.currencies[0].id;
+    if (!this.selectedCurrencyId) {
+      this.selectedCurrencyId = this.currencies[0].id;
     }
+
+    this.selectedCurrency =  this.currencies.find(c => c.id === this.selectedCurrencyId);
   }
 
   public async currencyChanged(arg: any): Promise<void> {
+    this.selectedCurrency = this.currencies.find(c => c.id === arg.value);
     await this.userService.updateUserPrefferedCurrency(arg.value).toPromise();
 
-    this.eventService.selectedCurrencyChanged.emit(this.currencies.find(c => c.id === arg.value));
+    this.eventService.selectedCurrencyChanged.emit(this.selectedCurrency);
   }
 }
