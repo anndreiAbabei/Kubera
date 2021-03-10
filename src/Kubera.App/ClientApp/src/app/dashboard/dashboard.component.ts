@@ -10,6 +10,7 @@ import { SettingsService } from '../../services/settings.service';
 export class DashboardComponent implements OnInit {
 
   public appName: string;
+  public version: string;
 
   public filter: Filter;
 
@@ -19,6 +20,7 @@ export class DashboardComponent implements OnInit {
 
   public ngOnInit(): void {
     this.appName = this.settingService.fullAppName;
+    this.version = this.settingService.appVersion;
   }
 
   public filterChanged(filter: Filter): void {

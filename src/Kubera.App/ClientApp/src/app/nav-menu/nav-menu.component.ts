@@ -12,6 +12,7 @@ import { SettingsService } from '../../services/settings.service';
 export class NavMenuComponent implements OnInit {
   public isExpanded = false;
   public appName: string;
+  public version: string;
   public dark: boolean;
   public isAuthenticated: Observable<boolean>;
 
@@ -23,6 +24,7 @@ export class NavMenuComponent implements OnInit {
 
   public ngOnInit(): void {
     this.appName = this.settingService.fullAppName;
+    this.version = this.settingService.appVersion;
     this.dark = this.themeService.currentActive() === this.themeService.dark;
     this.isAuthenticated = this.authorizeService.isAuthenticated();
   }
