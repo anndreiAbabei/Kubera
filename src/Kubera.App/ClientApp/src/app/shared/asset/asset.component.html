@@ -1,2 +1,2 @@
 <span class="bubble asset-icon">{{asset?.symbol}}</span>
-<span class="asset-name">{{asset?.name}}</span>
+<span class="asset-name" [ngClass]="{'responsive': !forceShowName}">{{asset?.name}}</span>

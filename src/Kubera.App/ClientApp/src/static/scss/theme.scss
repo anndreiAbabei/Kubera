@@ -15,11 +15,13 @@ $theme-dark:   mat-dark-theme($theme-dark-primary, $theme-dark-accent, $theme-da
 @import "./src/app/shared/currency/currency.component";
 @import "./src/app/shared/percent/percent.component";
 @import "./src/app/dashboard/dashboard-transactions/dashboard-transactions.component";
+@import "./src/app/dashboard/dashboard-edit-transaction/dashboard-edit-transaction.component";
 @mixin custom-components-theme($theme, $dark) {
   @include nav-bar-theme($theme);
   @include currency-theme($theme, $dark);
   @include percent-theme($theme, $dark);
   @include dashboard-transactions-theme($theme, $dark);
+  @include dashboard-edit-transaction-theme($theme, $dark);
 }
 
 .color-scheme-dark {
