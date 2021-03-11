@@ -160,7 +160,7 @@ namespace Kubera.App
                 options.IssuerUri = settings.Autorisation.ValidIssuer;
         }
 
-        private void ConfigureCors(IServiceCollection services, IAppSettings settings)
+        private static void ConfigureCors(IServiceCollection services, IAppSettings settings)
         {
             const string all = "*";
             const string separator = ",";
