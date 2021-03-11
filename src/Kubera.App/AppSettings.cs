@@ -1,5 +1,7 @@
 ﻿using Kubera.App.Infrastructure.Authorization;
 using Kubera.App.Infrastructure.Cors;
+using Kubera.App.Infrastructure.Mail;
+using Kubera.App.Static;
 using Kubera.Business.Services;
 using Kubera.General;
 using Kubera.General.Services;
@@ -9,6 +11,9 @@ namespace Kubera.App
 {
     public class AppSettings : IAppSettings
     {
+        public string AppName => Resources.AppName;
+        public string ApiName => Resources.AppName;
+
         public string DatabaseConnectionString { get; set; }
 
         public string AlphaVantageApiKey { get; set; }
@@ -21,10 +26,14 @@ namespace Kubera.App
 
         public CorsOptions Cors { get; set; }
 
+        public MailOptions Mail { get; set; }
+
         ICacheOptions IAppSettings.CacheOptions => CacheOptions;
 
         IAutorisationSettings IAppSettings.Autorisation => Autorisation;
 
         ICorsOptions IAppSettings.Cors => Cors;
+
+        IMailOptions IAppSettings.Mail => Mail;
     }
 }

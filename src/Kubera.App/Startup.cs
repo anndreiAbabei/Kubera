@@ -39,6 +39,8 @@ using Kubera.App.Infrastructure.Environment;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using IdentityServer4.Configuration;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Kubera.App.Infrastructure.Mail;
 
 namespace Kubera.App
 {
@@ -118,6 +120,9 @@ namespace Kubera.App
             settings.AlphaVantageApiKey = Configuration[SettingKeys.AlphaVantageApiKey];
             settings.DatabaseConnectionString = Configuration[SettingKeys.ConnectionStrKuberaDb];
 
+            if(settings.Mail != null)
+                settings.Mail.ApiKey = Configuration[SettingKeys.SendInBlueMailKey];
+
             return settings;
         }
 
@@ -149,6 +154,8 @@ namespace Kubera.App
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
+
+            services.AddHttpClient<IEmailSender, SendInBlueMailSender>();
         }
 
         private void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)

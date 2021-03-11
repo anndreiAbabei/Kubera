@@ -28,5 +28,10 @@ namespace Kubera.General.Extensions
 
             return (item = source.FirstOrDefault(e => e.Id.Equals(id))) != null;
         }
+
+        public static IEnumerable<T> Yield<T>(this T source)
+        {
+            yield return source;
+        }
     }
 }
