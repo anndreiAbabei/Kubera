@@ -36,11 +36,16 @@ using Kubera.Business.Entities;
 using Kubera.Data.Data;
 using Kubera.General.Defaults;
 using Kubera.App.Infrastructure.Environment;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using IdentityServer4.Configuration;
 
 namespace Kubera.App
 {
     public class Startup
     {
+        private const string CorsPolicy = "_KUBERA_API_CORS";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -53,7 +58,8 @@ namespace Kubera.App
             var settings = GetSettings();
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(b => ConfigureDb(b, settings));
 
-            ConfigureAuthorisation(services);
+            ConfigureAuthorisation(services, settings);
+            ConfigureCors(services, settings);
             ConfigureApi(services);
             ConfigureClient(services);
 
@@ -64,6 +70,8 @@ namespace Kubera.App
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var settings = app.ApplicationServices.GetRequiredService<IAppSettings>();
+
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
@@ -81,6 +89,9 @@ namespace Kubera.App
                 app.UseSpaStaticFiles();
             
             app.UseRouting();
+
+            if (settings.Cors != null)
+                app.UseCors(CorsPolicy);
 
             app.UseAuthentication();
             app.UseIdentityServer();
@@ -115,12 +126,12 @@ namespace Kubera.App
             builder.UseSqlServer(settings.DatabaseConnectionString, options => options.EnableRetryOnFailure(settings.DatabaseRetries));
         }
 
-        private void ConfigureAuthorisation(IServiceCollection services)
+        private void ConfigureAuthorisation(IServiceCollection services, IAppSettings settings)
         {
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            var identityBuilder = services.AddIdentityServer()
+            var identityBuilder = services.AddIdentityServer(options => ConfigureIdentityServer(options, settings))
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddOperationalStore<ApplicationDbContext>()
                 .AddIdentityResources()
@@ -138,6 +149,45 @@ namespace Kubera.App
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
+        }
+
+        private void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)
+        {
+            if (settings.Autorisation == null)
+                return;
+
+            if(!string.IsNullOrEmpty(settings.Autorisation.ValidIssuer))
+                options.IssuerUri = settings.Autorisation.ValidIssuer;
+        }
+
+        private static void ConfigureCors(IServiceCollection services, IAppSettings settings)
+        {
+            const string all = "*";
+            const string separator = ",";
+
+            if (settings.Cors == null)
+                return;
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicy, builder =>
+                {
+                    builder.WithOrigins(settings.Cors.Origins.ToArray());
+
+                    if (settings.Cors.AllowHeaders == all)
+                        builder.AllowAnyHeader();
+                    else
+                        builder.WithHeaders(settings.Cors.AllowHeaders.Split(separator));
+
+                    if (settings.Cors.AllowMethods == all)
+                        builder.AllowAnyMethod();
+                    else
+                        builder.WithMethods(settings.Cors.AllowMethods.Split(separator));
+
+                    if (settings.Cors.AllowedCredentials)
+                        builder.AllowCredentials();
+                });
+            });
         }
 
         private static void ConfigureApi(IServiceCollection services)
