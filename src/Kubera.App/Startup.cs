@@ -37,6 +37,7 @@ using Kubera.Data.Data;
 using Kubera.General.Defaults;
 using Kubera.App.Infrastructure.Environment;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
 namespace Kubera.App
 {
@@ -121,7 +122,7 @@ namespace Kubera.App
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            var identityBuilder = services.AddIdentityServer()
+            var identityBuilder = services.AddIdentityServer(options => options.IssuerUri = settings.Autorisation.ValidIssuers.First())
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddOperationalStore<ApplicationDbContext>()
                 .AddIdentityResources()
@@ -140,19 +141,19 @@ namespace Kubera.App
             services.AddAuthentication()
                 .AddIdentityServerJwt()
             //.AddIdentityServerAuthentication("", a => { });
-            .AddJwtBearer(options =>
-            {
-                options.Authority = settings.Autorisation.Authority;
-                options.Audience = settings.Autorisation.Audience;
-                options.SecurityTokenValidators.Clear();
-                options.SecurityTokenValidators.Add(new JwtSecurityTokenHandler
-                {
-                    MapInboundClaims = false
-                });
-                options.TokenValidationParameters.ValidIssuers = settings.Autorisation.ValidIssuers;
-                options.TokenValidationParameters.NameClaimType = "name";
-                options.TokenValidationParameters.RoleClaimType = "role";
-            });
+            //.AddJwtBearer(options =>
+            //{
+            //    options.Authority = settings.Autorisation.Authority;
+            //    options.Audience = settings.Autorisation.Audience;
+            //    options.SecurityTokenValidators.Clear();
+            //    options.SecurityTokenValidators.Add(new JwtSecurityTokenHandler
+            //    {
+            //        MapInboundClaims = false
+            //    });
+            //    options.TokenValidationParameters.ValidIssuers = settings.Autorisation.ValidIssuers;
+            //    options.TokenValidationParameters.NameClaimType = "name";
+            //    options.TokenValidationParameters.RoleClaimType = "role";
+            //});
         }
 
         private static void ConfigureApi(IServiceCollection services)
