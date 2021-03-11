@@ -8,7 +8,7 @@ namespace Kubera.General.Settings
 
         string Audience { get; }
 
-        IEnumerable<string> ValidIssuers{ get; }
+        string ValidIssuer { get; }
 
         bool MapInboundClaims { get; }
     }

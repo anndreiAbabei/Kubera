@@ -10,5 +10,6 @@ namespace Kubera.General
         int DatabaseRetries { get; }
         ICacheOptions CacheOptions { get; }
         IAutorisationSettings Autorisation { get; }
+        ICorsOptions Cors { get; }
     }
 }

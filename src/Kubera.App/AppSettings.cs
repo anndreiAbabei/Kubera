@@ -1,4 +1,5 @@
 ﻿using Kubera.App.Infrastructure.Authorization;
+using Kubera.App.Infrastructure.Cors;
 using Kubera.Business.Services;
 using Kubera.General;
 using Kubera.General.Services;
@@ -18,8 +19,12 @@ namespace Kubera.App
 
         public AutorisationSettings Autorisation { get; set; }
 
+        public CorsOptions Cors { get; set; }
+
         ICacheOptions IAppSettings.CacheOptions => CacheOptions;
 
         IAutorisationSettings IAppSettings.Autorisation => Autorisation;
+
+        ICorsOptions IAppSettings.Cors => Cors;
     }
 }

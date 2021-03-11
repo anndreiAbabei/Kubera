@@ -38,11 +38,14 @@ using Kubera.General.Defaults;
 using Kubera.App.Infrastructure.Environment;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using IdentityServer4.Configuration;
 
 namespace Kubera.App
 {
     public class Startup
     {
+        private const string CorsPolicy = "_KUBERA_API_CORS";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -56,6 +59,7 @@ namespace Kubera.App
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(b => ConfigureDb(b, settings));
 
             ConfigureAuthorisation(services, settings);
+            ConfigureCors(services, settings);
             ConfigureApi(services);
             ConfigureClient(services);
 
@@ -66,6 +70,8 @@ namespace Kubera.App
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var settings = app.ApplicationServices.GetRequiredService<IAppSettings>();
+
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
@@ -83,6 +89,9 @@ namespace Kubera.App
                 app.UseSpaStaticFiles();
             
             app.UseRouting();
+
+            if (settings.Cors != null)
+                app.UseCors(CorsPolicy);
 
             app.UseAuthentication();
             app.UseIdentityServer();
@@ -122,7 +131,7 @@ namespace Kubera.App
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                             .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            var identityBuilder = services.AddIdentityServer(options => options.IssuerUri = settings.Autorisation.ValidIssuers.First())
+            var identityBuilder = services.AddIdentityServer(options => ConfigureIdentityServer(options, settings))
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddOperationalStore<ApplicationDbContext>()
                 .AddIdentityResources()
@@ -139,21 +148,46 @@ namespace Kubera.App
             }
 
             services.AddAuthentication()
-                .AddIdentityServerJwt()
-            //.AddIdentityServerAuthentication("", a => { });
-            //.AddJwtBearer(options =>
-            //{
-            //    options.Authority = settings.Autorisation.Authority;
-            //    options.Audience = settings.Autorisation.Audience;
-            //    options.SecurityTokenValidators.Clear();
-            //    options.SecurityTokenValidators.Add(new JwtSecurityTokenHandler
-            //    {
-            //        MapInboundClaims = false
-            //    });
-            //    options.TokenValidationParameters.ValidIssuers = settings.Autorisation.ValidIssuers;
-            //    options.TokenValidationParameters.NameClaimType = "name";
-            //    options.TokenValidationParameters.RoleClaimType = "role";
-            //});
+                .AddIdentityServerJwt();
+        }
+
+        private void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)
+        {
+            if (settings.Autorisation == null)
+                return;
+
+            if(!string.IsNullOrEmpty(settings.Autorisation.ValidIssuer))
+                options.IssuerUri = settings.Autorisation.ValidIssuer;
+        }
+
+        private void ConfigureCors(IServiceCollection services, IAppSettings settings)
+        {
+            const string all = "*";
+            const string separator = ",";
+
+            if (settings.Cors == null)
+                return;
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicy, builder =>
+                {
+                    builder.WithOrigins(settings.Cors.Origins.ToArray());
+
+                    if (settings.Cors.AllowHeaders == all)
+                        builder.AllowAnyHeader();
+                    else
+                        builder.WithHeaders(settings.Cors.AllowHeaders.Split(separator));
+
+                    if (settings.Cors.AllowMethods == all)
+                        builder.AllowAnyMethod();
+                    else
+                        builder.WithMethods(settings.Cors.AllowMethods.Split(separator));
+
+                    if (settings.Cors.AllowedCredentials)
+                        builder.AllowCredentials();
+                });
+            });
         }
 
         private static void ConfigureApi(IServiceCollection services)
