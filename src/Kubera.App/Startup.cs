@@ -36,6 +36,7 @@ using Kubera.Business.Entities;
 using Kubera.Data.Data;
 using Kubera.General.Defaults;
 using Kubera.App.Infrastructure.Environment;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Kubera.App
 {
@@ -53,7 +54,7 @@ namespace Kubera.App
             var settings = GetSettings();
             services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(b => ConfigureDb(b, settings));
 
-            ConfigureAuthorisation(services);
+            ConfigureAuthorisation(services, settings);
             ConfigureApi(services);
             ConfigureClient(services);
 
@@ -115,7 +116,7 @@ namespace Kubera.App
             builder.UseSqlServer(settings.DatabaseConnectionString, options => options.EnableRetryOnFailure(settings.DatabaseRetries));
         }
 
-        private void ConfigureAuthorisation(IServiceCollection services)
+        private void ConfigureAuthorisation(IServiceCollection services, IAppSettings settings)
         {
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                             .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -137,7 +138,21 @@ namespace Kubera.App
             }
 
             services.AddAuthentication()
-                .AddIdentityServerJwt();
+                .AddIdentityServerJwt()
+            //.AddIdentityServerAuthentication("", a => { });
+            .AddJwtBearer(options =>
+            {
+                options.Authority = settings.Autorisation.Authority;
+                options.Audience = settings.Autorisation.Audience;
+                options.SecurityTokenValidators.Clear();
+                options.SecurityTokenValidators.Add(new JwtSecurityTokenHandler
+                {
+                    MapInboundClaims = false
+                });
+                options.TokenValidationParameters.ValidIssuers = settings.Autorisation.ValidIssuers;
+                options.TokenValidationParameters.NameClaimType = "name";
+                options.TokenValidationParameters.RoleClaimType = "role";
+            });
         }
 
         private static void ConfigureApi(IServiceCollection services)
