@@ -104,6 +104,7 @@ import { CurrencySelectorComponent } from './shared/currency-selector/currency-s
     MatProgressBarModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,

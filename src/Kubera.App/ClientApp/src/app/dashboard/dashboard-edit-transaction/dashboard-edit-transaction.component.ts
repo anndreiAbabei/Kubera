@@ -15,13 +15,17 @@ import { ErrorHandlerService } from 'src/services/errorHandler.service';
 })
 export class DashboardEditTransactionComponent implements OnInit {
   public transaction: Transaction;
-  public addTransactionForm: FormGroup;
   public assets: Asset[];
   public currencies: Currency[];
-  public minAmount = 0.0000001;
-  public minRate = 0.00000001;
-  public minFee = 0.0000001;
   public haveFee = false;
+  public typeOfValue: string;
+
+  public readonly minAmount = 0.0000001;
+  public readonly minRate = 0.00000001;
+  public readonly minFee = 0.0000001;
+  public readonly rateTypeOfValue = 'rate';
+  public readonly totalTypeOfValue = 'total';
+  public readonly addTransactionForm: FormGroup;
 
   constructor(public readonly activeModal: NgbActiveModal,
     public readonly formBuilder: FormBuilder,
@@ -55,11 +59,15 @@ export class DashboardEditTransactionComponent implements OnInit {
       ]),
       feeCurrency: new FormControl('', [
         Validators.required
-      ])
+      ]),
+      rateOrTotal: new FormControl(this.rateTypeOfValue, [
+        Validators.required
+      ]),
     });
   }
 
   public async ngOnInit(): Promise<void> {
+    this.onRateOrTotal(this.rateTypeOfValue);
     this.addTransactionForm.get('fee').disable();
     this.addTransactionForm.get('feeCurrency').disable();
 
@@ -82,10 +90,18 @@ export class DashboardEditTransactionComponent implements OnInit {
       if (this.transaction.fee) {
         this.addTransactionForm.get('fee').setValue(this.transaction.fee);
         this.addTransactionForm.get('feeCurrency').setValue(this.transaction.feeCurrencyId);
+
+        if (!this.haveFee) {
+          this.toggleFee();
+        }
       }
     } else {
       this.addTransactionForm.get('date').setValue(new Date(Date.now()));
     }
+  }
+
+  public onRateOrTotal(value: string): void {
+    this.typeOfValue = value === this.rateTypeOfValue ? 'Rate' : 'Total';
   }
 
   public toggleFee(): void {
@@ -111,11 +127,18 @@ export class DashboardEditTransactionComponent implements OnInit {
       this.transaction = new Transaction();
     }
 
+    let rate: number = this.addTransactionForm.get('rate').value;
+    const amount: number = this.addTransactionForm.get('amount').value;
+
+    if (this.addTransactionForm.get('rateOrTotal').value !== this.rateTypeOfValue) {
+      rate = rate / amount;
+    }
+
     this.transaction.createdAt = this.addTransactionForm.get('date').value;
     this.transaction.assetId = this.addTransactionForm.get('asset').value;
     this.transaction.wallet = this.addTransactionForm.get('wallet').value;
-    this.transaction.amount = this.addTransactionForm.get('amount').value;
-    this.transaction.rate = this.addTransactionForm.get('rate').value;
+    this.transaction.amount = amount;
+    this.transaction.rate = rate;
     this.transaction.currencyId = this.addTransactionForm.get('currency').value;
 
     if (this.haveFee) {

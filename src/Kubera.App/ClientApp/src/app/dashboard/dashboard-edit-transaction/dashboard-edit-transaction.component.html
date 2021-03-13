@@ -37,18 +37,14 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field class="full-width">
-      <mat-label>Wallet</mat-label>
-      <input type="text" matInput formControlName="wallet" placeholder="Ex. Revolut">
-      <mat-error *ngIf="addTransactionForm.get('wallet').hasError('required')">
-        Wallet is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
 
-
-    <div class="full-width field-group">
-      <mat-form-field class="field-small">
-        <mat-label>Rate</mat-label>
+    <div class="full-width field-group rate-or-total-fields">
+      <mat-button-toggle-group aria-label="Rate or total" class="toggle" formControlName="rateOrTotal" [formControl]="addTransactionForm" (change)="onRateOrTotal($event.value)">
+        <mat-button-toggle value="rate">Rate</mat-button-toggle>
+        <mat-button-toggle value="total">Total</mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-form-field class="input">
+        <mat-label>{{typeOfValue}}</mat-label>
         <input type="number" matInput formControlName="rate">
         <mat-error *ngIf="addTransactionForm.get('rate').hasError('required')">
           Rate is <strong>required</strong>
@@ -57,7 +53,7 @@
           Minimum rate is <strong>{{minAmount | number:'1.1-8'}}</strong>
         </mat-error>
       </mat-form-field>
-      <mat-form-field appearance="fill" class="field-fill">
+      <mat-form-field appearance="fill" class="select">
         <mat-label>Curency</mat-label>
         <mat-select formControlName="currency">
           <mat-option *ngFor="let currency of currencies" [value]="currency.id">
@@ -78,6 +74,14 @@
       </mat-error>
       <mat-error *ngIf="addTransactionForm.get('amount').hasError('min')">
         Minimum amount is <strong>{{minAmount | number:'1.1-8'}}</strong>
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Wallet</mat-label>
+      <input type="text" matInput formControlName="wallet" placeholder="Ex. Revolut">
+      <mat-error *ngIf="addTransactionForm.get('wallet').hasError('required')">
+        Wallet is <strong>required</strong>
       </mat-error>
     </mat-form-field>
 

@@ -99,15 +99,13 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   public async refreshTransactions(): Promise<void> {
     try {
       this.setIsLoading(true);
-      this.transactions = [];
-
       const response = await this.getTransactions();
 
       this.transactions = this.parseResults(response);
     } catch (error) {
       this.errorHandlerService.handle(error);
     } finally {
-      this.noResult = this.transactions.length === 0;
+      this.noResult = !this.transactions || this.transactions.length === 0;
       this.setIsLoading(false);
     }
   }
