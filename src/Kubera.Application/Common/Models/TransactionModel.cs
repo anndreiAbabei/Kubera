@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Kubera.Application.Common.Models
 {
+    [DebuggerDisplay("Id: {Id}, Asset: {Asset.Name}, Wallet: {Wallet}, CreatedAt: {CreatedAt}, Amount: {Amount}, Currency: {Currency.Name}, Rate: {Rate}, Fee: {Fee}")]
     public class TransactionModel
     {
         public Guid Id { get; set; }

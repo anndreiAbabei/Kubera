@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace Kubera.Business.Models.AlphaVantage
 {
+    [DebuggerDisplay("Information: {MetaData.Information}, Code: {MetaData.Code}, Rate: {MetaData.Rate}, LastRefreshed: {MetaData.LastRefreshed}")]
     public class AlphaVantageGetStockRateResponse
     {
         [JsonPropertyName("Meta Data")]
@@ -11,6 +13,7 @@ namespace Kubera.Business.Models.AlphaVantage
         [JsonPropertyName("Time Series (5min)")]
         public IDictionary<string, AlphaVantageGetStockSerie> Series { get; set; }
 
+        [DebuggerDisplay("Information: {Information}, Code: {Code}, Rate: {Rate}, LastRefreshed: {LastRefreshed}")]
         public class AlphaVantageGetStockMetaData
         {
             [JsonPropertyName("1. Information")]
@@ -32,6 +35,7 @@ namespace Kubera.Business.Models.AlphaVantage
             public string Timezone { get; set; }
         }
 
+        [DebuggerDisplay("Open: {Open}, High: {High}, Low: {Low}, Close: {Close}, Volume: {Volume}")]
         public class AlphaVantageGetStockSerie
         {
             [JsonPropertyName("1. open")]

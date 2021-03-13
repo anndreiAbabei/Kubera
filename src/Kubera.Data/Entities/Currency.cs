@@ -1,9 +1,11 @@
 ﻿using Kubera.General.Entities;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace Kubera.Data.Entities
 {
+    [DebuggerDisplay("Id: {Id}, Code: {Code}, Name: {Name}, Order: {Order}")]
     public class Currency : Entity, ISoftDeletable
     {
         public virtual string Code { get; set; }

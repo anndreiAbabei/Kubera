@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Kubera.Business.Exceptions
 {
+    [Serializable]
     public class AlphaVantageException : Exception
     {
         internal AlphaVantageException()

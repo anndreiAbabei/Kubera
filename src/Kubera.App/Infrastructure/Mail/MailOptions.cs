@@ -1,7 +1,9 @@
 ﻿using Kubera.General.Settings;
+using System.Diagnostics;
 
 namespace Kubera.App.Infrastructure.Mail
 {
+    [DebuggerDisplay("Api: {Api}, FromName: {FromName}, FromEmail: {FromEmail}")]
     public class MailOptions : IMailOptions
     {
         public string Api { get; set; }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Kubera.Application.Common.Models
 {
+    [DebuggerDisplay("AssetId: {AssetId}, Wallet: {Wallet}, CreatedAt: {CreatedAt}, Amount: {Amount}, CurrencyId: {CurrencyId}, Rate: {Rate}, Fee: {Fee}")]
     public class TransactionInputModel
     {
         [Required]
@@ -28,5 +30,6 @@ namespace Kubera.Application.Common.Models
         public virtual Guid? FeeCurrencyId { get; set; }
     }
 
+    [DebuggerDisplay("AssetId: {AssetId}, Wallet: {Wallet}, CreatedAt: {CreatedAt}, Amount: {Amount}, CurrencyId: {CurrencyId}, Rate: {Rate}, Fee: {Fee}")]
     public class TransactionUpdateModel : TransactionInputModel { }
 }
