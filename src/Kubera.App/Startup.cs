@@ -121,7 +121,7 @@ namespace Kubera.App
             settings.DatabaseConnectionString = Configuration[SettingKeys.ConnectionStrKuberaDb];
 
             if(settings.Mail != null)
-                settings.Mail.ApiKey = Configuration[SettingKeys.SendInBlueMailKey];
+                settings.Mail.ApiKey = Configuration[SettingKeys.MailjetKey];
 
             return settings;
         }
@@ -155,7 +155,7 @@ namespace Kubera.App
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            services.AddHttpClient<IEmailSender, SendInBlueMailSender>();
+            services.AddHttpClient<IEmailSender, MailjetMailSender>();
         }
 
         private void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)

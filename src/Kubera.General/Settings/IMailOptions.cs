@@ -6,5 +6,7 @@
         string ApiKey { get; }
         string SenderName { get; }
         string SenderEmail { get; }
+        string FromName { get; }
+        string FromEmail { get; }
     }
 }
