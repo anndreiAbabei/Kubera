@@ -1,8 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 using Kubera.General.Models;
 
 namespace Kubera.Business.Models.AlphaVantage
 {
+    [DebuggerDisplay("Code: {Code}, Name: {Name}, Exchange: {Exchange}, Currency: {Currency}, Country: {Country}")]
     public class AlphaVantageStockCompanyResponse : IStockCompanyResponse
     {
         [JsonPropertyName("Symbol")]

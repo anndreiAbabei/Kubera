@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Kubera.Application.Common.Models
 {
+    [DebuggerDisplay("Code: {Code}, Name: {Name}, Symbol: {Symbol}, Order: {Order}")]
     public class AssetInputModel
     {
         [Required]
@@ -27,5 +29,7 @@ namespace Kubera.Application.Common.Models
 
         public virtual string Icon { get; set; }
     }
+
+    [DebuggerDisplay("Code: {Code}, Name: {Name}, Symbol: {Symbol}, Order: {Order}")]
     public class AssetUpdateModel : AssetInputModel { }
 }

@@ -2,6 +2,8 @@
 using Kubera.General.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Kubera.App.Infrastructure.Mail
@@ -31,6 +33,7 @@ namespace Kubera.App.Infrastructure.Mail
             };
         }
 
+        [DebuggerDisplay("From: {From.Email}, To: {ToProxy.Email}, Subject: {Subject}, CustomID: {CustomID}")]
         public class MailjetMessage
         {
             [JsonPropertyName("From")]
@@ -53,8 +56,11 @@ namespace Kubera.App.Infrastructure.Mail
 
             [JsonPropertyName("CustomID")]
             public string CustomID { get; set; }
+
+            private MailjetContact ToProxy => To.First();
         }
 
+        [DebuggerDisplay("Email: {Email}, Name: {Name}")]
         public class MailjetContact
         {
             [JsonPropertyName("Email")]
@@ -74,27 +80,4 @@ namespace Kubera.App.Infrastructure.Mail
         }
     }
 
-}
-class a { 
-
-string str = @"{
-  ""Messages"":[
-    {
-                ""From"": {
-                    ""Email"": ""andrei@stgo.live"",
-        ""Name"": ""Andrei""
-                },
-      ""To"": [
-        {
-                    ""Email"": ""andrei@stgo.live"",
-          ""Name"": ""Andrei""
-        }
-      ],
-      ""Subject"": ""My first Mailjet email"",
-      ""TextPart"": ""Greetings from Mailjet."",
-      ""HTMLPart"": ""<h3>Dear passenger 1, welcome to <a href='https://www.mailjet.com/'>Mailjet</a>!</h3><br />May the delivery force be with you!"",
-      ""CustomID"": ""AppGettingStartedTest""
-    }
-  ]
-}";
 }

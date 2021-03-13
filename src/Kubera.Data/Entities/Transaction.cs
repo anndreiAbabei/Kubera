@@ -1,8 +1,10 @@
 ﻿using Kubera.General.Entities;
 using System;
+using System.Diagnostics;
 
 namespace Kubera.Data.Entities
 {
+    [DebuggerDisplay("Id: {Id}, Asset: {Asset.Name}, Amount: {Amount}, Rate: {Rate}, Currency: {Currency.Name}, Owner: {Owner.Email}")]
     public class Transaction : Entity, ISoftDeletable, IDateEntity
     {
         public virtual Guid AssetId { get; set; }
