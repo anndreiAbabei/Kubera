@@ -1,13 +1,11 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { merge, of as observableOf } from 'rxjs';
-import { map, startWith, switchMap, catchError } from 'rxjs/operators';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
 import { Filter, Order, Paging } from 'src/models/filtering.model';
-import { Transaction } from 'src/models/transactions.model';
+import { Transaction, TransactionsResponse } from 'src/models/transactions.model';
 import { TransactionsService } from 'src/services/transactions.service';
 import { DashboardEditTransactionComponent } from '../dashboard-edit-transaction/dashboard-edit-transaction.component';
 
@@ -37,16 +35,16 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
     private readonly errorHandlerService: ErrorHandlerService,
     private readonly eventService: EventService) {  }
 
-  public ngAfterViewInit(): void {
+  public async ngAfterViewInit(): Promise<void> {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-    this.eventService.transactions.subscribe(() => this.refreshTransactions());
+    this.eventService.transactions.subscribe(async () => await this.refreshTransactions());
 
-    this.refreshTransactions();
+    await this.refreshTransactions();
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
+  public async ngOnChanges(changes: SimpleChanges): Promise<void> {
     if (!changes['filter'].firstChange) {
-      this.refreshTransactions();
+      await this.refreshTransactions();
     }
   }
 
@@ -98,44 +96,20 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
     }
   }
 
-  public refreshTransactions(): void {
-    merge(this.sort?.sortChange, this.paginator?.page)
-    .pipe(startWith({}),
-      switchMap(() => {
-        this.setIsLoading(true);
+  public async refreshTransactions(): Promise<void> {
+    try {
+      this.setIsLoading(true);
+      this.transactions = [];
 
-        const order = this.sort.active && this.sort.direction === 'asc'
-                        ? Order.ascending
-                        : Order.descending;
+      const response = await this.getTransactions();
 
-        const page = new Paging();
-        page.page = this.paginator.pageIndex;
-        page.items = this.itemsPerPage;
-
-        return this.transactionService.getAll(page, order, this.filter);
-      }),
-      map(data => {
-        this.noResult = data.transactions.length === 0;
-        this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
-
-        data.transactions.forEach(t => {
-          t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
-          t.feeFormated = t.fee
-                            ? `${t.fee} ${t.feeCurrency?.symbol}`
-                            : `${0.00} ${t.currency?.symbol}`;
-          t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
-        });
-        this.setIsLoading(false);
-
-        return data.transactions;
-      }),
-      catchError(() => {
-        this.setIsLoading(false);
-        this.noResult = true;
-
-        return observableOf([]);
-      }))
-    .subscribe(data => this.transactions = data);
+      this.transactions = this.parseResults(response);
+    } catch (error) {
+      this.errorHandlerService.handle(error);
+    } finally {
+      this.noResult = this.transactions.length === 0;
+      this.setIsLoading(false);
+    }
   }
 
   public async removeTransaction(transaction: Transaction): Promise<void> {
@@ -169,6 +143,32 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   public async performRefresh(): Promise<void> {
     this.eventService.refreshRequested.emit();
     await this.refreshTransactions();
+  }
+
+  private async getTransactions(): Promise<TransactionsResponse> {
+    const order = this.sort.active && this.sort.direction === 'asc'
+      ? Order.ascending
+      : Order.descending;
+
+    const page = new Paging();
+    page.page = this.paginator.pageIndex;
+    page.items = this.itemsPerPage;
+
+    return await this.transactionService.getAll(page, order, this.filter).toPromise();
+  }
+
+  private parseResults(data: TransactionsResponse): Transaction[] {
+    this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
+
+    data.transactions.forEach(t => {
+      t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
+      t.feeFormated = t.fee
+        ? `${t.fee} ${t.feeCurrency?.symbol}`
+        : `${0.00} ${t.currency?.symbol}`;
+      t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+    });
+
+    return data.transactions;
   }
 
   private setIsLoading(isLoading: boolean): void {
