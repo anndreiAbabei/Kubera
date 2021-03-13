@@ -68,6 +68,8 @@ namespace Kubera.App
             ConfigureDi(services, settings);
 
             services.AddHostedService<StartupSeedService>();
+            services.AddHealthChecks()
+                .AddDbContextCheck<ApplicationDbContext>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -102,6 +104,7 @@ namespace Kubera.App
             {
                 endpoints.MapControllerRoute("default", "{controller}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+                endpoints.MapHealthChecks("/health");
             });
 
             app.UseSpa(spa =>
