@@ -43,16 +43,44 @@
       vertical-align: middle;
     }
 
-    td.right,
-    th.right {
-      text-align: end;
-    }
-
     th.tight {
       width: 7em;
     }
+
+    th, td {
+      &.right {
+        text-align: end;
+      }
+
+      @media only screen and (max-width: 768px) {
+        &.group,
+        &.wallet,
+        &.action {
+            display: none
+        }
+
+        &.menu, &.menu button {
+          width: 2em;
+        }
+      }
+    }
   }
 }
+
+.date-short {
+  display: none;
+}
+
+@media only screen and (max-width: 768px) {
+  .date {
+    display: none;
+  }
+
+  .date-short {
+    display: initial;
+  }
+}
+
 @import "./src/static/scss/shared";
 
 @mixin dashboard-transactions-theme($theme, $dark) {

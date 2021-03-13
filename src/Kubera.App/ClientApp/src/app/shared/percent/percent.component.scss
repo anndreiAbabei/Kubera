@@ -1,6 +1,10 @@
 .percent::before {
   float: left;
   padding-left: 1em;
+
+  @media only screen and (max-width: 768px) {
+    display: none;
+  }
 }
 
 .bad-100::before {

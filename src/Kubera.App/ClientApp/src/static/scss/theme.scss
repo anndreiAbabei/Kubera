@@ -10,17 +10,18 @@ $theme-dark-primary: mat-palette($mat-blue-grey);
 $theme-dark-accent:  mat-palette($mat-amber, A200, A100, A400);
 $theme-dark-warn:    mat-palette($mat-deep-orange);
 $theme-dark:   mat-dark-theme($theme-dark-primary, $theme-dark-accent, $theme-dark-warn);
-@include angular-material-theme($theme-dark);
 
 @import "./src/app/nav-menu/nav-menu.component";
 @import "./src/app/shared/currency/currency.component";
 @import "./src/app/shared/percent/percent.component";
 @import "./src/app/dashboard/dashboard-transactions/dashboard-transactions.component";
+@import "./src/app/dashboard/dashboard-edit-transaction/dashboard-edit-transaction.component";
 @mixin custom-components-theme($theme, $dark) {
   @include nav-bar-theme($theme);
   @include currency-theme($theme, $dark);
   @include percent-theme($theme, $dark);
   @include dashboard-transactions-theme($theme, $dark);
+  @include dashboard-edit-transaction-theme($theme, $dark);
 }
 
 .color-scheme-dark {

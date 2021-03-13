@@ -1,0 +1,12 @@
+<div class="comp">
+  <mat-form-field class="small no-underline no-padding">
+    <mat-select [(ngModel)]="selectedCurrencyId" (selectionChange)="currencyChanged($event)">
+      <mat-select-trigger>
+        <app-currency [currency]="selectedCurrency" [hideAmount]="true" [forceBuble]="true" class="pushed-left"></app-currency>
+      </mat-select-trigger>
+      <mat-option *ngFor="let currency of currencies" [value]="currency.id">
+        {{currency.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>

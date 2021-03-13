@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Kubera.Data.Store
 {
-    public class UserStore : BaseDbReadOnlyStore<ApplicationUser, string>, IUserStore
+    public class UserStore : BaseDbCrudStore<ApplicationUser, string>, IUserStore
     {
         public UserStore(IApplicationDbContext applicationDbContext, ILogger<UserStore> logger)
             : base(applicationDbContext, logger)
@@ -13,7 +13,7 @@ namespace Kubera.Data.Store
         }
     }
 
-    public interface IUserStore : IStore<ApplicationUser, string>
+    public interface IUserStore : ICrudStore<ApplicationUser, string>
     {
     }
 }

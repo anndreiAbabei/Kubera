@@ -22,10 +22,8 @@
 .refresh-button-container {
   float: left;
   margin-left: 1em;
-}
-
-.refresh-button-container{
   margin-bottom: .5em;
+  display: none;
 }
 
 .table {
@@ -41,6 +39,14 @@
     td.right,
     th.right {
       text-align: end;
+    }
+
+    tr.footer {
+      filter: contrast(75%);
+
+      td {
+        font-weight: bold;
+      }
     }
   }
 }

@@ -6,10 +6,13 @@ import { Currency } from 'src/models/currency.model';
     templateUrl: './currency.component.html',
     styleUrls: ['./currency.component.scss']
 })
-/** asset component*/
 export class CurrencyComponent {
   @Input()
   public currency: Currency;
   @Input()
   public amount: number;
+  @Input()
+  public hideAmount: boolean;
+  @Input()
+  public forceBuble: boolean;
 }

@@ -1,17 +1,17 @@
 <div class="main">
   <div class="filter">
-    <app-dashboard-filter></app-dashboard-filter>
+    <app-dashboard-filter (filterChanged)="filterChanged($event)"></app-dashboard-filter>
   </div>
   <div class="transactions">
-    <app-dashboard-transactions></app-dashboard-transactions>
+    <app-dashboard-transactions [filter]="filter"></app-dashboard-transactions>
   </div>
   <div class="assets">
-    <app-dashboard-assets></app-dashboard-assets>
+    <app-dashboard-assets [filter]="filter"></app-dashboard-assets>
   </div>
   <div class="groups">
-    <app-dashboard-groups></app-dashboard-groups>
+    <app-dashboard-groups [filter]="filter"></app-dashboard-groups>
   </div>
   <div class="footer">
-    {{appName}}<sup>&copy;</sup> 2021
+    {{appName}}<sup>&copy;</sup> 2021 - {{version}}
   </div>
 </div>

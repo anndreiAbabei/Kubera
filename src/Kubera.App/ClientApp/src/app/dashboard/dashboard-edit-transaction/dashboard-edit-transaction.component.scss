@@ -13,3 +13,40 @@
 .q-width {
   width: 25%;
 }
+
+.field-group {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+
+  .field-small {
+    width: calc(30% - .5em);
+    margin-right: .5em;
+  }
+
+  .field-fill {
+    width: calc(70% - .5em);
+    margin-left: .5em;
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+@import "./src/static/scss/shared";
+
+@mixin dashboard-edit-transaction-theme($theme, $dark) {
+  $foreground: map-get($theme, foreground);
+
+  .close {
+    color: mat-color($foreground, text);
+  }
+}

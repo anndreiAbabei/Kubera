@@ -2,7 +2,6 @@
 using Bogus;
 using Kubera.General;
 using Kubera.General.Services;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Kubera.App.IntegrationTests
@@ -13,18 +12,16 @@ namespace Kubera.App.IntegrationTests
 
         public virtual ICacheService CacheService { get; }
 
-
-
-        protected IntegrationTestingFactory()
+        public IntegrationTestingFactory()
         {
             var appMock = new Mock<IAppSettings>();
             var cacheMock = new Mock<ICacheService>();
 
             appMock.SetupGet(a => a.AlphaVantageApiKey)
-                   .Returns(Environment.GetEnvironmentVariable("ALPHA_VANTAGE_API"));
+                .Returns(Environment.GetEnvironmentVariable("ALPHA_VANTAGE_API"));
 
             cacheMock.Setup(c => c.Get<It.IsAnyType>(It.IsAny<string>()))
-                     .Returns(() => default);
+                .Returns(() => default);
             cacheMock.Setup(c => c.Add(It.IsAny<It.IsAnyType>(), It.IsAny<string>()));
             cacheMock.Setup(c => c.Remove<It.IsAnyType>(It.IsAny<string>()));
             cacheMock.Setup(c => c.RemoveAll<It.IsAnyType>());
@@ -32,15 +29,6 @@ namespace Kubera.App.IntegrationTests
 
             AppSettings = appMock.Object;
             CacheService = cacheMock.Object;
-        }
-
-
-
-        protected virtual ILogger<T> Logger<T>()
-        {
-            var logMock = new Mock<ILogger<T>>();
-
-            return logMock.Object;
         }
 
         public virtual T CreateFake<T>(Action<Faker<T>> options = null)

@@ -32,12 +32,12 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of logged user groups</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TransactionModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] DateFilter filter, [FromQuery] Order? order)
+        public async Task<ActionResult<IEnumerable<TransactionModel>>> GetTransactions([FromQuery] Paging paging, [FromQuery] Filter filter, [FromQuery] Order? order)
         {
             var query = new GetTransactionsQuery
             {
                 Paging = paging,
-                Date = filter,
+                Filter = filter,
                 Order = order
             };
 
@@ -61,10 +61,11 @@ namespace Kubera.App.Controllers.V1
         /// <returns>Collection of logged user groups</returns>
         [HttpGet("grouped")]
         [ProducesResponseType(typeof(IEnumerable<GroupedTransactionsModel>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Order? order)
+        public async Task<ActionResult<IEnumerable<GroupedTransactionsModel>>> GetGroupedTransactions([FromQuery] Filter filter, [FromQuery] Order? order)
         {
             var query = new GetAssetGroupedTransactionsQuery
             {
+                Filter = filter,
                 Order = order
             };
 

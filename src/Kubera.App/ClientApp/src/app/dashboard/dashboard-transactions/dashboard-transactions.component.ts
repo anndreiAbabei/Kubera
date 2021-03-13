@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -6,9 +6,9 @@ import { merge, of as observableOf } from 'rxjs';
 import { map, startWith, switchMap, catchError } from 'rxjs/operators';
 import { ErrorHandlerService } from 'src/services/errorHandler.service';
 import { EventService } from 'src/services/event.service';
-import { Order, Paging } from '../../../models/filtering.model';
-import { Transaction } from '../../../models/transactions.model';
-import { TransactionsService } from '../../../services/transactions.service';
+import { Filter, Order, Paging } from 'src/models/filtering.model';
+import { Transaction } from 'src/models/transactions.model';
+import { TransactionsService } from 'src/services/transactions.service';
 import { DashboardEditTransactionComponent } from '../dashboard-edit-transaction/dashboard-edit-transaction.component';
 
 @Component({
@@ -16,7 +16,7 @@ import { DashboardEditTransactionComponent } from '../dashboard-edit-transaction
     templateUrl: './dashboard-transactions.component.html',
     styleUrls: ['./dashboard-transactions.component.scss']
 })
-export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy {
+export class DashboardTransactionsComponent implements AfterViewInit, OnChanges, OnDestroy {
   public resultsLength = 0;
   public isLoadingResults = false;
   public noResult = false;
@@ -25,6 +25,9 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
   public transactions: Transaction[];
   public page: Paging;
   public readonly itemsPerPage = 30;
+
+  @Input()
+  public filter: Filter;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -39,6 +42,12 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
     this.eventService.transactions.subscribe(() => this.refreshTransactions());
 
     this.refreshTransactions();
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['filter'].firstChange) {
+      this.refreshTransactions();
+    }
   }
 
   public ngOnDestroy(): void {
@@ -90,41 +99,43 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
   }
 
   public refreshTransactions(): void {
-    merge(this.sort.sortChange, this.paginator.page)
-    .pipe(startWith({}), switchMap(() => {
-      this.setIsLoading(true);
+    merge(this.sort?.sortChange, this.paginator?.page)
+    .pipe(startWith({}),
+      switchMap(() => {
+        this.setIsLoading(true);
 
-      const order = this.sort.active && this.sort.direction === 'asc'
-                      ? Order.ascending
-                      : Order.descending;
+        const order = this.sort.active && this.sort.direction === 'asc'
+                        ? Order.ascending
+                        : Order.descending;
 
-      const page = new Paging();
-      page.page = this.paginator.pageIndex;
-      page.items = this.itemsPerPage;
+        const page = new Paging();
+        page.page = this.paginator.pageIndex;
+        page.items = this.itemsPerPage;
 
-      return this.transactionService.getAll(page, order);
-    }),
-    map(data => {
-      this.noResult = data.transactions.length === 0;
-      this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
+        return this.transactionService.getAll(page, order, this.filter);
+      }),
+      map(data => {
+        this.noResult = data.transactions.length === 0;
+        this.resultsLength = data.totalItems > 0 ? Math.ceil(data.totalItems / this.itemsPerPage) : 0;
 
-      data.transactions.forEach(t => {
-        t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
-        t.feeFormated = t.fee
-                          ? `${t.fee} ${t.feeCurrency?.symbol}`
-                          : `${0.00} ${t.currency?.symbol}`;
-        t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+        data.transactions.forEach(t => {
+          t.totalFormated = `${t.rate * t.amount} ${t.currency?.symbol}`;
+          t.feeFormated = t.fee
+                            ? `${t.fee} ${t.feeCurrency?.symbol}`
+                            : `${0.00} ${t.currency?.symbol}`;
+          t.action = t.amount < 0 ? 'SOLD' : 'BOUGHT';
+        });
         this.setIsLoading(false);
-      });
 
-      return data.transactions;
-    }),
-    catchError(() => {
-      this.setIsLoading(false);
-      this.noResult = true;
+        return data.transactions;
+      }),
+      catchError(() => {
+        this.setIsLoading(false);
+        this.noResult = true;
 
-      return observableOf([]);
-    })).subscribe(data => this.transactions = data);
+        return observableOf([]);
+      }))
+    .subscribe(data => this.transactions = data);
   }
 
   public async removeTransaction(transaction: Transaction): Promise<void> {
@@ -153,6 +164,11 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnDestroy 
 
   public formatTotal(transaction: Transaction): string {
     return transaction.totalFormated;
+  }
+
+  public async performRefresh(): Promise<void> {
+    this.eventService.refreshRequested.emit();
+    await this.refreshTransactions();
   }
 
   private setIsLoading(isLoading: boolean): void {

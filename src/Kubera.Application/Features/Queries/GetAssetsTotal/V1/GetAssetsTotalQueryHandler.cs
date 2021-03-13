@@ -16,7 +16,7 @@ using System;
 
 namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
 {
-    public class GetAssetsTotalQueryHandler : CachingHandler<GetAssetsTotalQuery, IEnumerable<AssetTotalModel>>
+    public class GetAssetsTotalQueryHandler : CachingHandler<GetAssetsTotalQuery, GetAssetsTotalOutput>
     {
         private readonly IAssetRepository _assetRepository;
         private readonly ITransactionRepository _transactionRepository;
@@ -41,25 +41,21 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
             cacheService.SetSlidingExpiration(TimeSpan.FromMinutes(10));
         }
 
-        protected override async ValueTask<IResult<IEnumerable<AssetTotalModel>>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<GetAssetsTotalOutput>> HandleImpl(GetAssetsTotalQuery request, CancellationToken cancellationToken)
         {
-            var result = new List<AssetTotalModel>();
-            var assets = await _assetRepository.GetAll()
-                .Include(a => a.Group)
-                .ToListAsync(cancellationToken)
+            var assestsResult = new List<AssetTotalModel>();
+
+            var assets = await GetAsseets(request, cancellationToken)
+                .ConfigureAwait(false);
+            var transactions = await GetTransactions(request, assets.Select(a => a.Id).ToArray(), cancellationToken)
                 .ConfigureAwait(false);
             var currency = await _currencyRepository.GetById(request.CurrencyId, cancellationToken)
                 .ConfigureAwait(false);
-            var transactions = await _transactionRepository
-                .GetAll()
-                .Include(t => t.Currency)
-                .ToListAsync(cancellationToken)
-                .ConfigureAwait(false);
 
-            foreach(var group in transactions.GroupBy(t => t.AssetId))
+            foreach (var group in transactions.GroupBy(t => t.AssetId))
             {
                 if (cancellationToken.IsCancellationRequested)
-                    return await Task.FromCanceled<IResult<IEnumerable<AssetTotalModel>>>(cancellationToken);
+                    return await FromCancellationToken(cancellationToken);
 
                 var asset = assets.FirstOrDefault(a => a.Id == group.Key);
                 if (asset == null)
@@ -91,19 +87,72 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     SumAmount = amount,
                     Total = total,
                     TotalNow = totalNow,
-                    Increase = totalNow.HasValue ? CalculateProcent(total, totalNow.Value) : 0
+                    Increase = totalNow.HasValue ? total.ProcentFrom(totalNow.Value) : 0
                 };
 
                 if (asset.Group != null)
                     model.Group = _mapper.Map<Group, GroupModel>(asset.Group);
 
-                result.Add(model);
+                assestsResult.Add(model);
             }
+
+            var resultTotal = assestsResult.Select(a => a.Total).DefaultIfEmpty(0).Sum();
+            var resultTotalNow = assestsResult.Select(a => a.TotalNow ?? 0).DefaultIfEmpty(0).Sum();
+
+            var result = new GetAssetsTotalOutput
+            {
+                Assets = assestsResult,
+                Count = assestsResult.Count,
+                Total = resultTotal,
+                TotalNow = resultTotalNow,
+                Increase = resultTotal.ProcentFrom(resultTotalNow)
+            };
 
             return result.AsResult();
         }
 
-        protected override string GenerateKey(GetAssetsTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}";
+        protected override string GenerateKey(GetAssetsTotalQuery request) => $"{base.GenerateKey(request)}.{request.CurrencyId}.{request.Filter}";
+
+        private async Task<IEnumerable<Asset>> GetAsseets(GetAssetsTotalQuery request, CancellationToken cancellationToken)
+        {
+            var query = _assetRepository.GetAll();
+
+            if (request.Filter != null)
+            {
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.Id == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.GroupId == request.Filter.GroupId.Value);
+            }
+
+            return await query.Include(a => a.Group)
+                            .ToListAsync(cancellationToken)
+                            .ConfigureAwait(false);
+        }
+
+        private async Task<List<Transaction>> GetTransactions(GetAssetsTotalQuery request, Guid[] assetIds, CancellationToken cancellationToken)
+        {
+            var query = _transactionRepository.GetAll();
+
+            if (request.Filter != null)
+            {
+                if (request.Filter.From.HasValue)
+                    query = query.Where(t => t.CreatedAt >= request.Filter.From.Value);
+                if (request.Filter.To.HasValue)
+                    query = query.Where(t => t.CreatedAt <= request.Filter.To.Value);
+                if (request.Filter.AssetId.HasValue)
+                    query = query.Where(t => t.AssetId == request.Filter.AssetId.Value);
+                if (request.Filter.GroupId.HasValue)
+                    query = query.Where(t => t.Asset.GroupId == request.Filter.GroupId.Value);
+                else
+                    query = query.Where(t => assetIds.Contains(t.AssetId));
+            }
+
+            return await query
+                            .Include(t => t.Currency)
+                            .ToListAsync(cancellationToken)
+                            .ConfigureAwait(false);
+        }   
 
         private async ValueTask<decimal> Exchange(string from, string to, decimal amount, CancellationToken cancellationToken = default)
         {
@@ -114,17 +163,6 @@ namespace Kubera.Application.Features.Queries.GetAssetsTotal.V1
                     .ConfigureAwait(false);
 
             return rate.IsSuccess ? amount * rate.Value.Rate : amount;
-        }
-
-        private static float CalculateProcent(decimal previous, decimal current)
-        {
-            if (previous == 0)
-                return 0f;
-
-            if (current == 0)
-                return -100f;
-
-            return (float)((current - previous) / previous * 100m);
         }
     }
 }

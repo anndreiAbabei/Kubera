@@ -9,7 +9,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
 
         public IPaging Paging { get; set; }
 
-        public IDateFilter Date { get; set; }
+        public IFilter Filter { get; set; }
 
         public Order? Order { get; set; }
     }

@@ -7,7 +7,6 @@ using ConfigurationSubstitution;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Kubera.App
 {
@@ -16,55 +15,57 @@ namespace Kubera.App
     {
         public static void Main(string[] args) => CreateHostBuilder(args).Build().Run();
 
-
-
-        private static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                       .ConfigureLogging(ConfigureLogging)
-                       .ConfigureAppConfiguration(ConfigureConfiguration)
-                       .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
-        }
-
-
-
-        private static void ConfigureLogging(HostBuilderContext ctx, ILoggingBuilder builder)
-        {
-            builder.AddConsole();
-        }
-
-
-
-        private static void ConfigureConfiguration(HostBuilderContext ctx, IConfigurationBuilder builder)
-        {
-            builder.EnableSubstitutions("$(", ")");
-            AddUserSecrets(ctx, builder);
-        }
-
-
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((ctx, builder) =>
+                {
+                    builder.EnableSubstitutions("$(", ")");
+                    AddUserSecrets(ctx, builder);
+                })
+                .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
 
         private static void AddUserSecrets(HostBuilderContext ctx, IConfigurationBuilder builder)
         {
             if (ctx.HostingEnvironment.IsDevelopment())
                 builder.AddUserSecrets<Program>();
-            else if (ctx.HostingEnvironment.IsProduction())
+            else
             {
-                var builtConfig = builder.Build();
+                var root = builder.Build();
+                var vaultName = root["KeyVault:Name"];
+                var appId = root["KeyVault:ADApplicationId"];
+                var directoryId = root["KeyVault:ADDirectoryId"];
+                var cert = GetApplicationCertificate(root);
 
-                using var store = new X509Store(StoreLocation.CurrentUser);
+                var uri = new Uri($"https://{vaultName}.vault.azure.net/");
+                var credential = new ClientCertificateCredential(directoryId, appId, cert);
+                var manager = new KeyVaultSecretManager();
 
+                builder.AddAzureKeyVault(uri, credential, manager);
+            }
+        }
+
+        internal static X509Certificate2 GetApplicationCertificate(IConfiguration configuration)
+        {
+            return GetCertificate(configuration, "Application:Certificate");
+        }
+
+        internal static X509Certificate2 GetCertificate(IConfiguration configuration, string path)
+        {
+            var thumbprint = configuration[path];
+
+            if (string.IsNullOrEmpty(thumbprint))
+                return null;
+
+            using var store = new X509Store(StoreLocation.CurrentUser);
+            try
+            {
                 store.Open(OpenFlags.ReadOnly);
-                var certs = store.Certificates.Find(X509FindType.FindByThumbprint,
-                                                    builtConfig["AzureADCertThumbprint"], 
-                                                    false);
-
-                builder.AddAzureKeyVault(new Uri($"https://{builtConfig["KeyVaultName"]}.vault.azure.net/"),
-                                         new ClientCertificateCredential(builtConfig["AzureADDirectoryId"],
-                                                                         builtConfig["AzureADApplicationId"],
-                                                                         certs.OfType<X509Certificate2>().Single()),
-                                         new KeyVaultSecretManager());
-
-
+                return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)
+                                .OfType<X509Certificate2>()
+                                .Single();
+            }
+            finally
+            {
                 store.Close();
             }
         }

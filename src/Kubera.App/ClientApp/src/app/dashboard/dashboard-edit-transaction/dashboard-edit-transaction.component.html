@@ -29,7 +29,7 @@
       <mat-label>Asset</mat-label>
       <mat-select formControlName="asset">
         <mat-option *ngFor="let asset of assets" [value]="asset.id">
-          <app-asset [asset]="asset"></app-asset>
+          <app-asset [asset]="asset" [forceShowName]="true"></app-asset>
         </mat-option>
       </mat-select>
       <mat-error *ngIf="addTransactionForm.get('asset').hasError('required')">
@@ -46,33 +46,29 @@
     </mat-form-field>
 
 
-    <table class="full-width" cell-spacing="0"><tr>
-      <td>
-        <mat-form-field>
-          <mat-label>Rate</mat-label>
-          <input type="number" matInput formControlName="rate">
-          <mat-error *ngIf="addTransactionForm.get('rate').hasError('required')">
-            Rate is <strong>required</strong>
-          </mat-error>
-          <mat-error *ngIf="addTransactionForm.get('rate').hasError('min')">
-            Minimum rate is <strong>{{minAmount | number:'1.1-8'}}</strong>
-          </mat-error>
-        </mat-form-field>
-      </td>
-      <td>
-        <mat-form-field appearance="fill">
-          <mat-label>Curency</mat-label>
-          <mat-select formControlName="currency">
-            <mat-option *ngFor="let currency of currencies" [value]="currency.id">
-              {{currency.name}}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="addTransactionForm.get('currency').hasError('required')">
-            Currency is <strong>required</strong>
-          </mat-error>
-        </mat-form-field>
-      </td>
-    </tr></table>
+    <div class="full-width field-group">
+      <mat-form-field class="field-small">
+        <mat-label>Rate</mat-label>
+        <input type="number" matInput formControlName="rate">
+        <mat-error *ngIf="addTransactionForm.get('rate').hasError('required')">
+          Rate is <strong>required</strong>
+        </mat-error>
+        <mat-error *ngIf="addTransactionForm.get('rate').hasError('min')">
+          Minimum rate is <strong>{{minAmount | number:'1.1-8'}}</strong>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="field-fill">
+        <mat-label>Curency</mat-label>
+        <mat-select formControlName="currency">
+          <mat-option *ngFor="let currency of currencies" [value]="currency.id">
+            {{currency.name}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="addTransactionForm.get('currency').hasError('required')">
+          Currency is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
 
     <mat-form-field class="full-width">
       <mat-label>Amount</mat-label>
@@ -87,30 +83,26 @@
 
     <mat-checkbox class="full-width" (change)="toggleFee()">Paid fee?</mat-checkbox>
 
-    <table class="full-width" cell-spacing="0"><tr>
-      <td>
-        <mat-form-field>
-          <mat-label>Fee</mat-label>
-          <input type="number" matInput formControlName="fee">
-          <mat-error *ngIf="addTransactionForm.get('fee').hasError('min')">
-            Minimum fee is <strong>{{minFee | number:'1.1-8'}}</strong>
-          </mat-error>
-        </mat-form-field>
-      </td>
-      <td>
-        <mat-form-field appearance="fill">
-          <mat-label>Fee curency</mat-label>
-          <mat-select formControlName="feeCurrency">
-            <mat-option *ngFor="let currency of currencies" [value]="currency.id">
-              {{currency.name}}
-            </mat-option>
-          </mat-select>
-          <mat-error *ngIf="addTransactionForm.get('feeCurrency').hasError('required')">
-            Fee currency is <strong>required</strong>
-          </mat-error>
-        </mat-form-field>
-      </td>
-    </tr></table>
+    <div class="full-width field-group">
+      <mat-form-field class="field-small">
+        <mat-label>Fee</mat-label>
+        <input type="number" matInput formControlName="fee">
+        <mat-error *ngIf="addTransactionForm.get('fee').hasError('min')">
+          Minimum fee is <strong>{{minFee | number:'1.1-8'}}</strong>
+        </mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="field-fill">
+        <mat-label>Fee curency</mat-label>
+        <mat-select formControlName="feeCurrency">
+          <mat-option *ngFor="let currency of currencies" [value]="currency.id">
+            {{currency.name}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="addTransactionForm.get('feeCurrency').hasError('required')">
+          Fee currency is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
   </form>
 </div>
 <div class="modal-footer">

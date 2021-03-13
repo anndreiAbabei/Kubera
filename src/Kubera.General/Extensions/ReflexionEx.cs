@@ -17,7 +17,9 @@ namespace Kubera.General.Extensions
 
             var strings = source.GetType()
                 .GetProperties()
-                .Select(p => $"{p.Name}={p.GetValue(source).ToString().EncodeQueryString()}");
+                .Select(p => (p.Name, Value: p.GetValue(source)))
+                .Where(t => t.Value != null)
+                .Select(t => $"{t.Name}={t.Value.ToString().EncodeQueryString()}");
 
             return string.Join("&", strings);
         }

@@ -5,65 +5,68 @@
   <div class="mat-elevation-z8 content">
     <div class="table">
       <mat-progress-bar mode="query" *ngIf="isLoadingResults" aria-label="Loading transactions"></mat-progress-bar>
-      <table mat-table [dataSource]="transactions" matSort matSortActive="createdAt" matSortDisableClear matSortDirection="desc">
+      <table mat-table [dataSource]="transactions" matSort matSortActive="createdAt" matSortDisableClear matSortDirection="desc" class="tight-md">
         <ng-container matColumnDef="createdAt">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header disableClear class="createdAt">
             Created
           </th>
-          <td mat-cell *matCellDef="let row">{{row.createdAt | date}}</td>
+          <td mat-cell *matCellDef="let row" class="createdAt">
+            <span class="date">{{row.createdAt | date: 'mediumDate'}}</span>
+            <span class="date-short">{{row.createdAt | date: 'shortDate'}}</span>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="group">
-          <th mat-header-cell *matHeaderCellDef>Group</th>
-          <td mat-cell *matCellDef="let row">{{row.group?.name || '-'}}</td>
+          <th mat-header-cell *matHeaderCellDef class="group">Group</th>
+          <td mat-cell *matCellDef="let row" class="group">{{row.group?.name || '-'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="asset">
-          <th mat-header-cell *matHeaderCellDef>Asset</th>
-          <td mat-cell *matCellDef="let row">
+          <th mat-header-cell *matHeaderCellDef class="asset">Asset</th>
+          <td mat-cell *matCellDef="let row" class="asset">
             <app-asset [asset]="row.asset"></app-asset>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="wallet">
-          <th mat-header-cell *matHeaderCellDef>Wallet</th>
-          <td mat-cell *matCellDef="let row">
+          <th mat-header-cell *matHeaderCellDef class="wallet">Wallet</th>
+          <td mat-cell *matCellDef="let row" class="wallet">
             <app-wallet [wallet]="row.wallet"></app-wallet>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef>Action</th>
-          <td mat-cell *matCellDef="let row">{{row.amount < 0 ? 'SOLD' : 'BOUGHT'}}</td>
+          <th mat-header-cell *matHeaderCellDef class="action">Action</th>
+          <td mat-cell *matCellDef="let row" class="action">{{row.amount < 0 ? 'SOLD' : 'BOUGHT'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="amount">
-          <th mat-header-cell *matHeaderCellDef class="right">Amount</th>
-          <td mat-cell *matCellDef="let row" class="right">{{row.amount | number:'1.2-8'}}</td>
+          <th mat-header-cell *matHeaderCellDef class="right amount">Amount</th>
+          <td mat-cell *matCellDef="let row" class="right amount">{{row.amount | number:'1.2-8'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="rate">
-          <th mat-header-cell *matHeaderCellDef class="right">Rate</th>
-          <td mat-cell *matCellDef="let row" class="right">{{row.rate | number:'1.2-8'}}</td>
+          <th mat-header-cell *matHeaderCellDef class="right rate">Rate</th>
+          <td mat-cell *matCellDef="let row" class="right rate">{{row.rate | number:'1.2-8'}}</td>
         </ng-container>
 
         <ng-container matColumnDef="totalFormated">
-          <th mat-header-cell *matHeaderCellDef class="right">Total</th>
-          <td mat-cell *matCellDef="let row" class="right">
+          <th mat-header-cell *matHeaderCellDef class="right total">Total</th>
+          <td mat-cell *matCellDef="let row" class="right total">
             <app-currency [currency]="row.currency" [amount]="row.rate * row.amount"></app-currency>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="feeFormated">
-          <th mat-header-cell *matHeaderCellDef class="right">Fee</th>
-          <td mat-cell *matCellDef="let row" class="right">
+          <th mat-header-cell *matHeaderCellDef class="right fee">Fee</th>
+          <td mat-cell *matCellDef="let row" class="right fee">
             <app-currency [currency]="row.feeCurrency || row.currency" [amount]="row.fee || 0"></app-currency>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="menu">
-          <th mat-header-cell *matHeaderCellDef class="tight"></th>
-          <td mat-cell *matCellDef="let row" class="right">
+          <th mat-header-cell *matHeaderCellDef class="tight menu"></th>
+          <td mat-cell *matCellDef="let row" class="right menu">
             <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{element: row}" [disabled]="isLoadingResults">
               <i class="material-icons">more_vert</i>
             </button>
@@ -83,7 +86,7 @@
         </button>
       </div>
       <div class="refresh-button-container">
-        <button mat-mini-fab color="accent" aria-label="Refresh transactions" [disabled]="isLoadingResults" (click)="refreshTransactions()">
+        <button mat-mini-fab color="accent" aria-label="Refresh transactions" [disabled]="isLoadingResults" (click)="performRefresh()">
           <mat-icon>refresh</mat-icon>
         </button>
       </div>
