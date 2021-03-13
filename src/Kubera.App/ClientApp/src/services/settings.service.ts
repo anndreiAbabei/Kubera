@@ -7,6 +7,6 @@ import { Endpoints } from '../models/endpoints.model';
 export class SettingsService {
   public appName = 'Loot';
   public fullAppName = 'Loot - App';
-  public appVersion = 'v.alpha.2.0.2';
+  public appVersion = 'v.Alpha.2.0.4';
   public endpoints = new Endpoints();
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Kubera.General.Entities
 {
@@ -10,11 +11,13 @@ namespace Kubera.General.Entities
     {
     }
 
+    [DebuggerDisplay("Id: {Id}")]
     public abstract class Entity<TKey> : IEntity<TKey>
     {
         public virtual TKey Id { get; set; }
     }
 
+    [DebuggerDisplay("Id: {Id}")]
     public abstract class Entity : Entity<Guid>, IEntity
     {
     }

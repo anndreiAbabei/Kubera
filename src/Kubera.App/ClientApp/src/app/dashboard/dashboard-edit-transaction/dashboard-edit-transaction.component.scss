@@ -19,14 +19,44 @@
   flex-flow: row;
   align-items: baseline;
 
-  .field-small {
-    width: calc(30% - .5em);
+  .field-xsmall {
+    width: calc(20% - .5em);
+    margin-right: .5em;
+  }
+
+  .field-mid {
+    width: calc(40% - .5em);
     margin-right: .5em;
   }
 
   .field-fill {
     width: calc(70% - .5em);
     margin-left: .5em;
+  }
+
+  .field-fill {
+    width: calc(70% - .5em);
+    margin-left: .5em;
+  }
+
+  &.rate-or-total-fields {
+    align-items: end;
+
+    .toggle {
+      flex-shrink: 0;
+      align-self: end;
+      margin-top: 0.3em;
+    }
+
+    .input {
+      max-width: 20%;
+      margin: 0 1em;
+      margin-bottom: 0.1em;
+    }
+
+    .select {
+      flex-grow: 1;
+    }
   }
 }
 

@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace Kubera.Application.Common.Models
 {
+    [DebuggerDisplay("Code: {Code}, Name: {Name}")]
     public class GroupInputModel
     {
         [Required]
@@ -15,5 +17,6 @@ namespace Kubera.Application.Common.Models
         public virtual string Name { get; set; }
     }
 
+    [DebuggerDisplay("Code: {Code}, Name: {Name}")]
     public class GroupUpdateModel : GroupInputModel { }
 }

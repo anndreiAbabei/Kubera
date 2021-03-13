@@ -1,12 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Kubera.Business.Models.AlphaVantage
 {
+    [DebuggerDisplay("From: {Result.FromCode}, To: {Result.ToCode}, Rate: {Result.Rate}")]
     public sealed class AlphaVantageGetCurrencyExchangeRateResponse
     {
         [JsonPropertyName("Realtime Currency Exchange Rate")]
         public AlphaVantageGetCurrencyExchangeRateResult Result { get; set; }
-
+        
+        [DebuggerDisplay("From: {FromCode}, To: {ToCode}, Rate: {Rate}, LastRefreshed: {LastRefreshed}")]
         public class AlphaVantageGetCurrencyExchangeRateResult
         {
             [JsonPropertyName("1. From_Currency Code")]

@@ -1,9 +1,11 @@
 ﻿using Kubera.General.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Kubera.Data.Entities
 {
+    [DebuggerDisplay("Id: {Id}, Code: {Code}, Name: {Name}")]
     public class Group : Entity, ISoftDeletable
     {
         public virtual string Code { get; set; }

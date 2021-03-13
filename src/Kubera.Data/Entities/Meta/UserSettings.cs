@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Kubera.Data.Entities.Meta
 {
+    [DebuggerDisplay("Language: {Language}, PrefferedCurrency: {PrefferedCurrency}")]
     public class UserSettings
     {
         public string Language { get; set; }
