@@ -5,11 +5,14 @@ namespace Kubera.General
 {
     public interface IAppSettings
     {
+        string AppName { get; }
+        string ApiName { get; }
         string AlphaVantageApiKey { get; }
         string DatabaseConnectionString { get; }
         int DatabaseRetries { get; }
         ICacheOptions CacheOptions { get; }
         IAutorisationSettings Autorisation { get; }
         ICorsOptions Cors { get; }
+        IMailOptions Mail { get; }
     }
 }
