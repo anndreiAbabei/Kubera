@@ -16,7 +16,7 @@ namespace Kubera.App.Infrastructure.Mail
             var message = new MailjetMessage
             {
                 From = MailjetContact.Create(appSettings.Mail.FromEmail, appSettings.Mail.FromName),
-                To = MailjetContact.Create(email),
+                To = MailjetContact.Create(email).Yield(),
                 Subject = subject,
                 HTMLPart = htmlMessage
             };
@@ -40,7 +40,7 @@ namespace Kubera.App.Infrastructure.Mail
             public MailjetContact Sender { get; set; }
 
             [JsonPropertyName("To")]
-            public MailjetContact To { get; set; }
+            public IEnumerable<MailjetContact> To { get; set; }
 
             [JsonPropertyName("Subject")]
             public string Subject { get; set; }
