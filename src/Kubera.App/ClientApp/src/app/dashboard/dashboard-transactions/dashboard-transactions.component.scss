@@ -37,6 +37,7 @@
 
 .table {
   flex: 1;
+  overflow-y: auto;
 
   table {
     width: 100%;
