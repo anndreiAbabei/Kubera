@@ -16,7 +16,7 @@ using System;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
-    public class GetTransactionsQueryHandler : CachingHandler<GetTransactionsQuery, GetTransactionsQueryOutput>
+    public class GetTransactionsQueryHandler : CachingHandler<GetTransactionsQuery, GetTransactionsOutput>
     {
         private readonly ITransactionRepository _transactionRepository;
         private readonly IAssetRepository _assetRepository;
@@ -41,7 +41,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
             cacheService.SetAbsoluteExpiration(DateTimeOffset.Now.AddDays(1));
         }
 
-        protected override async ValueTask<IResult<GetTransactionsQueryOutput>> HandleImpl(GetTransactionsQuery request, CancellationToken cancellationToken)
+        protected override async ValueTask<IResult<GetTransactionsOutput>> HandleImpl(GetTransactionsQuery request, CancellationToken cancellationToken)
         {
             IPagingResult paging = null;
             var order = request.Order ?? Order.Descending;
@@ -109,7 +109,7 @@ namespace Kubera.Application.Features.Queries.GetTransactions.V1
                     model.FeeCurrency = _mapper.Map<Currency, CurrencyModel>(feeCurrency);
             }
             
-            var output = new GetTransactionsQueryOutput
+            var output = new GetTransactionsOutput
             {
                 Transactions = models,
                 Paging = paging

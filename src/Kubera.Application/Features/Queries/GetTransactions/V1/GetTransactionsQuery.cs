@@ -3,7 +3,7 @@ using Kubera.General.Models;
 
 namespace Kubera.Application.Features.Queries.GetTransactions.V1
 {
-    public class GetTransactionsQuery : CacheableRequest<GetTransactionsQueryOutput>
+    public class GetTransactionsQuery : CacheableRequest<GetTransactionsOutput>
     {
         internal override CacheRegion CacheRegion => CacheRegion.Transactions;
 

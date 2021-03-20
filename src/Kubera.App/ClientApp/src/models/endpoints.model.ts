@@ -1,5 +1,6 @@
 export class EndpointsGet {
   transactions = `${this.base}/transaction`;
+  wallet = `${this.base}/wallet`;
   assets = `${this.base}/asset`;
   user = `${this.base}/user`;
   assetsTotal = `${this.base}/asset/totals`;

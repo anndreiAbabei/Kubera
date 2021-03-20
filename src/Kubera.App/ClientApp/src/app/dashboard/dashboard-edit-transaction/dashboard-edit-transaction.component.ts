@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { Asset } from 'src/models/asset.model';
 import { Currency } from 'src/models/currency.model';
 import { Transaction } from 'src/models/transactions.model';
@@ -18,7 +20,9 @@ export class DashboardEditTransactionComponent implements OnInit {
   public assets: Asset[];
   public currencies: Currency[];
   public haveFee = false;
-  public typeOfValue: string;
+  public wallets: string[];
+
+  public filteredWallets: Observable<string[]>;
 
   public readonly minAmount = 0.0000001;
   public readonly minRate = 0.00000001;
@@ -26,6 +30,8 @@ export class DashboardEditTransactionComponent implements OnInit {
   public readonly rateTypeOfValue = 'rate';
   public readonly totalTypeOfValue = 'total';
   public readonly addTransactionForm: FormGroup;
+
+  public typeOfValue = this.rateTypeOfValue;
 
   constructor(public readonly activeModal: NgbActiveModal,
     public readonly formBuilder: FormBuilder,
@@ -98,6 +104,9 @@ export class DashboardEditTransactionComponent implements OnInit {
     } else {
       this.addTransactionForm.get('date').setValue(new Date(Date.now()));
     }
+
+    this.filteredWallets = this.addTransactionForm.get('wallet').valueChanges
+      .pipe(startWith(''), map(value => this.filterWallet(value)));
   }
 
   public onRateOrTotal(value: string): void {
@@ -119,6 +128,10 @@ export class DashboardEditTransactionComponent implements OnInit {
   }
 
   public getSelectedAsset(): Asset {
+    if (!this.assets) {
+      return null;
+    }
+
     return this.assets.find(a => a.id === this.addTransactionForm.get('asset').value);
   }
 
@@ -138,19 +151,25 @@ export class DashboardEditTransactionComponent implements OnInit {
       rate = rate / amount;
     }
 
-    const date: Date = this.addTransactionForm.get('date').value;
+    const dateCtrl = this.addTransactionForm.get('date');
+    const date: Date = dateCtrl.value instanceof Date
+                        ? dateCtrl.value
+                        : new Date(dateCtrl.value);
     const utcDate = Date.UTC(date.getFullYear(), date.getMonth(), date.getUTCDay(), 12);
                                                 // timezones are awful :(
     this.transaction.date = new Date(utcDate - date.getTimezoneOffset() * 60000);
     this.transaction.assetId = this.addTransactionForm.get('asset').value;
+    this.transaction.asset = this.assets.find(c => c.id === this.transaction.assetId);
     this.transaction.wallet = this.addTransactionForm.get('wallet').value;
     this.transaction.amount = amount;
     this.transaction.rate = rate;
     this.transaction.currencyId = this.addTransactionForm.get('currency').value;
+    this.transaction.currency = this.currencies.find(c => c.id === this.transaction.currencyId);
 
     if (this.haveFee) {
       this.transaction.fee = this.addTransactionForm.get('fee').value;
       this.transaction.feeCurrencyId = this.addTransactionForm.get('feeCurrency').value;
+      this.transaction.feeCurrency = this.currencies.find(c => c.id === this.transaction.feeCurrencyId);
     }
 
     this.activeModal.close(this.transaction);
@@ -158,5 +177,11 @@ export class DashboardEditTransactionComponent implements OnInit {
 
   public close() {
     this.activeModal.close();
+  }
+
+  private filterWallet(value: string): string[] {
+    const filterValue = value.toLowerCase();
+
+    return this.wallets.filter(wallet => wallet.toLowerCase().indexOf(filterValue) === 0);
   }
 }

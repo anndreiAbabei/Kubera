@@ -1,3 +1,5 @@
+@import '/src/static/scss/variables.scss';
+
 .full-width {
   width: 100%;
 }
@@ -24,14 +26,14 @@
     margin-right: .5em;
   }
 
-  .field-mid {
-    width: calc(40% - .5em);
+  .field-small {
+    width: calc(30% - .5em);
     margin-right: .5em;
   }
 
-  .field-fill {
-    width: calc(70% - .5em);
-    margin-left: .5em;
+  .field-mid {
+    width: calc(40% - .5em);
+    margin-right: .5em;
   }
 
   .field-fill {
@@ -56,6 +58,11 @@
 
     .select {
       flex-grow: 1;
+
+
+      @media only screen and (max-width: $mobile-res) {
+        max-width: calc(40% - 0.5em);
+      }
     }
   }
 }

@@ -82,7 +82,17 @@
 
     <mat-form-field class="full-width">
       <mat-label>Wallet</mat-label>
-      <input type="text" matInput formControlName="wallet" placeholder="Ex. Revolut">
+      <input type="text"
+              placeholder="Ex. Revolut"
+              aria-label="Number"
+              matInput
+              formControlName="wallet"
+              [matAutocomplete]="auto">
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+        <mat-option *ngFor="let wallet of filteredWallets | async" [value]="wallet">
+          <app-wallet [wallet]="wallet"></app-wallet>
+        </mat-option>
+      </mat-autocomplete>
       <mat-error *ngIf="addTransactionForm.get('wallet').hasError('required')">
         Wallet is <strong>required</strong>
       </mat-error>

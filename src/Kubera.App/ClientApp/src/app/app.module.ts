@@ -110,6 +110,7 @@ import { CurrencySelectorComponent } from './shared/currency-selector/currency-s
     MatInputModule,
     MatSelectModule,
     MatCheckboxModule,
+    MatAutocompleteModule,
     MatMenuModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent },
