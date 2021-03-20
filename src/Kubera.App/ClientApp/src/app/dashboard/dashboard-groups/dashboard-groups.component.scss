@@ -1,4 +1,6 @@
-﻿.no-item {
+﻿@import '/src/static/scss/variables.scss';
+
+.no-item {
   text-align: center;
   color: gray;
   margin-top: 1em;
@@ -35,9 +37,16 @@
       vertical-align: middle;
     }
 
-    td.right,
-    th.right {
-      text-align: end;
+    td, th{
+      &.right {
+        text-align: end;
+      }
+
+      @media only screen and (max-width: $small-res) {
+        &.amount {
+            display: none
+        }
+      }
     }
 
     tr.footer {

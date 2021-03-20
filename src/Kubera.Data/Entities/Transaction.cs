@@ -15,6 +15,8 @@ namespace Kubera.Data.Entities
 
         public virtual DateTime CreatedAt { get; set; }
 
+        public virtual DateTime Date { get; set; }
+
         public virtual decimal Amount { get; set; }
 
         public virtual Guid CurrencyId { get; set; }

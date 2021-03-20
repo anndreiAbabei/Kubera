@@ -1,9 +1,26 @@
-span.bubble.asset-icon {
-  background-color: coral;
-  margin-right: .5em;
+@import '/src/static/scss/variables.scss';
 
+@mixin asset-component-theme($theme, $dark) {
+  $foreground: map-get($theme, foreground);
+
+  span.bubble.asset-icon {
+    background-color: coral;
+    margin-right: .5em;
+  }
+
+  .asset-code {
+    display: none;
+  }
+
+  .asset-icon, .asset-code, .asset-name {
+    color: mat-color($foreground, text);
+  }
 }
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: $xsmall-res) {
+  .asset-code.responsive {
+    display: initial;
+  }
+
   .asset-name.responsive {
     display: none;
   }

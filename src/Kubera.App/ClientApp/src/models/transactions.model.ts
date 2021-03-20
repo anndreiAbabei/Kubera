@@ -15,6 +15,7 @@ export class Transaction {
   assetId: string;
   wallet: string;
   createdAt: Date;
+  date: Date;
   amount: number;
   currencyId: string;
   rate: number;

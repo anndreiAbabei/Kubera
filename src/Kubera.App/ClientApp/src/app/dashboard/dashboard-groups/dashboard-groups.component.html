@@ -16,7 +16,7 @@
         </ng-container>
 
         <ng-container matColumnDef="total">
-          <th mat-header-cell class="right total" *matHeaderCellDef>Total</th>
+          <th mat-header-cell class="right total" *matHeaderCellDef>Invested</th>
           <td mat-cell class="right total" *matCellDef="let row">
             <app-currency [currency]="selectedCurrency" [amount]="row.total"></app-currency>
           </td>

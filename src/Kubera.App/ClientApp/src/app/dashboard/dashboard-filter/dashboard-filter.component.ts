@@ -12,7 +12,7 @@ import { GroupService } from 'src/services/group.service';
     styleUrls: ['./dashboard-filter.component.scss']
 })
 export class DashboardFilterComponent implements OnInit {
-  private applied = false;
+  public applied = false;
   public filterForm: FormGroup;
   public assets: Asset[];
   public groups: Group[];
@@ -67,16 +67,16 @@ export class DashboardFilterComponent implements OnInit {
     }
 
     if (asset.enabled) {
-      filter.assetId = asset.value;
+      filter.assetId = asset.value.id;
     }
 
     if (group.enabled) {
-      filter.groupId = group.value;
+      filter.groupId = group.value.id;
     }
 
     this.filterChanged.emit(filter);
 
-    this.applied = true;
+    this.applied = (from.enabled && to.enabled) || asset.enabled || group.enabled;
   }
 
   public setStatus(): void {
@@ -88,7 +88,7 @@ export class DashboardFilterComponent implements OnInit {
       from.enable();
       to.enable();
 
-      if (wasDisabled) {
+      if (wasDisabled && (!from.value || !to.value)) {
         this.dtp.open();
       }
     } else {
@@ -102,7 +102,7 @@ export class DashboardFilterComponent implements OnInit {
 
       asset.enable();
 
-      if (wasDisabled) {
+      if (wasDisabled && !asset.value) {
         this.selectAsset.open();
       }
     } else {
@@ -115,7 +115,7 @@ export class DashboardFilterComponent implements OnInit {
 
       group.enable();
 
-      if (wasDisabled) {
+      if (wasDisabled && !group.value) {
         this.selectGroup.open();
       }
     } else {

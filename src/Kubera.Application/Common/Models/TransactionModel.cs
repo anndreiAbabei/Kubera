@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Kubera.Application.Common.Models
 {
-    [DebuggerDisplay("Id: {Id}, Asset: {Asset.Name}, Wallet: {Wallet}, CreatedAt: {CreatedAt}, Amount: {Amount}, Currency: {Currency.Name}, Rate: {Rate}, Fee: {Fee}")]
+    [DebuggerDisplay("Id: {Id}, Asset: {Asset.Name}, Wallet: {Wallet}, CreatedAt: {CreatedAt}, Date: {Date}, Amount: {Amount}, Currency: {Currency.Name}, Rate: {Rate}, Fee: {Fee}")]
     public class TransactionModel
     {
         public Guid Id { get; set; }
@@ -13,6 +13,8 @@ namespace Kubera.Application.Common.Models
         public virtual string Wallet { get; set; }
 
         public virtual DateTime CreatedAt { get; set; }
+
+        public virtual DateTime Date { get; set; }
 
         public virtual decimal Amount { get; set; }
 

@@ -24,7 +24,7 @@ export class ThemeService {
   public update(scheme: string) {
       this.setColorScheme(scheme);
       // Remove the old color-scheme class
-      this.renderer.removeClass( document.body, this.colorSchemePrefix + (this.colorScheme === this.dark ? this.light: this.dark) );
+      this.renderer.removeClass(document.body, this.colorSchemePrefix + (this.colorScheme === this.dark ? this.light: this.dark) );
       // Add the new / current color-scheme class
       this.renderer.addClass(document.body, this.colorSchemePrefix + scheme);
   }

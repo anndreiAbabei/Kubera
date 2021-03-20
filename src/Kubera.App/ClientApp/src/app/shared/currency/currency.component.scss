@@ -1,4 +1,6 @@
-@mixin currency-theme($theme, $dark) {
+@import '/src/static/scss/variables.scss';
+
+@mixin currency-component-theme($theme, $dark) {
   $primary: map-get($theme, primary);
   $foreground: map-get($theme, foreground);
   $warn: map-get($theme, warn);
@@ -6,10 +8,12 @@
   span.currency-name, span.currency-symbol {
     display: none;
   }
+
   span.no-amount {
     color: mat-color($warn, text);
     margin-right: .3em;
   }
+
   span.bubble.currency-icon {
     background-color: lightgreen;
     margin-left: .5em;
@@ -21,15 +25,19 @@
     }
   }
 
+  .currency-icon, .currency-symbol, .currency-name, .amount {
+    color: mat-color($foreground, text);
+  }
+}
 
-  @media only screen and (max-width: 768px) {
-    div.responsive {
-      span.currency-symbol{
-        display: initial;
-      }
-      span.bubble.currency-icon {
-        display: none;
-      }
+
+@media only screen and (max-width: $xsmall-res) {
+  div.responsive {
+    span.currency-symbol{
+      display: initial;
+    }
+    span.bubble.currency-icon {
+      display: none;
     }
   }
 }

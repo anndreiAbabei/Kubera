@@ -28,6 +28,9 @@
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Asset</mat-label>
       <mat-select formControlName="asset">
+        <mat-select-trigger>
+          <app-asset [asset]="getSelectedAsset()" [forceShowName]="true"></app-asset>
+        </mat-select-trigger>
         <mat-option *ngFor="let asset of assets" [value]="asset.id">
           <app-asset [asset]="asset" [forceShowName]="true"></app-asset>
         </mat-option>
@@ -57,7 +60,7 @@
         <mat-label>Curency</mat-label>
         <mat-select formControlName="currency">
           <mat-option *ngFor="let currency of currencies" [value]="currency.id">
-            {{currency.name}}
+            <span class="text">{{currency.name}}</span>
           </mat-option>
         </mat-select>
         <mat-error *ngIf="addTransactionForm.get('currency').hasError('required')">
@@ -99,7 +102,7 @@
         <mat-label>Fee curency</mat-label>
         <mat-select formControlName="feeCurrency">
           <mat-option *ngFor="let currency of currencies" [value]="currency.id">
-            {{currency.name}}
+            <span class="text">{{currency.name}}</span>
           </mat-option>
         </mat-select>
         <mat-error *ngIf="addTransactionForm.get('feeCurrency').hasError('required')">

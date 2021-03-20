@@ -14,7 +14,7 @@ namespace Kubera.Application.Common.Models
         public virtual string Wallet { get; set; }
 
         [Required]
-        public virtual DateTime CreatedAt { get; set; }
+        public virtual DateTime Date { get; set; }
 
         [Required]
         public virtual decimal Amount { get; set; }

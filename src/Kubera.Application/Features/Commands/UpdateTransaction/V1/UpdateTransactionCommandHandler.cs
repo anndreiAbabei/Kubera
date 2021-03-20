@@ -39,6 +39,7 @@ namespace Kubera.Application.Features.Commands.UpdateTransaction.V1
             transaction.AssetId = request.Input.AssetId;
             transaction.Wallet = request.Input.Wallet;
             transaction.Amount = request.Input.Amount;
+            transaction.Date = request.Input.Date;
             transaction.CurrencyId = request.Input.CurrencyId;
             transaction.Rate = request.Input.Rate;
             transaction.Fee = request.Input.Fee;

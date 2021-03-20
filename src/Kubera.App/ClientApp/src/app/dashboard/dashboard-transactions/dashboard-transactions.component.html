@@ -11,8 +11,8 @@
             Created
           </th>
           <td mat-cell *matCellDef="let row" class="createdAt">
-            <span class="date">{{row.createdAt | date: 'mediumDate'}}</span>
-            <span class="date-short">{{row.createdAt | date: 'shortDate'}}</span>
+            <span class="date">{{row.date | date: 'mediumDate'}}</span>
+            <span class="date-short">{{row.date | date: 'MM/dd/yy'}}</span>
           </td>
         </ng-container>
 

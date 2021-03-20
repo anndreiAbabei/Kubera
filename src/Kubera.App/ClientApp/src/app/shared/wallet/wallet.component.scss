@@ -1,9 +1,19 @@
-span.bubble.wallet-icon {
-  background-color: lightseagreen;
-  border-radius: 5px;
-  margin-right: .5em;
+@import '/src/static/scss/variables.scss';
 
-  @media only screen and (max-width: 768px) {
-    display: none;
+@mixin wallet-component-theme($theme, $dark) {
+  $foreground: map-get($theme, foreground);
+
+  .wallet-icon, .wallet-name {
+    color: mat-color($foreground, text);
+  }
+
+  span.bubble.wallet-icon {
+    background-color: lightseagreen;
+    border-radius: 5px;
+    margin-right: .5em;
+
+    @media only screen and (max-width: $xsmall-res) {
+      display: none;
+    }
   }
 }

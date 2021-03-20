@@ -1,3 +1,5 @@
+@import '/src/static/scss/variables.scss';
+
 .main {
   display: grid;
   height: calc(100vh - 5rem);
@@ -6,7 +8,7 @@
   grid-gap: 1em;
   grid-template-areas: 'filter filter' 'transactions assets' 'transactions groups' 'footer footer ';
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: $mobile-res) {
     height: calc(100vh - 5rem);
     grid-template-columns: 1fr;
     grid-template-rows: auto 1fr 1fr 2fr auto;

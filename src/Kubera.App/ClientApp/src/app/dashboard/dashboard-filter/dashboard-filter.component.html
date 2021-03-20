@@ -21,8 +21,11 @@
       <mat-form-field class="filter-field" appearance="fill">
         <mat-label>Asset</mat-label>
         <mat-select formControlName="asset" #selectAsset>
-          <mat-option *ngFor="let asset of assets" [value]="asset.id">
-            <app-asset [asset]="asset"></app-asset>
+          <mat-select-trigger>
+            <app-asset [asset]="filterForm.get('asset').value" [forceShowName]="true"></app-asset>
+          </mat-select-trigger>
+          <mat-option *ngFor="let asset of assets" [value]="asset">
+            <app-asset [asset]="asset" [forceShowName]="true"></app-asset>
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -33,7 +36,7 @@
       <mat-form-field class="filter-field" appearance="fill">
         <mat-label>Group</mat-label>
         <mat-select formControlName="group" #selectGroup>
-          <mat-option *ngFor="let group of groups" [value]="group.id">
+          <mat-option *ngFor="let group of groups" [value]="group">
             {{group.name}}
           </mat-option>
         </mat-select>
@@ -41,7 +44,7 @@
     </div>
 
     <div class="actions">
-      <button mat-flat-button class="left hide-filter icon-button" (click)="collapsed = !collapsed" aria-label="Hide filter">
+      <button mat-flat-button class="left hide-filter icon-button" [ngClass]="{'active': applied}" (click)="collapsed = !collapsed" aria-label="Hide filter">
         <mat-icon class="collapse-icon">expand_less</mat-icon>
         <mat-icon class="expand-icon">expand_more</mat-icon>
         <span class="icon-button-text">Filter</span>

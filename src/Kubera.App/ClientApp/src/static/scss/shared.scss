@@ -23,6 +23,22 @@
   }
 }
 
+.mat-select-disabled span.bubble {
+  &, & ~ span {
+    opacity: 35%;
+  }
+}
+
+// .color-scheme-dark
+
+// .color-scheme-light .mat-select-disabled span.bubble {
+//   color: lightgray;
+//   background-color: gray;
+//   & ~ span {
+//     color: gray;
+//   }
+// }
+
 //hack
 .pushed-left .currency-component {
   margin-left: -0.5em;

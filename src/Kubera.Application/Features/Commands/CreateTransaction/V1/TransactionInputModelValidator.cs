@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Kubera.Application.Common.Models;
+using System;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 {
@@ -14,8 +15,9 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(m => m.CreatedAt)
-                .NotEmpty();
+            RuleFor(m => m.Date)
+                .NotEmpty()
+                .LessThan(DateTime.Now.AddDays(1));
 
             RuleFor(m => m.Amount)
                 .NotEqual(0m);

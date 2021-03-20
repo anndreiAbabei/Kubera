@@ -5,7 +5,7 @@
         <app-currency [currency]="selectedCurrency" [hideAmount]="true" [forceBuble]="true" class="pushed-left"></app-currency>
       </mat-select-trigger>
       <mat-option *ngFor="let currency of currencies" [value]="currency.id">
-        {{currency.name}}
+        <span class="text">{{currency.name}}</span>
       </mat-option>
     </mat-select>
   </mat-form-field>

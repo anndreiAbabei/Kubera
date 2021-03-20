@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Kubera.Application.Common.Extensions;
 using Kubera.Application.Common.Caching;
+using System;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1
 {
@@ -47,7 +48,8 @@ namespace Kubera.Application.Features.Commands.CreateTransaction.V1
             {
                 AssetId = request.Input.AssetId,
                 Wallet = request.Input.Wallet,
-                CreatedAt = request.Input.CreatedAt,
+                CreatedAt = DateTime.UtcNow,
+                Date = request.Input.Date,
                 Amount = request.Input.Amount,
                 CurrencyId = request.Input.CurrencyId,
                 Rate = request.Input.Rate,

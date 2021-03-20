@@ -1,4 +1,6 @@
-﻿.no-item {
+﻿@import '/src/static/scss/variables.scss';
+
+.no-item {
     text-align: center;
     color: gray;
     margin-top: 1em;
@@ -52,11 +54,41 @@
         text-align: end;
       }
 
-      @media only screen and (max-width: 768px) {
+      &.menu {
+        padding-left: .5em;
+      }
+
+      &.menu, &.menu button {
+        width: 3em;
+      }
+
+      @media only screen and (max-width: $small-res) {
+        &.action,
+        &.wallet,
+        &.fee {
+          display: none
+        }
+
+        &.menu {
+          padding-left: 0;
+        }
+
+        &.menu, &.menu button {
+          width: 2em;
+        }
+      }
+
+      @media only screen and (max-width: $mobile-res) {
         &.group,
         &.wallet,
-        &.action {
+        &.action,
+        &.rate,
+        &.fee {
             display: none
+        }
+
+        &.menu {
+          padding-left: 0;
         }
 
         &.menu, &.menu button {
@@ -71,7 +103,7 @@
   display: none;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: $xsmall-res) {
   .date {
     display: none;
   }

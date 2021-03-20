@@ -1,8 +1,10 @@
+@import '/src/static/scss/variables.scss';
+
 .percent::before {
   float: left;
   padding-left: 1em;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: $xsmall-res) {
     display: none;
   }
 }
@@ -25,7 +27,7 @@
 
 @import "./src/static/scss/shared";
 
-@mixin percent-theme($theme, $dark) {
+@mixin percent-component-theme($theme, $dark) {
   .bad-100, .bad-50, .bad-10  {
     @include shared-theme-red($dark)
   }

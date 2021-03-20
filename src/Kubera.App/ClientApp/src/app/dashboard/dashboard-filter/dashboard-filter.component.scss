@@ -1,7 +1,9 @@
-﻿.content > form {
+﻿@import '/src/static/scss/variables.scss';
+
+.content > form {
   padding: .5em 2em 0 2em;
 
-  @media only screen and (max-width: 768px) {
+  @media only screen and (max-width: $xsmall-res) {
     padding: .5em 1em;
 
     .collapse-icon {
@@ -44,7 +46,7 @@
   .filter-group {
     display: inline;
 
-    @media only screen and (max-width: 768px) {
+    @media only screen and (max-width: $xsmall-res) {
       display: flex;
       flex-flow: row;
       align-items: center;
@@ -75,9 +77,13 @@
 
     .hide-filter {
       display: none;
+
+      &.active {
+        border: 1px solid greenyellow;
+      }
     }
 
-    @media only screen and (max-width: 768px) {
+    @media only screen and (max-width: $xsmall-res) {
       padding-top: 0;
       padding-bottom: .5em;
       width: 100%;

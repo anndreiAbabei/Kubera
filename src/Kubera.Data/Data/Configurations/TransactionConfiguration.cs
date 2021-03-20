@@ -13,6 +13,7 @@ namespace Kubera.Data.Data.Configurations
 
             builder.Property(t => t.Wallet).IsRequired().HasMaxLength(Constraints.Length.Transaction.Wallet);
             builder.Property(t => t.CreatedAt).IsRequired().HasDefaultValueSql(Constraints.SQL.Default.GetUtcDate);
+            builder.Property(t => t.Date).IsRequired();
             builder.Property(t => t.Amount).IsRequired().HasPrecision(38, 8);
             builder.Property(t => t.Rate).IsRequired().HasPrecision(38, 8);
             builder.Property(t => t.Fee).IsRequired(false).HasPrecision(38, 8);

@@ -80,7 +80,7 @@ export class DashboardEditTransactionComponent implements OnInit {
     }
 
     if (this.transaction) {
-      this.addTransactionForm.get('date').setValue(this.transaction.createdAt);
+      this.addTransactionForm.get('date').setValue(this.transaction.date);
       this.addTransactionForm.get('asset').setValue(this.transaction.assetId);
       this.addTransactionForm.get('wallet').setValue(this.transaction.wallet);
       this.addTransactionForm.get('amount').setValue(this.transaction.amount);
@@ -118,6 +118,10 @@ export class DashboardEditTransactionComponent implements OnInit {
     }
   }
 
+  public getSelectedAsset(): Asset {
+    return this.assets.find(a => a.id === this.addTransactionForm.get('asset').value);
+  }
+
   public save(): void {
     if (!this.addTransactionForm.valid) {
       return;
@@ -134,7 +138,10 @@ export class DashboardEditTransactionComponent implements OnInit {
       rate = rate / amount;
     }
 
-    this.transaction.createdAt = this.addTransactionForm.get('date').value;
+    const date: Date = this.addTransactionForm.get('date').value;
+    const utcDate = Date.UTC(date.getFullYear(), date.getMonth(), date.getUTCDay(), 12);
+                                                // timezones are awful :(
+    this.transaction.date = new Date(utcDate - date.getTimezoneOffset() * 60000);
     this.transaction.assetId = this.addTransactionForm.get('asset').value;
     this.transaction.wallet = this.addTransactionForm.get('wallet').value;
     this.transaction.amount = amount;

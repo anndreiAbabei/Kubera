@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +33,8 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   constructor(private readonly transactionService: TransactionsService,
     private readonly modalService: NgbModal,
     private readonly errorHandlerService: ErrorHandlerService,
-    private readonly eventService: EventService) {  }
+    private readonly eventService: EventService,
+    private readonly chDetRef: ChangeDetectorRef) {  }
 
   public async ngAfterViewInit(): Promise<void> {
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
@@ -66,8 +67,9 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
     try {
       this.isLoadingResults = true;
       const t = await this.transactionService.create(result).toPromise();
-      this.transactions.push(t);
+      this.transactions = [t, ...this.transactions];
       this.eventService.updateTransaction.emit(t);
+      this.chDetRef.markForCheck();
     } catch (ex) {
       this.errorHandlerService.handle(ex);
     } finally {
@@ -115,7 +117,7 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
       return;
     }
 
-    const answer = confirm(`Are you sure you want to remove ${transaction.action} transaction of ${transaction.amount} ${transaction.asset.code} from ${transaction.createdAt}?`);
+    const answer = confirm(`Are you sure you want to remove ${transaction.action} transaction of ${transaction.amount} ${transaction.asset.code} from ${transaction.date}?`);
 
     if (!answer) {
       return;
