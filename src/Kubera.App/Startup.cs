@@ -36,7 +36,6 @@ using Kubera.Business.Entities;
 using Kubera.Data.Data;
 using Kubera.General.Defaults;
 using Kubera.App.Infrastructure.Environment;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -46,7 +45,7 @@ namespace Kubera.App
 {
     public class Startup
     {
-        private const string CorsPolicy = "_KUBERA_API_CORS";
+        private const string _corsPolicy = "_KUBERA_API_CORS";
 
         public Startup(IConfiguration configuration)
         {
@@ -95,7 +94,7 @@ namespace Kubera.App
             app.UseRouting();
 
             if (settings.Cors != null)
-                app.UseCors(CorsPolicy);
+                app.UseCors(_corsPolicy);
 
             app.UseAuthentication();
             app.UseIdentityServer();
@@ -180,7 +179,7 @@ namespace Kubera.App
 
             services.AddCors(options =>
             {
-                options.AddPolicy(CorsPolicy, builder =>
+                options.AddPolicy(_corsPolicy, builder =>
                 {
                     builder.WithOrigins(settings.Cors.Origins.ToArray());
 
