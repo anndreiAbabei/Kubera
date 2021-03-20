@@ -7,7 +7,7 @@ namespace Kubera.App.IntegrationTests.TestData
         where T2 : class
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly Type StringType = typeof(string);
+        private static readonly Type _stringType = typeof(string);
 
         public virtual bool AreEqual(T1 t1, T2 t2)
         {
@@ -38,9 +38,9 @@ namespace Kubera.App.IntegrationTests.TestData
                     if (!AreEqualInt(value1, value2))
                         return false;
                 }
-                else if (typeProp1 == StringType)
+                else if (typeProp1 == _stringType)
                 {
-                    if (typeProp2 != StringType)
+                    if (typeProp2 != _stringType)
                         return false;
 
                     if (!AreEqualInt(value1, value2))

@@ -10,7 +10,7 @@ namespace Kubera.Business.Services
     public class CacheService : ICacheService
     {
         private readonly ILogger<CacheService> _logger;
-        private static readonly MemoryCache MemoryCache = MemoryCache.Default;
+        private static readonly MemoryCache _memoryCache = MemoryCache.Default;
 
         private readonly CacheItemPolicy _defaultCachePolicy = new CacheItemPolicy
         {
@@ -58,7 +58,7 @@ namespace Kubera.Business.Services
 
             _logger.LogTrace(evId, $"Try get [{key}] from cache of type [{typeof(T).FullName}]");
 
-            if (MemoryCache.Get(key) is not CachedEntity<T> entity)
+            if (_memoryCache.Get(key) is not CachedEntity<T> entity)
             {
                 _logger.LogTrace(evId, $"Key [{key}] not found in cache, returns default");
                 return default;
@@ -79,7 +79,7 @@ namespace Kubera.Business.Services
         public virtual void RemoveAll<T>()
         {
             _logger.LogTrace($"Removing all [{typeof(T).FullName}] from cache");
-            var keysToRemve = MemoryCache.Where(kvp => kvp.Value is CachedEntity<T>)
+            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity<T>)
                                           .Select(kvp => kvp.Key)
                                           .ToList();
 
@@ -90,7 +90,7 @@ namespace Kubera.Business.Services
         public void RemoveRegion(string region)
         {
             _logger.LogTrace($"Removing region [{region}] from cache");
-            var keysToRemve = MemoryCache.Where(kvp => kvp.Value is CachedEntity ce && ce.Regions.Contains(region))
+            var keysToRemve = _memoryCache.Where(kvp => kvp.Value is CachedEntity ce && ce.Regions.Contains(region))
                                           .Select(kvp => kvp.Key)
                                           .ToList();
 
@@ -102,7 +102,7 @@ namespace Kubera.Business.Services
         public virtual void Clear()
         {
             _logger.LogTrace("Clear cache");
-            MemoryCache.Trim(100);
+            _memoryCache.Trim(100);
         }
 
         protected virtual string CreateKey<T>(string key) => $"{typeof(T).FullName}[{key}]";
@@ -112,12 +112,12 @@ namespace Kubera.Business.Services
             key = CreateKey<T>(key);
             
             _logger.LogTrace($"Adding [{key}] to cache, at regions [{regions.Join()}], of type [{typeof(T).FullName}]");
-            MemoryCache.Add(key, new CachedEntity<T>(entity, regions), _defaultCachePolicy);
+            _memoryCache.Add(key, new CachedEntity<T>(entity, regions), _defaultCachePolicy);
         }
 
         private static string CreateCacheTokenKey<T>() => typeof(T).FullName;
 
-        private static void RemoveExpiredEntity(string key) => MemoryCache.Remove(key, CacheEntryRemovedReason.Removed);
+        private static void RemoveExpiredEntity(string key) => _memoryCache.Remove(key, CacheEntryRemovedReason.Removed);
 
         private class CachedEntity
         {

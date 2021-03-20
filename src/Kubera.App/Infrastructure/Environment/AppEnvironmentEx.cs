@@ -5,9 +5,9 @@ namespace Kubera.App.Infrastructure.Environment
 {
     public static class AppEnvironmentEx
     {
-        private const string Developement = "Development";
-        private const string UAT = "UAT";
-        private const string Production = "Production";
+        private const string _developement = "Development";
+        private const string _uat = "UAT";
+        private const string _production = "Production";
 
 
         public static AppEnvironment GetAppEnvironment(this IConfiguration configuration)
@@ -15,9 +15,9 @@ namespace Kubera.App.Infrastructure.Environment
             var env = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT");
             return env switch
             {
-                Developement => AppEnvironment.Developement,
-                UAT => AppEnvironment.UAT,
-                Production => AppEnvironment.Production,
+                _developement => AppEnvironment.Developement,
+                _uat => AppEnvironment.UAT,
+                _production => AppEnvironment.Production,
                 _ => throw new InvalidOperationException($"Invalid environment <{env}>")
             };
         }

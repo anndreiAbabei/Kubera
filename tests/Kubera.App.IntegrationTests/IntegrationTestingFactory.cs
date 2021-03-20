@@ -1,7 +1,9 @@
 ﻿using System;
 using Bogus;
+using Kubera.App.IntegrationTests.Mock;
 using Kubera.General;
 using Kubera.General.Services;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Kubera.App.IntegrationTests
@@ -40,5 +42,7 @@ namespace Kubera.App.IntegrationTests
 
             return faker.Generate();
         }
+
+        public virtual ILogger<T> Logger<T>() => new TestLogger<T>();
     }
 }

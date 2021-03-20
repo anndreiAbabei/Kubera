@@ -21,9 +21,9 @@ namespace Kubera.Business.Services
         private readonly IAppSettings _appSettings;
         private readonly ICacheService _cacheService;
         private readonly ILogger<AlphaVantageService> _logger;
-        private const string FunctionExchange = "CURRENCY_EXCHANGE_RATE";
-        private const string FunctionStock = "TIME_SERIES_INTRADAY";
-        private const string FunctionOverviewCompany = "OVERVIEW";
+        private const string _functionExchange = "CURRENCY_EXCHANGE_RATE";
+        private const string _functionStock = "TIME_SERIES_INTRADAY";
+        private const string _functionOverviewCompany = "OVERVIEW";
 
         public AlphaVantageService(HttpClient httpClient,
             IAppSettings appSettings,
@@ -108,7 +108,7 @@ namespace Kubera.Business.Services
         {
             var qs = new
             {
-                function = FunctionExchange,
+                function = _functionExchange,
                 from_currency = fromCode,
                 to_currency = toCode,
                 apikey = _appSettings.AlphaVantageApiKey
@@ -145,7 +145,7 @@ namespace Kubera.Business.Services
         {
             var qs = new
             {
-                function = FunctionStock,
+                function = _functionStock,
                 symbol = stock,
                 interval = "5min",
                 apikey = _appSettings.AlphaVantageApiKey
@@ -191,7 +191,7 @@ namespace Kubera.Business.Services
         {
             var qs = new
             {
-                function = FunctionOverviewCompany,
+                function = _functionOverviewCompany,
                 symbol = company,
                 apikey = _appSettings.AlphaVantageApiKey
             };

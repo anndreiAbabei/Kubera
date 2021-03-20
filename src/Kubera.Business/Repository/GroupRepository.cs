@@ -26,7 +26,7 @@ namespace Kubera.Business.Repository
         public async ValueTask<Group> GetByCode(string code, CancellationToken cancellationToken = default)
         {
             return await GetAll()
-                .FirstOrDefaultAsync(g => g.Code == code)
+                .FirstOrDefaultAsync(g => g.Code == code, cancellationToken)
                 .ConfigureAwait(false);
         }
 

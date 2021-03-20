@@ -160,7 +160,7 @@ namespace Kubera.App
             services.AddHttpClient<IEmailSender, MailjetMailSender>();
         }
 
-        private void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)
+        private static void ConfigureIdentityServer(IdentityServerOptions options, IAppSettings settings)
         {
             if (settings.Autorisation == null)
                 return;
