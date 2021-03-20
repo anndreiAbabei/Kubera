@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Kubera.Application.Common.Extensions;
-using System.Collections.Generic;
 using Kubera.Application.Common.Caching;
 
 namespace Kubera.Application.Features.Commands.CreateTransaction.V1

@@ -1,4 +1,5 @@
 ﻿using Kubera.General.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Kubera.Business.Services
 {
@@ -8,7 +9,8 @@ namespace Kubera.Business.Services
 
         public string UserId => _userIdAccesor.Id;
 
-        public UserCacheService(IUserIdAccesor userIdAccesor)
+        public UserCacheService(IUserIdAccesor userIdAccesor, ILogger<UserCacheService> logger)
+            : base(logger)
         {
             _userIdAccesor = userIdAccesor;
         }
