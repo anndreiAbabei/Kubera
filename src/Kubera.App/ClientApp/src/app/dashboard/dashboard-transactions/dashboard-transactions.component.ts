@@ -54,7 +54,7 @@ export class DashboardTransactionsComponent implements AfterViewInit, OnChanges,
   }
 
   public ngOnDestroy(): void {
-    this.eventService.transactions.unsubscribe();
+    // this.eventService.transactions.unsubscribe();
   }
 
   public async addTransaction(): Promise<void> {

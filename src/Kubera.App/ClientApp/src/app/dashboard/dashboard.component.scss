@@ -2,17 +2,16 @@
 
 .main {
   display: grid;
-  height: calc(100vh - 5rem);
-  grid-template-rows: auto 1fr 1fr auto;
+  height: 100%;
+  grid-template-rows: auto 1fr 1fr;
   grid-template-columns: 1.5fr 1fr;
   grid-gap: 1em;
-  grid-template-areas: 'filter filter' 'transactions assets' 'transactions groups' 'footer footer ';
+  grid-template-areas: 'filter filter' 'transactions assets' 'transactions groups';
 
   @media only screen and (max-width: $mobile-res) {
-    height: calc(100vh - 5rem);
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr 1fr 2fr auto;
-    grid-template-areas: 'filter' 'assets' 'groups' 'transactions' 'footer';
+    grid-template-rows: auto 1fr 1fr 2fr;
+    grid-template-areas: 'filter' 'assets' 'groups' 'transactions';
 
     & > div {
       max-width: calc(100vw - 30px);
@@ -33,12 +32,5 @@
 
   .groups {
     grid-area: groups
-  }
-
-  .footer {
-    grid-area: footer;
-    box-shadow: 0rem .65rem .75rem 1.5em rgba(0, 0, 0, .05);
-    background-color: rgba(0, 0, 0, 0.05);
-    border-top: 1px solid rgba(0, 0, 0, .2);
   }
 }
