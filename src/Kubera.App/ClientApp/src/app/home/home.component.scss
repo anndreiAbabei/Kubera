@@ -1,1 +1,31 @@
-﻿
+﻿@import '/src/static/scss/variables.scss';
+
+.root {
+  height: 100%;
+  background-image: url('/assets/img/dark_home_bg2_x1.png');
+  background-size: 50vmin 50vmin;
+  background-repeat: no-repeat;
+  background-position: 25% center;
+  padding-left: calc(50vmin + 25%);
+  padding-top: 20vh;
+
+  @media only screen and (max-width: $xsmall-res) {
+    background-image: url('/assets/img/dark_home_bg2_x2.png');
+    padding-top: 15vh;
+    padding-left: 1em;
+    background-position: 100% 100%;
+  }
+
+  @media only screen and (max-width: $mobile-res) {
+    background-image: url('/assets/img/dark_home_bg2_x3.png');
+  }
+
+  h1 {
+    font-size: 46px;
+    line-height: 1em;
+
+    span {
+      color: #ffd740
+    }
+  }
+}
