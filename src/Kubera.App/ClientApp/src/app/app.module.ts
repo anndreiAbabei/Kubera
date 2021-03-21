@@ -58,6 +58,7 @@ import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { HomeComponent } from './home/home.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { FooterComponent } from './footer/footer.component';
 
 
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -77,6 +78,7 @@ import { CurrencySelectorComponent } from './shared/currency-selector/currency-s
   declarations: [
     AppComponent,
     NavMenuComponent,
+    FooterComponent,
     DashboardComponent,
     HomeComponent,
     DashboardAssetsComponent,
