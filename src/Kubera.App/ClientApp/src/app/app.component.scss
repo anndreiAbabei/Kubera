@@ -1,0 +1,18 @@
+.root {
+  display: flex;
+  flex-flow: column;
+  max-height: 100vh;
+  height: 100vh;
+
+  .nav-bar {
+    flex: 0 1 auto;
+  }
+
+  .main {
+    flex: 1 1 auto;
+  }
+
+  .footer {
+    flex: 0 1 auto;
+  }
+}
