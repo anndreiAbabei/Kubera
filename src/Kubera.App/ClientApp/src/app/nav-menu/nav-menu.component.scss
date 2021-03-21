@@ -1,3 +1,5 @@
+@import '/src/static/scss/variables.scss';
+
 @mixin nav-bar-theme($theme) {
   $accent: map-get($theme, accent);
   $background: map-get($theme, background);
@@ -14,7 +16,10 @@
   a.navbar-brand {
     white-space: normal;
     text-align: center;
-    word-break: break-all;
+
+    @media only screen and (max-width: $small-res) {
+      text-align: start;
+    }
   }
 
   .box-shadow {
@@ -57,4 +62,5 @@ html {
 .version {
   margin-left: .2rem;
   font-size: .7rem;
+  word-break: keep-all;
 }
