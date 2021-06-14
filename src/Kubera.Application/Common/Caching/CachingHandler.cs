@@ -39,6 +39,7 @@ namespace Kubera.Application.Common.Caching
                 {
                     request.CompletedFromCache = true;
                     OnGotFromCache(existing, code);
+
                     return Result.Success(existing);
                 }
             }
