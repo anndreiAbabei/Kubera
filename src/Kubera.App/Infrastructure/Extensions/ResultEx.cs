@@ -2,6 +2,7 @@
 using Kubera.Application.Common.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using IResult = CSharpFunctionalExtensions.IResult;
 
 namespace Kubera.App.Infrastructure.Extensions
 {

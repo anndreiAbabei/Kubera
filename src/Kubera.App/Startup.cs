@@ -214,7 +214,7 @@ namespace Kubera.App
                 options.GroupNameFormat = "VVV";
                 options.SubstituteApiVersionInUrl = true;
             })
-            .AddSingleton<FluentValidationSchemaProcessor>()
+            .AddScoped<FluentValidationSchemaProcessor>()
             .AddSwaggerDocument((settings, sp) => GenerateSwaggerDocument(settings, sp, "v1", "1"));
 
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true)
